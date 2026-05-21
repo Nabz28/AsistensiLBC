@@ -28,6 +28,7 @@
   var meta = COURSE.meta || {};
   var units = COURSE.units || [];
   var glossary = COURSE.glossary || [];
+  var exams = COURSE.exams || [];
 
   // ---- language ------------------------------------------------------------
   var LANG_KEY = 'lbc-lang';
@@ -58,6 +59,8 @@
       notes: 'Notes', formulas: 'Formulas', graphs: 'Graphs', quiz: 'Quiz',
       reveal: 'Reveal answer', hide: 'Hide answer', worked: 'Worked answer', filter: 'Filter terms…',
       back: 'Back to overview', examPrep: 'Exam prep', noWeeks: 'No weeks yet',
+      pastExams: 'Past Exams', mcq: 'Multiple choice', essay: 'Essay', no: 'No.',
+      examsIntro: 'Past UAS papers, worked 1:1 — open a question, then reveal the answer.',
       empty: function (l) { return l + ' for this week will be added soon.'; },
       emptyT: function (l) { return 'No ' + l.toLowerCase() + ' yet'; } },
     id: { all: '‹ Semua mata kuliah', overview: 'Ringkasan', glossary: 'Glosarium', weeks: 'Minggu',
@@ -65,6 +68,8 @@
       notes: 'Catatan', formulas: 'Rumus', graphs: 'Grafik', quiz: 'Kuis',
       reveal: 'Lihat jawaban', hide: 'Sembunyikan jawaban', worked: 'Pembahasan', filter: 'Cari istilah…',
       back: 'Kembali ke ringkasan', examPrep: 'Persiapan ujian', noWeeks: 'Belum ada minggu',
+      pastExams: 'Soal UAS', mcq: 'Pilihan ganda', essay: 'Esai', no: 'No.',
+      examsIntro: 'Soal UAS tahun-tahun lalu, dibahas 1:1 — buka soal, lalu tampilkan jawabannya.',
       empty: function (l) { return l + ' untuk minggu ini akan segera ditambahkan.'; },
       emptyT: function (l) { return 'Belum ada ' + l.toLowerCase(); } }
   };
@@ -162,6 +167,7 @@
     units.forEach(function (u) {
       items.push({ key: 'unit/' + u.id, label: t(u.label) || t(u.title), doneId: u.id });
     });
+    if (exams.length) items.push({ key: 'exams', label: S('pastExams') });
     if (glossary.length) items.push({ key: 'glossary', label: S('glossary') });
 
     nav.innerHTML = '';
@@ -352,6 +358,55 @@
     });
   }
 
+  function chartHTML(spec) { return spec && window.EconChart ? window.EconChart(spec) : ''; }
+
+  function examQuestionHTML(q) {
+    var h = '<div class="exam-qbody">';
+    h += '<div class="exam-qtext">' + t(q.q) + '</div>';
+    if (q.options) {
+      var opts = q.options[lang] || q.options.en || [];
+      if (opts.length) { h += '<ul class="exam-opts">'; opts.forEach(function (o) { h += '<li>' + o + '</li>'; }); h += '</ul>'; }
+    }
+    h += chartHTML(q.qChart);
+    h += '<button class="exam-reveal qz-reveal">' + S('reveal') + '</button>';
+    h += '<div class="exam-answer qz-answer"><h5>' + S('worked') + '</h5>';
+    if (q.answer) h += '<div class="exam-ans">' + t(q.answer) + '</div>';
+    if (q.working) h += t(q.working);
+    h += chartHTML(q.aChart);
+    h += '</div></div>';
+    return h;
+  }
+
+  function viewExams() {
+    var h = '<div class="eyebrow">' + S('pastExams') + '</div><h1 class="ov-title">' + S('pastExams') + '</h1>' +
+      '<p class="ov-sub">' + S('examsIntro') + '</p>';
+    exams.forEach(function (ex) {
+      h += '<details class="exam-year"><summary>' + (t(ex.label) || ('UAS ' + ex.year)) + '</summary><div class="exam-year-body">';
+      if (ex.note) h += '<div class="note">' + t(ex.note) + '</div>';
+      (ex.sections || []).forEach(function (sec) {
+        var secLabel = t(sec.label) || (sec.kind === 'mcq' ? S('mcq') : S('essay'));
+        var qs = sec.questions || [];
+        h += '<details class="exam-sec"><summary>' + secLabel + '<span class="exam-count">' + qs.length + '</span></summary><div class="exam-sec-body">';
+        qs.forEach(function (q) {
+          var stem = t(q.q).replace(/<[^>]+>/g, '').replace(/\$[^$]*\$/g, '').trim().slice(0, 64);
+          h += '<details class="exam-q"><summary><b>' + S('no') + ' ' + q.n + '</b> <span class="exam-stem">' + stem + '…</span></summary>' +
+            examQuestionHTML(q) + '</details>';
+        });
+        h += '</div></details>';
+      });
+      h += '</div></details>';
+    });
+    view.innerHTML = h;
+    renderMath(view);
+    view.querySelectorAll('.exam-reveal').forEach(function (b) {
+      b.onclick = function () {
+        var a = b.nextElementSibling;
+        var open = a.classList.toggle('open');
+        b.textContent = open ? S('hide') : S('reveal');
+      };
+    });
+  }
+
   function viewGlossary() {
     var groups = {};
     glossary.forEach(function (term) {
@@ -398,6 +453,8 @@
       var id = rest[0], seg = rest[1] || 'notes';
       active = 'unit/' + id;
       viewUnit(id, seg);
+    } else if (hash.indexOf('exams') === 0 && exams.length) {
+      active = 'exams'; viewExams();
     } else if (hash === 'glossary' && glossary.length) {
       active = 'glossary'; viewGlossary();
     } else {

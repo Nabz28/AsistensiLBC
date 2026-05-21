@@ -43,6 +43,11 @@
 
     units: order.map(function (k) { return W[k]; }).filter(Boolean),
 
+    exams: (function () {
+      var E = window.PE2_EXAMS || {};
+      return ['2019', '2022', '2023', '2024', '2025'].map(function (y) { return E[y]; }).filter(Boolean);
+    })(),
+
     glossary: (window.PE2_GLOSSARY || [])
   };
 })();

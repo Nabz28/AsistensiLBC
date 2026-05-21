@@ -169,6 +169,30 @@ a{color:inherit}
 .econ-panel svg{display:block;margin:0 auto}
 .econ-cap{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center;
   margin-top:6px;letter-spacing:.02em}
+
+/* Past Exams — nested accordions */
+.exam-year,.exam-sec,.exam-q{border:1px solid var(--line);border-radius:9px;margin:9px 0;overflow:hidden}
+.exam-year{background:var(--paper)}
+.exam-year>summary{font-weight:700;font-size:15px;padding:13px 15px}
+.exam-sec{margin:9px 0;background:var(--paper-2)}
+.exam-sec>summary{font-weight:600;font-size:13px;color:var(--ink-2);padding:10px 13px}
+.exam-q{background:var(--paper)}
+.exam-q>summary{font-size:13px;color:var(--ink-2);padding:9px 13px}
+summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+.exam-year>summary::before,.exam-sec>summary::before,.exam-q>summary::before{
+  content:'\25B8';color:var(--accent);font-size:11px;transition:transform .12s;flex:none}
+details[open]>summary::before{transform:rotate(90deg)}
+.exam-year-body,.exam-sec-body{padding:2px 13px 12px}
+.exam-qbody{padding:10px 14px 16px;border-top:1px solid var(--line)}
+.exam-qtext{font-size:14px;line-height:1.65;margin-bottom:10px}
+.exam-opts{list-style:none;padding:0;margin:0 0 12px}
+.exam-opts li{padding:3px 0;font-size:13.5px;line-height:1.5}
+.exam-stem{color:var(--ink-3);font-weight:400;font-size:12.5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.exam-count{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto;
+  background:var(--paper-3);padding:1px 9px;border-radius:99px;flex:none}
+.exam-reveal{margin-top:4px}
+.exam-ans{font-size:14px;line-height:1.65}
 .btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:99px;
   border:1px solid var(--line-2);background:var(--paper);color:var(--ink-2);cursor:pointer;transition:all .14s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
