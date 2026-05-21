@@ -21,4 +21,7 @@ desktop.ini
 *.log
 .vercel
 
-.vercel
+# ─── Source course materials (NOT for the public repo / deploy) ────
+# Raw lecture decks, past exams, and ANSWER KEYS. Used locally to author
+# course content; must never be committed or deployed publicly.
+PE-2/
