@@ -92,6 +92,12 @@ body{
 h1{font-family:'Inter';font-weight:200;font-size:clamp(42px,6vw,84px);line-height:.96;letter-spacing:-.035em;color:#fff;margin-top:14px}
 h1 b{font-weight:600;background:linear-gradient(120deg,var(--cyan) 0%,var(--blue) 45%,var(--amber) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{margin-top:16px;color:var(--dim);font-size:14.5px;font-weight:300;letter-spacing:.03em;max-width:580px;line-height:1.55}
+.handle{display:inline-block;margin-top:14px;color:#fff;font-weight:700;font-size:15px;
+  letter-spacing:.02em;text-decoration:none;transition:color .15s}
+.handle:hover{color:var(--blue)}
+.course-note{margin:8px 0 20px;color:#fff;font-weight:700;font-size:13.5px;line-height:1.55;max-width:620px}
+.course-note a{color:#fff;text-decoration:underline;text-underline-offset:2px}
+.course-note a:hover{color:var(--blue)}
 
 .shell{position:relative;z-index:3;max-width:720px;margin:28px auto 0;padding:0 40px 60px}
 .prompt{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.26em;color:var(--dim);
@@ -166,10 +172,12 @@ h1 b{font-weight:600;background:linear-gradient(120deg,var(--cyan) 0%,var(--blue
   <h1>Legacy Bridge <b>Learning</b>.</h1>
   <p class="sub">Exam-grade study terminals for University of Indonesia finals — concept maps,
   worked lessons, glossaries and practice. Built by Legacy Bridge Capital, open to everyone.</p>
+  <a class="handle" href="https://instagram.com/legacybridgecapital" target="_blank" rel="noopener">@legacybridgecapital</a>
 </div>
 
 <div class="shell">
   <div class="prompt">Select a course</div>
+  <p class="course-note">We will add more courses in the future before the exam. Want to request? Chat <a href="https://instagram.com/legacybridgecapital" target="_blank" rel="noopener">@legacybridgecapital</a> on Instagram.</p>
   <div class="grid" id="grid"></div>
 </div>
 <div class="foot">
