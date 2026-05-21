@@ -11,12 +11,13 @@ window.LBC_COURSES = [
     slug: 'pe2',
     code: 'PE2',
     title: 'Pengantar Ekonomi 2',
-    subtitle: 'Material coming soon',
+    subtitle: 'Open economy · AD–AS · monetary & fiscal policy · Phillips curve',
     faculty: 'UI · FEB',
     status: 'ready',
     accent: '#46c9ee',
     meta: [
-      { label: 'Weeks', value: '4' }
+      { label: 'Weeks', value: '5' },
+      { label: 'Bilingual', value: 'EN·ID' }
     ]
   }
 ];
