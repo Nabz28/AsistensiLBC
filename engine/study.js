@@ -1,18 +1,15 @@
 /* ============================================================================
-   LBC LEARNING — Study Engine (v3.1)
+   LBC LEARNING — Study Engine (v3.2, bilingual)
    Renders a self-contained course from a single `window.COURSE` object.
    Vanilla JS, no build step. Default landing view = Overview.
 
-   Each week (unit) has four sub-segments rendered as an in-lesson tab bar:
-       Notes · Formulas · Graphs · Quiz
-   Notes/Formulas/Graphs are section→card arrays (prose, math, tables, charts).
-   Quiz is an array of practice questions with reveal-able worked answers.
+   Bilingual: any text leaf may be a plain string (shared across languages —
+   good for formulas / numbers) OR an { en, id } object. A top-right toggle
+   switches language; the choice is remembered in localStorage. Chrome strings
+   (nav, buttons, segment names) are localised via the built-in STR dictionary.
 
-   A course page only needs:
-     <link rel="stylesheet" href="../../engine/study.css">
-     <div id="study"></div>
-     <script src="course.js"></script>      // defines window.COURSE
-     <script src="../../engine/study.js"></script>
+   Each week (unit) has four sub-segments shown as an in-lesson tab bar:
+       Notes · Formulas · Graphs · Quiz   (Catatan · Rumus · Grafik · Kuis)
 
    Hash routing (deep links + back/forward):
      #/overview   #/unit/<id>   #/unit/<id>/<segment>   #/glossary
@@ -32,12 +29,52 @@
   var units = COURSE.units || [];
   var glossary = COURSE.glossary || [];
 
-  // The four sub-segments every week carries. `kind` picks the renderer.
+  // ---- language ------------------------------------------------------------
+  var LANG_KEY = 'lbc-lang';
+  var LANGS = [{ code: 'en', label: 'EN' }, { code: 'id', label: 'ID' }];
+  var lang = (function () {
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'en' || s === 'id') return s; } catch (e) {}
+    return 'en';
+  })();
+  function setLang(next) {
+    if (next === lang) return;
+    lang = next;
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    syncChrome();
+    route();
+  }
+  // pick the right string from a leaf: plain string (shared) or {en,id}
+  function t(v) {
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      return v[lang] != null ? v[lang] : (v.en != null ? v.en : (v.id != null ? v.id : ''));
+    }
+    return v == null ? '' : v;
+  }
+  // chrome (UI) strings
+  var STR = {
+    en: { all: '‹ All courses', overview: 'Overview', glossary: 'Glossary', weeks: 'Weeks',
+      terms: 'Terms', mark: 'Mark complete', done: '✓ Completed', objectives: 'What you will be able to do',
+      notes: 'Notes', formulas: 'Formulas', graphs: 'Graphs', quiz: 'Quiz',
+      reveal: 'Reveal answer', hide: 'Hide answer', worked: 'Worked answer', filter: 'Filter terms…',
+      back: 'Back to overview', examPrep: 'Exam prep', noWeeks: 'No weeks yet',
+      empty: function (l) { return l + ' for this week will be added soon.'; },
+      emptyT: function (l) { return 'No ' + l.toLowerCase() + ' yet'; } },
+    id: { all: '‹ Semua mata kuliah', overview: 'Ringkasan', glossary: 'Glosarium', weeks: 'Minggu',
+      terms: 'Istilah', mark: 'Tandai selesai', done: '✓ Selesai', objectives: 'Yang akan kamu kuasai',
+      notes: 'Catatan', formulas: 'Rumus', graphs: 'Grafik', quiz: 'Kuis',
+      reveal: 'Lihat jawaban', hide: 'Sembunyikan jawaban', worked: 'Pembahasan', filter: 'Cari istilah…',
+      back: 'Kembali ke ringkasan', examPrep: 'Persiapan ujian', noWeeks: 'Belum ada minggu',
+      empty: function (l) { return l + ' untuk minggu ini akan segera ditambahkan.'; },
+      emptyT: function (l) { return 'Belum ada ' + l.toLowerCase(); } }
+  };
+  function S(k) { var d = STR[lang] || STR.en; return d[k] != null ? d[k] : STR.en[k]; }
+
   var SEGMENTS = [
-    { key: 'notes',    label: 'Notes',    kind: 'sections' },
-    { key: 'formulas', label: 'Formulas', kind: 'sections' },
-    { key: 'graphs',   label: 'Graphs',   kind: 'sections' },
-    { key: 'quiz',     label: 'Quiz',     kind: 'quiz' }
+    { key: 'notes',    str: 'notes',    kind: 'sections' },
+    { key: 'formulas', str: 'formulas', kind: 'sections' },
+    { key: 'graphs',   str: 'graphs',   kind: 'sections' },
+    { key: 'quiz',     str: 'quiz',     kind: 'quiz' }
   ];
   function segDef(key) {
     for (var i = 0; i < SEGMENTS.length; i++) if (SEGMENTS[i].key === key) return SEGMENTS[i];
@@ -71,10 +108,7 @@
     for (var i = 0; i < units.length; i++) if (units[i].id === id) return units[i];
     return null;
   }
-  function hasContent(u, segKey) {
-    var v = u[segKey];
-    return !!(v && v.length);
-  }
+  function hasContent(u, segKey) { var v = u[segKey]; return !!(v && v.length); }
   function renderMath(scope) {
     if (window.renderMathInElement) {
       try {
@@ -92,31 +126,43 @@
   // ---- chrome (top bar + nav) ---------------------------------------------
   if (meta.accent) document.documentElement.style.setProperty('--accent', meta.accent);
   if (meta.accentSoft) document.documentElement.style.setProperty('--accent-soft', meta.accentSoft);
+  document.documentElement.lang = lang;
 
   var bar = el('div', 'sbar');
-  bar.innerHTML =
-    '<a class="sbar-home" href="../../index.html">‹ All courses</a>' +
-    '<div class="sbar-id">' +
-      '<span class="sbar-code">' + (meta.code || 'COURSE') + '</span>' +
-      '<span class="sbar-title">' + (meta.title || 'Untitled course') + '</span>' +
-    '</div>' +
-    '<div class="sbar-spacer"></div>' +
-    '<div class="sbar-prog"><span id="prog-label">0%</span>' +
-      '<span class="track"><span class="fill" id="prog-fill"></span></span></div>';
   root.appendChild(bar);
-
   var nav = el('div', 'snav');
   root.appendChild(nav);
-
   var view = el('div'); view.id = 'view';
   root.appendChild(view);
 
-  function buildNav(active) {
-    var items = [{ key: 'overview', label: 'Overview' }];
-    units.forEach(function (u) {
-      items.push({ key: 'unit/' + u.id, label: u.label || u.title, doneId: u.id });
+  function syncChrome() {
+    bar.innerHTML =
+      '<a class="sbar-home" href="../../index.html">' + S('all') + '</a>' +
+      '<div class="sbar-id">' +
+        '<span class="sbar-code">' + (meta.code || 'COURSE') + '</span>' +
+        '<span class="sbar-title">' + t(meta.title) + '</span>' +
+      '</div>' +
+      '<div class="sbar-spacer"></div>' +
+      '<div class="sbar-prog"><span id="prog-label"></span>' +
+        '<span class="track"><span class="fill" id="prog-fill"></span></span></div>' +
+      '<div class="langtog" role="group" aria-label="Language">' +
+        LANGS.map(function (L) {
+          return '<button class="langbtn' + (L.code === lang ? ' active' : '') +
+            '" data-lang="' + L.code + '">' + L.label + '</button>';
+        }).join('') +
+      '</div>';
+    bar.querySelectorAll('.langbtn').forEach(function (b) {
+      b.onclick = function () { setLang(b.getAttribute('data-lang')); };
     });
-    if (glossary.length) items.push({ key: 'glossary', label: 'Glossary' });
+    renderProgress();
+  }
+
+  function buildNav(active) {
+    var items = [{ key: 'overview', label: S('overview') }];
+    units.forEach(function (u) {
+      items.push({ key: 'unit/' + u.id, label: t(u.label) || t(u.title), doneId: u.id });
+    });
+    if (glossary.length) items.push({ key: 'glossary', label: S('glossary') });
 
     nav.innerHTML = '';
     items.forEach(function (it) {
@@ -143,12 +189,12 @@
     (arr || []).forEach(function (sec, si) {
       if (sec.heading) {
         h += '<div class="sec-head"><span class="sec-num">' + (sec.num || (si + 1)) + '</span>' +
-          sec.heading + '</div>';
+          t(sec.heading) + '</div>';
       }
       (sec.cards || []).forEach(function (c) {
         h += '<div class="card"' + (c.chartId ? ' data-chart="' + c.chartId + '"' : '') + '>' +
-          (c.title ? '<h4>' + c.title + '</h4>' : '') +
-          (c.html || '') +
+          (c.title ? '<h4>' + t(c.title) + '</h4>' : '') +
+          t(c.html) +
           (c.chartId ? '<div class="chart-wrap"><canvas id="chart-' + c.chartId + '"></canvas></div>' : '') +
         '</div>';
       });
@@ -162,13 +208,13 @@
       var type = q.type || 'concept';
       h += '<div class="qz-card"><div class="qz-q">' +
         '<span class="qz-badge ' + type + '">' + type + '</span>' +
-        '<div class="qz-text">' + (q.q || '') + '</div>' +
-        (q.context ? '<div class="qz-context">' + q.context + '</div>' : '') +
+        '<div class="qz-text">' + t(q.q) + '</div>' +
+        (q.context ? '<div class="qz-context">' + t(q.context) + '</div>' : '') +
       '</div>' +
-      '<button class="qz-reveal" data-i="' + i + '">Reveal answer</button>' +
-      '<div class="qz-answer" id="qa-' + i + '"><h5>Worked answer</h5>';
-      (q.answer || []).forEach(function (step) { h += '<div class="qz-step">' + step + '</div>'; });
-      if (q.tip) h += '<div class="qz-tip">' + q.tip + '</div>';
+      '<button class="qz-reveal" data-i="' + i + '">' + S('reveal') + '</button>' +
+      '<div class="qz-answer" id="qa-' + i + '"><h5>' + S('worked') + '</h5>';
+      (q.answer || []).forEach(function (step) { h += '<div class="qz-step">' + t(step) + '</div>'; });
+      if (q.tip) h += '<div class="qz-tip">' + t(q.tip) + '</div>';
       h += '</div></div>';
     });
     return h;
@@ -179,7 +225,7 @@
       b.onclick = function () {
         var ans = document.getElementById('qa-' + b.getAttribute('data-i'));
         var open = ans.classList.toggle('open');
-        b.textContent = open ? 'Hide answer' : 'Reveal answer';
+        b.textContent = open ? S('hide') : S('reveal');
       };
     });
   }
@@ -190,7 +236,7 @@
       var key = cardEl.getAttribute('data-chart');
       var canvas = document.getElementById('chart-' + key);
       if (canvas && typeof COURSE.charts[key] === 'function') {
-        try { COURSE.charts[key](canvas); } catch (e) {}
+        try { COURSE.charts[key](canvas, lang); } catch (e) {}
       }
     });
   }
@@ -199,48 +245,48 @@
   function viewOverview() {
     var ov = COURSE.overview || {};
     var h = '<div class="ov-hero">' +
-      '<div class="eyebrow">' + (meta.term || 'Exam prep') + '</div>' +
-      '<h1 class="ov-title">' + (meta.title || '') + '</h1>' +
-      (ov.blurb ? '<p class="ov-sub">' + ov.blurb + '</p>' : '');
+      '<div class="eyebrow">' + (meta.term ? t(meta.term) : S('examPrep')) + '</div>' +
+      '<h1 class="ov-title">' + t(meta.title) + '</h1>' +
+      (t(ov.blurb) ? '<p class="ov-sub">' + t(ov.blurb) + '</p>' : '');
     var stats = ov.stats || defaultStats();
     if (stats.length) {
       h += '<div class="ov-stats">';
       stats.forEach(function (s) {
-        h += '<div class="ov-stat"><b>' + s.value + '</b><span>' + s.label + '</span></div>';
+        h += '<div class="ov-stat"><b>' + t(s.value) + '</b><span>' + t(s.label) + '</span></div>';
       });
       h += '</div>';
     }
     h += '</div>';
 
     if (ov.objectives && ov.objectives.length) {
-      h += '<div class="ov-objectives"><h3>What you will be able to do</h3><ul>';
-      ov.objectives.forEach(function (o) { h += '<li>' + o + '</li>'; });
+      h += '<div class="ov-objectives"><h3>' + S('objectives') + '</h3><ul>';
+      ov.objectives.forEach(function (o) { h += '<li>' + t(o) + '</li>'; });
       h += '</ul></div>';
     }
 
-    h += '<div class="sec-label">Weeks</div>';
+    h += '<div class="sec-label">' + S('weeks') + '</div>';
     if (units.length) {
       h += '<div class="unit-grid">';
       units.forEach(function (u, i) {
         h += '<a class="unit-card' + (isDone(u.id) ? ' done' : '') + '" href="#/unit/' + u.id + '">' +
           '<div class="uc-top"><span class="uc-num">' +
-            (u.label || ('Week ' + (i + 1))) + '</span>' +
+            (t(u.label) || ('Week ' + (i + 1))) + '</span>' +
             '<span class="uc-check">✓</span></div>' +
-          '<div class="uc-title">' + (u.title || '') + '</div>' +
-          (u.subtitle ? '<div class="uc-sub">' + u.subtitle + '</div>' : '') +
+          '<div class="uc-title">' + t(u.title) + '</div>' +
+          (t(u.subtitle) ? '<div class="uc-sub">' + t(u.subtitle) + '</div>' : '') +
         '</a>';
       });
       h += '</div>';
     } else {
-      h += emptyHTML('No weeks yet', 'Add entries to COURSE.units in course.js.');
+      h += emptyHTML(S('noWeeks'), '');
     }
     view.innerHTML = h;
     renderMath(view);
   }
 
   function defaultStats() {
-    var s = [{ label: 'Weeks', value: units.length }];
-    if (glossary.length) s.push({ label: 'Terms', value: glossary.length });
+    var s = [{ label: S('weeks'), value: units.length }];
+    if (glossary.length) s.push({ label: S('terms'), value: glossary.length });
     return s;
   }
 
@@ -252,43 +298,38 @@
     var def = segDef(seg);
 
     var h = '<div class="lesson-head">' +
-      '<div class="eyebrow">' + (u.label || ('Week ' + (idx + 1))) + '</div>' +
-      '<h1 class="lesson-title">' + (u.title || '') + '</h1>' +
-      (u.subtitle ? '<div class="lesson-sub">' + u.subtitle + '</div>' : '') +
+      '<div class="eyebrow">' + (t(u.label) || ('Week ' + (idx + 1))) + '</div>' +
+      '<h1 class="lesson-title">' + t(u.title) + '</h1>' +
+      (t(u.subtitle) ? '<div class="lesson-sub">' + t(u.subtitle) + '</div>' : '') +
     '</div>';
 
     h += '<div class="lesson-toolbar">' +
       '<button class="btn ' + (isDone(u.id) ? 'done' : 'primary') + '" id="mark-done">' +
-        (isDone(u.id) ? '✓ Completed' : 'Mark complete') + '</button>' +
+        (isDone(u.id) ? S('done') : S('mark')) + '</button>' +
     '</div>';
 
-    // sub-segment tab bar
     h += '<div class="subtabs">';
     SEGMENTS.forEach(function (s) {
       h += '<button class="subtab' + (s.key === def.key ? ' active' : '') +
         (hasContent(u, s.key) ? ' filled' : '') + '" data-seg="' + s.key + '">' +
-        s.label + '</button>';
+        S(s.str) + '</button>';
     });
     h += '</div>';
 
-    // active sub-segment content
     h += '<div class="seg-body">';
     if (def.kind === 'quiz') {
-      h += hasContent(u, 'quiz')
-        ? quizHTML(u.quiz)
-        : emptyHTML('No quiz yet', 'Practice questions for this week will be added soon.');
+      h += hasContent(u, 'quiz') ? quizHTML(u.quiz) : emptyHTML(S('emptyT')(S('quiz')), S('empty')(S('quiz')));
     } else {
       h += hasContent(u, def.key)
         ? sectionsHTML(u[def.key])
-        : emptyHTML('No ' + def.label.toLowerCase() + ' yet',
-            def.label + ' for this week will be added soon.');
+        : emptyHTML(S('emptyT')(S(def.str)), S('empty')(S(def.str)));
     }
     h += '</div>';
 
     h += '<div class="lesson-foot">' +
-      (prev ? '<a class="btn" href="#/unit/' + prev.id + '">‹ ' + (prev.label || 'Previous') + '</a>' : '<span></span>') +
-      (next ? '<a class="btn primary" href="#/unit/' + next.id + '">' + (next.label || 'Next') + ' ›</a>'
-            : '<a class="btn" href="#/overview">Back to overview</a>') +
+      (prev ? '<a class="btn" href="#/unit/' + prev.id + '">‹ ' + (t(prev.label) || S('overview')) + '</a>' : '<span></span>') +
+      (next ? '<a class="btn primary" href="#/unit/' + next.id + '">' + (t(next.label) || '') + ' ›</a>'
+            : '<a class="btn" href="#/overview">' + S('back') + '</a>') +
     '</div>';
 
     view.innerHTML = h;
@@ -300,7 +341,7 @@
     if (mark) mark.onclick = function () {
       setDone(u.id, !isDone(u.id));
       mark.className = 'btn ' + (isDone(u.id) ? 'done' : 'primary');
-      mark.textContent = isDone(u.id) ? '✓ Completed' : 'Mark complete';
+      mark.textContent = isDone(u.id) ? S('done') : S('mark');
       buildNav('unit/' + u.id);
     };
 
@@ -311,19 +352,20 @@
 
   function viewGlossary() {
     var groups = {};
-    glossary.forEach(function (t) {
-      var g = t.group || 'General';
-      (groups[g] = groups[g] || []).push(t);
+    glossary.forEach(function (term) {
+      var g = t(term.group) || 'General';
+      (groups[g] = groups[g] || []).push(term);
     });
-    var h = '<div class="eyebrow">Reference</div><h1 class="ov-title">Exam glossary</h1>' +
-      '<input class="glo-search" id="glo-search" placeholder="Filter terms…" autocomplete="off">' +
+    var h = '<div class="eyebrow">' + S('glossary') + '</div><h1 class="ov-title">' + S('glossary') + '</h1>' +
+      '<input class="glo-search" id="glo-search" placeholder="' + S('filter') + '" autocomplete="off">' +
       '<div id="glo-groups">';
     Object.keys(groups).forEach(function (g) {
       h += '<div class="glo-group"><div class="glo-group-head">' + g +
         '<span class="count">' + groups[g].length + '</span></div><div class="glo-list">';
-      groups[g].forEach(function (t) {
-        h += '<div class="glo-term" data-text="' + (t.term + ' ' + t.def).toLowerCase().replace(/"/g, '') +
-          '"><span class="t">' + t.term + '</span><span class="d">' + t.def + '</span></div>';
+      groups[g].forEach(function (term) {
+        var txt = (t(term.term) + ' ' + t(term.def)).toLowerCase().replace(/"/g, '');
+        h += '<div class="glo-term" data-text="' + txt + '">' +
+          '<span class="t">' + t(term.term) + '</span><span class="d">' + t(term.def) + '</span></div>';
       });
       h += '</div></div>';
     });
@@ -341,7 +383,8 @@
   }
 
   function emptyHTML(title, msg) {
-    return '<div class="empty"><div class="em-ico">◔</div><p><b>' + title + '</b><br>' + msg + '</p></div>';
+    return '<div class="empty"><div class="em-ico">◔</div><p><b>' + title + '</b>' +
+      (msg ? '<br>' + msg : '') + '</p></div>';
   }
 
   // ---- router --------------------------------------------------------------
@@ -362,10 +405,10 @@
     window.scrollTo(0, 0);
   }
 
-  document.title = (meta.code ? meta.code + ' — ' : '') + (meta.title || 'LBC Learning');
+  document.title = (meta.code ? meta.code + ' — ' : '') + t(meta.title);
   window.addEventListener('hashchange', route);
+  syncChrome();
   buildNav('overview');
-  renderProgress();
   route();
 
   // KaTeX auto-render is loaded with `defer`, so on a fresh page load it is not
