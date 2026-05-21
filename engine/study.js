@@ -1,7 +1,12 @@
 /* ============================================================================
-   LBC LEARNING — Study Engine (v3.0)
+   LBC LEARNING — Study Engine (v3.1)
    Renders a self-contained course from a single `window.COURSE` object.
-   Vanilla JS, no build step. Default landing view = Overview (NOT a concept map).
+   Vanilla JS, no build step. Default landing view = Overview.
+
+   Each week (unit) has four sub-segments rendered as an in-lesson tab bar:
+       Notes · Formulas · Graphs · Quiz
+   Notes/Formulas/Graphs are section→card arrays (prose, math, tables, charts).
+   Quiz is an array of practice questions with reveal-able worked answers.
 
    A course page only needs:
      <link rel="stylesheet" href="../../engine/study.css">
@@ -9,8 +14,8 @@
      <script src="course.js"></script>      // defines window.COURSE
      <script src="../../engine/study.js"></script>
 
-   Routing is hash-based so deep links + back/forward work:
-     #/overview   #/unit/<id>   #/glossary   #/quiz
+   Hash routing (deep links + back/forward):
+     #/overview   #/unit/<id>   #/unit/<id>/<segment>   #/glossary
    ============================================================================ */
 (function () {
   'use strict';
@@ -26,7 +31,18 @@
   var meta = COURSE.meta || {};
   var units = COURSE.units || [];
   var glossary = COURSE.glossary || [];
-  var quiz = COURSE.quiz || [];
+
+  // The four sub-segments every week carries. `kind` picks the renderer.
+  var SEGMENTS = [
+    { key: 'notes',    label: 'Notes',    kind: 'sections' },
+    { key: 'formulas', label: 'Formulas', kind: 'sections' },
+    { key: 'graphs',   label: 'Graphs',   kind: 'sections' },
+    { key: 'quiz',     label: 'Quiz',     kind: 'quiz' }
+  ];
+  function segDef(key) {
+    for (var i = 0; i < SEGMENTS.length; i++) if (SEGMENTS[i].key === key) return SEGMENTS[i];
+    return SEGMENTS[0];
+  }
 
   // ---- progress (localStorage per course) ---------------------------------
   var STORE_KEY = 'lbc-learn:' + (meta.slug || 'course') + ':done';
@@ -54,6 +70,10 @@
   function unitById(id) {
     for (var i = 0; i < units.length; i++) if (units[i].id === id) return units[i];
     return null;
+  }
+  function hasContent(u, segKey) {
+    var v = u[segKey];
+    return !!(v && v.length);
   }
   function renderMath(scope) {
     if (window.renderMathInElement) {
@@ -97,7 +117,6 @@
       items.push({ key: 'unit/' + u.id, label: u.label || u.title, doneId: u.id });
     });
     if (glossary.length) items.push({ key: 'glossary', label: 'Glossary' });
-    if (quiz.length) items.push({ key: 'quiz', label: 'Practice' });
 
     nav.innerHTML = '';
     items.forEach(function (it) {
@@ -116,6 +135,64 @@
     var label = document.getElementById('prog-label');
     if (fill) fill.style.width = pct + '%';
     if (label) label.textContent = pct + '% · ' + n + '/' + units.length;
+  }
+
+  // ---- shared content renderers -------------------------------------------
+  function sectionsHTML(arr) {
+    var h = '';
+    (arr || []).forEach(function (sec, si) {
+      if (sec.heading) {
+        h += '<div class="sec-head"><span class="sec-num">' + (sec.num || (si + 1)) + '</span>' +
+          sec.heading + '</div>';
+      }
+      (sec.cards || []).forEach(function (c) {
+        h += '<div class="card"' + (c.chartId ? ' data-chart="' + c.chartId + '"' : '') + '>' +
+          (c.title ? '<h4>' + c.title + '</h4>' : '') +
+          (c.html || '') +
+          (c.chartId ? '<div class="chart-wrap"><canvas id="chart-' + c.chartId + '"></canvas></div>' : '') +
+        '</div>';
+      });
+    });
+    return h;
+  }
+
+  function quizHTML(arr) {
+    var h = '';
+    (arr || []).forEach(function (q, i) {
+      var type = q.type || 'concept';
+      h += '<div class="qz-card"><div class="qz-q">' +
+        '<span class="qz-badge ' + type + '">' + type + '</span>' +
+        '<div class="qz-text">' + (q.q || '') + '</div>' +
+        (q.context ? '<div class="qz-context">' + q.context + '</div>' : '') +
+      '</div>' +
+      '<button class="qz-reveal" data-i="' + i + '">Reveal answer</button>' +
+      '<div class="qz-answer" id="qa-' + i + '"><h5>Worked answer</h5>';
+      (q.answer || []).forEach(function (step) { h += '<div class="qz-step">' + step + '</div>'; });
+      if (q.tip) h += '<div class="qz-tip">' + q.tip + '</div>';
+      h += '</div></div>';
+    });
+    return h;
+  }
+
+  function wireQuiz() {
+    view.querySelectorAll('.qz-reveal').forEach(function (b) {
+      b.onclick = function () {
+        var ans = document.getElementById('qa-' + b.getAttribute('data-i'));
+        var open = ans.classList.toggle('open');
+        b.textContent = open ? 'Hide answer' : 'Reveal answer';
+      };
+    });
+  }
+
+  function wireCharts() {
+    if (!COURSE.charts) return;
+    view.querySelectorAll('[data-chart]').forEach(function (cardEl) {
+      var key = cardEl.getAttribute('data-chart');
+      var canvas = document.getElementById('chart-' + key);
+      if (canvas && typeof COURSE.charts[key] === 'function') {
+        try { COURSE.charts[key](canvas); } catch (e) {}
+      }
+    });
   }
 
   // ---- views ---------------------------------------------------------------
@@ -141,13 +218,13 @@
       h += '</ul></div>';
     }
 
-    h += '<div class="sec-label">Units</div>';
+    h += '<div class="sec-label">Weeks</div>';
     if (units.length) {
       h += '<div class="unit-grid">';
       units.forEach(function (u, i) {
         h += '<a class="unit-card' + (isDone(u.id) ? ' done' : '') + '" href="#/unit/' + u.id + '">' +
           '<div class="uc-top"><span class="uc-num">' +
-            (u.label || ('Unit ' + (i + 1))) + '</span>' +
+            (u.label || ('Week ' + (i + 1))) + '</span>' +
             '<span class="uc-check">✓</span></div>' +
           '<div class="uc-title">' + (u.title || '') + '</div>' +
           (u.subtitle ? '<div class="uc-sub">' + u.subtitle + '</div>' : '') +
@@ -155,27 +232,27 @@
       });
       h += '</div>';
     } else {
-      h += emptyHTML('No units yet', 'Add entries to COURSE.units in course.js.');
+      h += emptyHTML('No weeks yet', 'Add entries to COURSE.units in course.js.');
     }
     view.innerHTML = h;
     renderMath(view);
   }
 
   function defaultStats() {
-    var s = [{ label: 'Units', value: units.length }];
+    var s = [{ label: 'Weeks', value: units.length }];
     if (glossary.length) s.push({ label: 'Terms', value: glossary.length });
-    if (quiz.length) s.push({ label: 'Practice Q', value: quiz.length });
     return s;
   }
 
-  function viewUnit(id) {
+  function viewUnit(id, seg) {
     var u = unitById(id);
     if (!u) { viewOverview(); return; }
     var idx = units.indexOf(u);
     var prev = units[idx - 1], next = units[idx + 1];
+    var def = segDef(seg);
 
     var h = '<div class="lesson-head">' +
-      '<div class="eyebrow">' + (u.label || ('Unit ' + (idx + 1))) + '</div>' +
+      '<div class="eyebrow">' + (u.label || ('Week ' + (idx + 1))) + '</div>' +
       '<h1 class="lesson-title">' + (u.title || '') + '</h1>' +
       (u.subtitle ? '<div class="lesson-sub">' + u.subtitle + '</div>' : '') +
     '</div>';
@@ -185,22 +262,28 @@
         (isDone(u.id) ? '✓ Completed' : 'Mark complete') + '</button>' +
     '</div>';
 
-    (u.sections || []).forEach(function (sec, si) {
-      h += '<div class="sec-head"><span class="sec-num">' + (sec.num || (si + 1)) + '</span>' +
-        (sec.heading || '') + '</div>';
-      (sec.cards || []).forEach(function (c) {
-        h += '<div class="card"' + (c.chartId ? ' data-chart="' + c.chartId + '"' : '') + '>' +
-          (c.title ? '<h4>' + c.title + '</h4>' : '') +
-          (c.html || '') +
-          (c.chartId ? '<div class="chart-wrap"><canvas id="chart-' + c.chartId + '"></canvas></div>' : '') +
-        '</div>';
-      });
+    // sub-segment tab bar
+    h += '<div class="subtabs">';
+    SEGMENTS.forEach(function (s) {
+      h += '<button class="subtab' + (s.key === def.key ? ' active' : '') +
+        (hasContent(u, s.key) ? ' filled' : '') + '" data-seg="' + s.key + '">' +
+        s.label + '</button>';
     });
+    h += '</div>';
 
-    if (!(u.sections && u.sections.length)) {
-      h += emptyHTML('Placeholder unit', 'This unit has no sections yet. Fill ' +
-        '<code>units[].sections</code> in course.js.');
+    // active sub-segment content
+    h += '<div class="seg-body">';
+    if (def.kind === 'quiz') {
+      h += hasContent(u, 'quiz')
+        ? quizHTML(u.quiz)
+        : emptyHTML('No quiz yet', 'Practice questions for this week will be added soon.');
+    } else {
+      h += hasContent(u, def.key)
+        ? sectionsHTML(u[def.key])
+        : emptyHTML('No ' + def.label.toLowerCase() + ' yet',
+            def.label + ' for this week will be added soon.');
     }
+    h += '</div>';
 
     h += '<div class="lesson-foot">' +
       (prev ? '<a class="btn" href="#/unit/' + prev.id + '">‹ ' + (prev.label || 'Previous') + '</a>' : '<span></span>') +
@@ -210,25 +293,20 @@
 
     view.innerHTML = h;
     renderMath(view);
+    wireQuiz();
+    wireCharts();
 
-    var btn = document.getElementById('mark-done');
-    if (btn) btn.onclick = function () {
+    var mark = document.getElementById('mark-done');
+    if (mark) mark.onclick = function () {
       setDone(u.id, !isDone(u.id));
-      btn.className = 'btn ' + (isDone(u.id) ? 'done' : 'primary');
-      btn.textContent = isDone(u.id) ? '✓ Completed' : 'Mark complete';
+      mark.className = 'btn ' + (isDone(u.id) ? 'done' : 'primary');
+      mark.textContent = isDone(u.id) ? '✓ Completed' : 'Mark complete';
       buildNav('unit/' + u.id);
     };
 
-    // optional per-card charts: COURSE.charts[chartId] = function(canvas){...}
-    if (COURSE.charts) {
-      view.querySelectorAll('[data-chart]').forEach(function (cardEl) {
-        var key = cardEl.getAttribute('data-chart');
-        var canvas = document.getElementById('chart-' + key);
-        if (canvas && typeof COURSE.charts[key] === 'function') {
-          try { COURSE.charts[key](canvas); } catch (e) {}
-        }
-      });
-    }
+    view.querySelectorAll('.subtab').forEach(function (b) {
+      b.onclick = function () { location.hash = '#/unit/' + u.id + '/' + b.getAttribute('data-seg'); };
+    });
   }
 
   function viewGlossary() {
@@ -262,34 +340,6 @@
     };
   }
 
-  function viewQuiz() {
-    var h = '<div class="eyebrow">Practice</div><h1 class="ov-title">Practice questions</h1>' +
-      '<div class="qz-intro">Self-check questions. Try each one before revealing the worked answer.</div>';
-    quiz.forEach(function (q, i) {
-      var type = q.type || 'concept';
-      h += '<div class="qz-card"><div class="qz-q">' +
-        '<span class="qz-badge ' + type + '">' + type + '</span>' +
-        '<div class="qz-text">' + (q.q || '') + '</div>' +
-        (q.context ? '<div class="qz-context">' + q.context + '</div>' : '') +
-      '</div>' +
-      '<button class="qz-reveal" data-i="' + i + '">Reveal answer</button>' +
-      '<div class="qz-answer" id="qa-' + i + '"><h5>Worked answer</h5>';
-      (q.answer || []).forEach(function (step) { h += '<div class="qz-step">' + step + '</div>'; });
-      if (q.tip) h += '<div class="qz-tip">' + q.tip + '</div>';
-      h += '</div></div>';
-    });
-    view.innerHTML = h;
-    renderMath(view);
-
-    view.querySelectorAll('.qz-reveal').forEach(function (b) {
-      b.onclick = function () {
-        var ans = document.getElementById('qa-' + b.getAttribute('data-i'));
-        var open = ans.classList.toggle('open');
-        b.textContent = open ? 'Hide answer' : 'Reveal answer';
-      };
-    });
-  }
-
   function emptyHTML(title, msg) {
     return '<div class="empty"><div class="em-ico">◔</div><p><b>' + title + '</b><br>' + msg + '</p></div>';
   }
@@ -299,12 +349,12 @@
     var hash = (location.hash || '').replace(/^#\/?/, '');
     var active = 'overview';
     if (hash.indexOf('unit/') === 0) {
-      active = hash;
-      viewUnit(hash.slice('unit/'.length));
+      var rest = hash.slice('unit/'.length).split('/');
+      var id = rest[0], seg = rest[1] || 'notes';
+      active = 'unit/' + id;
+      viewUnit(id, seg);
     } else if (hash === 'glossary' && glossary.length) {
       active = 'glossary'; viewGlossary();
-    } else if (hash === 'quiz' && quiz.length) {
-      active = 'quiz'; viewQuiz();
     } else {
       viewOverview();
     }
