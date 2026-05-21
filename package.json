@@ -1,0 +1,9 @@
+{
+  "name": "lbc-learning",
+  "private": true,
+  "version": "0.1.0",
+  "description": "LBC Learning — exam-grade study modules for University of Indonesia finals. Static, no build step.",
+  "scripts": {
+    "serve": "node serve.js 4173"
+  }
+}

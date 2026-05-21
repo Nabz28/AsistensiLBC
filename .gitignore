@@ -1,0 +1,22 @@
+# ─── Build / dependency artifacts ──────────────────────────────────
+node_modules
+dist
+.venv
+venv
+
+# ─── Local environment / secrets ───────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── OS junk ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Claude Code internal state ────────────────────────────────────
+.claude/
+
+# ─── Logs / Vercel ─────────────────────────────────────────────────
+*.log
+.vercel

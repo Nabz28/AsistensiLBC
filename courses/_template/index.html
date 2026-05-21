@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LBC Learning — Course</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<!-- Reading + UI fonts (shared across all courses) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+
+<!-- Math rendering (auto-renders $…$ and $$…$$ after the engine injects content) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<!-- Optional: charts. Uncomment if a course uses COURSE.charts.
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+-->
+
+<!-- Shared study engine styles -->
+<link rel="stylesheet" href="../../engine/study.css">
+</head>
+<body>
+<!-- The engine mounts everything inside #study. -->
+<div id="study"></div>
+
+<!-- 1) Course content (defines window.COURSE)  2) Engine renders it -->
+<script src="course.js"></script>
+<script src="../../engine/study.js"></script>
+</body>
+</html>

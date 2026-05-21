@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LBC · Learning</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020912; --bg-2:#04101e; --bg-3:#071528;
+  --ink:#dfe9fb; --dim:#5f779e;
+  --blue:#6f9cf2; --cyan:#46c9ee; --amber:#f3c574; --rose:#f0809e;
+  --line:rgba(140,180,245,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+body{
+  background:
+    radial-gradient(1000px 760px at 50% 16%, rgba(70,130,225,.11), transparent 62%),
+    radial-gradient(720px 600px at 14% 86%, rgba(50,170,215,.05), transparent 60%),
+    radial-gradient(820px 620px at 92% 94%, rgba(60,110,200,.05), transparent 60%),
+    linear-gradient(180deg,#01060e 0%,#04101e 55%,#061525 100%);
+}
+/* blueprint drafting grid with a cursor-following hole for the brighter lens */
+.gridbg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(0deg,rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(0deg,rgba(255,255,255,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:34px 34px,34px 34px,170px 170px,170px 170px;
+  -webkit-mask-image:radial-gradient(210px circle at var(--lx,-500px) var(--ly,-500px), transparent 0, transparent 14%, #000 60%);
+  mask-image:radial-gradient(210px circle at var(--lx,-500px) var(--ly,-500px), transparent 0, transparent 14%, #000 60%)}
+.gridbg-hi{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .45s;
+  background-image:
+    linear-gradient(0deg,rgba(255,255,255,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px),
+    linear-gradient(0deg,rgba(255,255,255,.20) 1.4px,transparent 1.4px),
+    linear-gradient(90deg,rgba(255,255,255,.20) 1.4px,transparent 1.4px);
+  background-size:52px 52px,52px 52px,260px 260px,260px 260px;
+  -webkit-mask-image:radial-gradient(210px circle at var(--lx,-500px) var(--ly,-500px), #000 0, #000 14%, transparent 60%);
+  mask-image:radial-gradient(210px circle at var(--lx,-500px) var(--ly,-500px), #000 0, #000 14%, transparent 60%)}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stars::before{content:"";position:absolute;inset:-40%;background-image:
+  radial-gradient(1px 1px at 30px 40px,#fff,transparent),
+  radial-gradient(.8px .8px at 90px 90px,rgba(255,255,255,.5),transparent),
+  radial-gradient(1px 1px at 160px 60px,#fff,transparent),
+  radial-gradient(.6px .6px at 240px 150px,rgba(255,255,255,.4),transparent),
+  radial-gradient(1px 1px at 300px 30px,#fff,transparent),
+  radial-gradient(.8px .8px at 380px 110px,rgba(255,255,255,.5),transparent);
+  background-size:420px 240px;animation:drift 140s linear infinite;opacity:.5}
+@keyframes drift{to{transform:translate(-200px,-120px)}}
+.cursor-glow{position:fixed;top:0;left:0;width:520px;height:520px;border-radius:50%;
+  transform:translate(-50%,-50%);pointer-events:none;z-index:1;opacity:0;transition:opacity .5s;
+  background:radial-gradient(circle, rgba(70,180,245,.11) 0%, rgba(60,120,235,.05) 38%, transparent 70%);
+  mix-blend-mode:screen}
+
+.bar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;
+  padding:18px 40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.18em;
+  border-bottom:1px solid var(--line);text-transform:uppercase;backdrop-filter:blur(8px);background:rgba(6,17,31,.45)}
+.bar a{color:inherit;text-decoration:none;transition:color .2s}
+.bar a:hover{color:var(--cyan)}
+.bar b{color:var(--ink);font-weight:500;letter-spacing:.22em}
+.bar-r{display:flex;gap:24px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:p 2s infinite}
+@keyframes p{50%{opacity:.45}}
+
+.hero{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:54px 40px 18px}
+.logo{width:min(420px,58vw);position:relative}
+.logo svg{width:100%;height:auto;display:block;overflow:visible}
+.bridge .seg{fill:none;stroke:#f4f9ff;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round;
+  filter:drop-shadow(0 0 5px rgba(98,231,255,.5))}
+.flow{fill:none;stroke:#bff6ff;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;
+  filter:drop-shadow(0 0 7px rgba(150,235,255,.95));
+  -webkit-mask-image:linear-gradient(90deg,#0000 0 46%,#000 50%,#0000 54% 100%);
+  mask-image:linear-gradient(90deg,#0000 0 46%,#000 50%,#0000 54% 100%);
+  -webkit-mask-size:220% 100%;mask-size:220% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:-120% 0;mask-position:-120% 0;
+  animation:flow 4.2s linear 2.1s infinite}
+@keyframes flow{from{-webkit-mask-position:-120% 0;mask-position:-120% 0}to{-webkit-mask-position:120% 0;mask-position:120% 0}}
+@media (prefers-reduced-motion: reduce){ .flow{animation:none;opacity:0} .cursor-glow,.gridbg-hi,.stars{display:none} }
+
+.kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.5em;color:var(--blue);
+  text-transform:uppercase;margin-top:26px;text-shadow:0 0 12px rgba(134,178,255,.4);
+  display:flex;align-items:center;justify-content:center;gap:14px}
+.kicker::before,.kicker::after{content:"";width:50px;height:1px;background:linear-gradient(to right,transparent,var(--blue),transparent)}
+h1{font-family:'Inter';font-weight:200;font-size:clamp(42px,6vw,84px);line-height:.96;letter-spacing:-.035em;color:#fff;margin-top:14px}
+h1 b{font-weight:600;background:linear-gradient(120deg,var(--cyan) 0%,var(--blue) 45%,var(--amber) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin-top:16px;color:var(--dim);font-size:14.5px;font-weight:300;letter-spacing:.03em;max-width:580px;line-height:1.55}
+
+.shell{position:relative;z-index:3;max-width:720px;margin:28px auto 0;padding:0 40px 60px}
+.prompt{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.26em;color:var(--dim);
+  text-transform:uppercase;margin:0 2px 14px;display:flex;align-items:center;gap:10px}
+.prompt::after{content:"";flex:1;height:1px;background:var(--line)}
+.grid{display:flex;flex-direction:column;gap:12px}
+.card{display:flex;align-items:center;gap:22px;padding:22px 26px;border-radius:16px;cursor:pointer;
+  position:relative;overflow:hidden;text-decoration:none;color:inherit;
+  background:linear-gradient(180deg,rgba(14,30,55,.5) 0%,rgba(10,22,40,.46) 100%);backdrop-filter:blur(14px);
+  border:1px solid rgba(140,180,245,.13);transition:transform .3s,border-color .3s,background .3s}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+  opacity:0;transition:opacity .35s;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(95,200,250,.16), transparent 60%)}
+.card:hover::after{opacity:1}
+.card:hover{transform:translateY(-3px);border-color:var(--cyan);background:linear-gradient(180deg,rgba(16,34,62,.7) 0%,rgba(10,24,44,.64) 100%)}
+.cnum{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--blue);
+  letter-spacing:.12em;opacity:.6;min-width:30px;position:relative;z-index:2}
+.cbody{flex:1;position:relative;z-index:2;min-width:0}
+.crow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ccode{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--cyan);text-transform:uppercase}
+.cfaculty{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.ctitle{font-family:'Inter';font-weight:500;font-size:21px;letter-spacing:-.02em;color:var(--ink);margin-top:3px;line-height:1.2}
+.cdesc{font-size:12.5px;color:var(--dim);line-height:1.5;margin-top:5px}
+.cmeta{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
+.cmeta span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.04em}
+.cmeta b{color:var(--ink);font-weight:600}
+.arrow{width:34px;height:34px;border-radius:50%;border:1px solid rgba(140,180,245,.22);flex-shrink:0;
+  display:grid;place-items:center;color:var(--blue);font-size:14px;position:relative;z-index:2;
+  transition:transform .3s,background .3s,border-color .3s,color .3s}
+.card:hover .arrow{transform:translate(2px,-2px);background:var(--cyan);color:#06121f;border-color:var(--cyan)}
+/* coming-soon cards: dimmed + not interactive */
+.card.soon{cursor:default;opacity:.62}
+.card.soon:hover{transform:none;border-color:rgba(140,180,245,.13);background:linear-gradient(180deg,rgba(14,30,55,.5) 0%,rgba(10,22,40,.46) 100%)}
+.card.soon:hover::after{opacity:0}
+.card.soon .arrow{border-style:dashed}
+.soon-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--amber);border:1px solid rgba(243,197,116,.4);border-radius:99px;padding:3px 9px;flex-shrink:0;position:relative;z-index:2}
+.accentpip{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:16px 0 0 16px;z-index:2}
+
+.foot{max-width:720px;margin:30px auto 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);
+  letter-spacing:.2em;display:flex;justify-content:space-between;padding:18px 40px 0;border-top:1px solid rgba(140,180,245,.1);text-transform:uppercase}
+.foot b{color:var(--ink)}
+@media (max-width:560px){.foot{flex-direction:column;gap:8px;text-align:center}}
+</style></head><body>
+<div class="stars"></div>
+<div class="gridbg"></div>
+<div class="gridbg-hi" id="gridhi"></div>
+<div class="cursor-glow" id="cglow"></div>
+
+<div class="bar">
+  <div><b>LBC · LEARNING</b></div>
+  <div class="bar-r"><span>STUDY MODULES</span><span class="dot"></span><span>ONLINE</span></div>
+</div>
+
+<div class="hero">
+  <div class="logo">
+    <svg viewBox="3 77 425 172" aria-label="Legacy Bridge Capital">
+      <g class="bridge">
+        <path class="seg" data-delay="0.980" d="M 228.500 98.954 C 221.097 100.904, 215.990 102.931, 216.014 103.911 C 216.022 104.235, 218.173 105.682, 220.793 107.126 C 223.413 108.570, 228.932 112.434, 233.057 115.712 C 239.633 120.937, 241.261 121.755, 246.258 122.343 C 258.712 123.806, 273.486 132.558, 289.220 147.789 C 299.988 158.215, 314.558 174.776, 313.708 175.625 C 313.423 175.910, 306.285 176.401, 297.845 176.716 C 289.405 177.031, 281.766 177.561, 280.869 177.894 C 279.491 178.406, 279.981 179.798, 284.024 186.856 C 286.657 191.451, 289.191 195.589, 289.656 196.050 C 290.120 196.512, 298.031 196.972, 307.236 197.074 C 317.779 197.190, 324.512 197.673, 325.433 198.379 C 326.236 198.996, 330.060 206.250, 333.929 214.500 L 340.964 229.500 356.905 229.774 L 372.845 230.049 366.923 216.063 C 363.665 208.371, 361 201.795, 361 201.450 C 361 201.104, 371.462 200.957, 384.250 201.122 L 407.500 201.424 408.268 193.962 C 408.691 189.858, 408.916 183.370, 408.768 179.545 C 408.511 172.869, 408.400 172.590, 406 172.578 C 402.287 172.560, 370.073 173.933, 357.951 174.627 L 347.402 175.231 344.269 169.366 C 331.578 145.606, 305.729 118.211, 286.548 108.193 C 266.270 97.601, 245.927 94.364, 228.500 98.954" />
+        <path class="seg" data-delay="0.000" d="M 161.500 98.950 C 145.596 101.549, 128.477 108.908, 115.500 118.723 C 98.420 131.642, 76.312 157.880, 63.904 179.957 C 61.976 183.387, 61.283 183.807, 56.637 184.365 C 53.811 184.705, 45.088 184.987, 37.250 184.991 C 25.608 184.998, 23 185.260, 23 186.421 C 23 188.229, 25.987 188.688, 39 188.882 C 44.775 188.968, 51.600 189.292, 54.166 189.602 L 58.832 190.165 48.820 209.653 C 43.314 220.372, 39.020 229.353, 39.278 229.611 C 39.536 229.869, 45.270 221.273, 52.020 210.509 C 58.770 199.744, 64.652 190.715, 65.090 190.444 C 65.529 190.173, 80.200 190.651, 97.694 191.507 C 115.187 192.362, 156.432 194.368, 189.350 195.964 C 222.267 197.560, 249.299 199.009, 249.420 199.183 C 249.541 199.357, 252.639 206.250, 256.304 214.500 L 262.969 229.500 280.101 229.774 C 295.981 230.028, 297.184 229.922, 296.570 228.321 C 296.205 227.372, 293.624 220.498, 290.834 213.047 C 279.390 182.490, 263.297 157.077, 239.738 132.358 C 223.750 115.583, 208.246 105.696, 190.766 101.128 C 181.726 98.766, 168.603 97.789, 161.500 98.950" />
+        <path class="seg" data-delay="0.573" d="M 147.652 123.049 C 144.986 123.496, 142.556 124.111, 142.251 124.415 C 141.947 124.720, 140.666 135.663, 139.404 148.734 C 138.142 161.805, 136.844 174.637, 136.520 177.250 L 135.931 182 143.466 182 C 147.610 182, 151.013 181.887, 151.030 181.750 C 151.262 179.806, 155.979 124.150, 155.988 123.250 C 156.001 121.873, 154.829 121.844, 147.652 123.049" />
+        <path class="seg" data-delay="0.723" d="M 167.510 136.799 C 167.113 144.476, 166.498 157.562, 166.144 165.879 L 165.500 181.002 172.250 181.001 C 178.575 181, 179.002 180.858, 179.027 178.750 C 179.043 177.512, 179.708 166.600, 180.506 154.500 C 182.475 124.627, 182.755 127.554, 177.750 125.684 C 175.412 124.811, 172.315 123.815, 170.867 123.469 L 168.233 122.842 167.510 136.799" />
+        <path class="seg" data-delay="0.437" d="M 122 132.108 C 118.425 134.357, 115.177 136.498, 114.782 136.866 C 114.083 137.518, 109 176.023, 109 180.668 C 109 182.824, 109.409 183, 114.429 183 C 117.671 183, 120.405 182.453, 121.217 181.641 C 122.109 180.748, 123.544 171.757, 125.395 155.443 C 126.946 141.782, 128.439 130.019, 128.714 129.303 C 129.415 127.476, 129.261 127.540, 122 132.108" />
+        <path class="seg" data-delay="0.868" d="M 194 156.941 L 194 180 200.993 180 L 207.986 180 207.446 164.750 C 206.622 141.465, 206.749 142.005, 201.224 138.355 C 198.626 136.638, 195.938 134.929, 195.250 134.558 C 194.267 134.026, 194 138.800, 194 156.941" />
+        <path class="seg" data-delay="0.237" d="M 93.886 153.778 C 87.735 160.446, 79.146 171.023, 73.517 178.860 L 69.668 184.220 81.751 183.860 C 88.396 183.662, 94.100 183.234, 94.425 182.909 C 95.021 182.313, 99.937 148.741, 99.505 148.219 C 99.377 148.065, 96.848 150.566, 93.886 153.778" />
+        <path class="seg" data-delay="1.000" d="M 220.026 157.080 C 220.062 160.481, 221.923 179.283, 222.239 179.446 C 222.383 179.520, 225.961 179.337, 230.192 179.040 L 237.884 178.500 228.942 166.580 C 222.165 157.545, 220.006 155.245, 220.026 157.080" />
+      </g>
+      <path class="flow" d="M 228.500 98.954 C 221.097 100.904, 215.990 102.931, 216.014 103.911 C 216.022 104.235, 218.173 105.682, 220.793 107.126 C 223.413 108.570, 228.932 112.434, 233.057 115.712 C 239.633 120.937, 241.261 121.755, 246.258 122.343 C 258.712 123.806, 273.486 132.558, 289.220 147.789 C 299.988 158.215, 314.558 174.776, 313.708 175.625 C 313.423 175.910, 306.285 176.401, 297.845 176.716 C 289.405 177.031, 281.766 177.561, 280.869 177.894 C 279.491 178.406, 279.981 179.798, 284.024 186.856 C 286.657 191.451, 289.191 195.589, 289.656 196.050 C 290.120 196.512, 298.031 196.972, 307.236 197.074 C 317.779 197.190, 324.512 197.673, 325.433 198.379 C 326.236 198.996, 330.060 206.250, 333.929 214.500 L 340.964 229.500 356.905 229.774 L 372.845 230.049 366.923 216.063 C 363.665 208.371, 361 201.795, 361 201.450 C 361 201.104, 371.462 200.957, 384.250 201.122 L 407.500 201.424 408.268 193.962 C 408.691 189.858, 408.916 183.370, 408.768 179.545 C 408.511 172.869, 408.400 172.590, 406 172.578 C 402.287 172.560, 370.073 173.933, 357.951 174.627 L 347.402 175.231 344.269 169.366 C 331.578 145.606, 305.729 118.211, 286.548 108.193 C 266.270 97.601, 245.927 94.364, 228.500 98.954 M 161.500 98.950 C 145.596 101.549, 128.477 108.908, 115.500 118.723 C 98.420 131.642, 76.312 157.880, 63.904 179.957 C 61.976 183.387, 61.283 183.807, 56.637 184.365 C 53.811 184.705, 45.088 184.987, 37.250 184.991 C 25.608 184.998, 23 185.260, 23 186.421 C 23 188.229, 25.987 188.688, 39 188.882 C 44.775 188.968, 51.600 189.292, 54.166 189.602 L 58.832 190.165 48.820 209.653 C 43.314 220.372, 39.020 229.353, 39.278 229.611 C 39.536 229.869, 45.270 221.273, 52.020 210.509 C 58.770 199.744, 64.652 190.715, 65.090 190.444 C 65.529 190.173, 80.200 190.651, 97.694 191.507 C 115.187 192.362, 156.432 194.368, 189.350 195.964 C 222.267 197.560, 249.299 199.009, 249.420 199.183 C 249.541 199.357, 252.639 206.250, 256.304 214.500 L 262.969 229.500 280.101 229.774 C 295.981 230.028, 297.184 229.922, 296.570 228.321 C 296.205 227.372, 293.624 220.498, 290.834 213.047 C 279.390 182.490, 263.297 157.077, 239.738 132.358 C 223.750 115.583, 208.246 105.696, 190.766 101.128 C 181.726 98.766, 168.603 97.789, 161.500 98.950 M 147.652 123.049 C 144.986 123.496, 142.556 124.111, 142.251 124.415 C 141.947 124.720, 140.666 135.663, 139.404 148.734 C 138.142 161.805, 136.844 174.637, 136.520 177.250 L 135.931 182 143.466 182 C 147.610 182, 151.013 181.887, 151.030 181.750 C 151.262 179.806, 155.979 124.150, 155.988 123.250 C 156.001 121.873, 154.829 121.844, 147.652 123.049 M 167.510 136.799 C 167.113 144.476, 166.498 157.562, 166.144 165.879 L 165.500 181.002 172.250 181.001 C 178.575 181, 179.002 180.858, 179.027 178.750 C 179.043 177.512, 179.708 166.600, 180.506 154.500 C 182.475 124.627, 182.755 127.554, 177.750 125.684 C 175.412 124.811, 172.315 123.815, 170.867 123.469 L 168.233 122.842 167.510 136.799 M 122 132.108 C 118.425 134.357, 115.177 136.498, 114.782 136.866 C 114.083 137.518, 109 176.023, 109 180.668 C 109 182.824, 109.409 183, 114.429 183 C 117.671 183, 120.405 182.453, 121.217 181.641 C 122.109 180.748, 123.544 171.757, 125.395 155.443 C 126.946 141.782, 128.439 130.019, 128.714 129.303 C 129.415 127.476, 129.261 127.540, 122 132.108 M 194 156.941 L 194 180 200.993 180 L 207.986 180 207.446 164.750 C 206.622 141.465, 206.749 142.005, 201.224 138.355 C 198.626 136.638, 195.938 134.929, 195.250 134.558 C 194.267 134.026, 194 138.800, 194 156.941 M 93.886 153.778 C 87.735 160.446, 79.146 171.023, 73.517 178.860 L 69.668 184.220 81.751 183.860 C 88.396 183.662, 94.100 183.234, 94.425 182.909 C 95.021 182.313, 99.937 148.741, 99.505 148.219 C 99.377 148.065, 96.848 150.566, 93.886 153.778 M 220.026 157.080 C 220.062 160.481, 221.923 179.283, 222.239 179.446 C 222.383 179.520, 225.961 179.337, 230.192 179.040 L 237.884 178.500 228.942 166.580 C 222.165 157.545, 220.006 155.245, 220.026 157.080" />
+    </svg>
+  </div>
+  <div class="kicker">Study Modules</div>
+  <h1>Legacy Bridge <b>Learning</b>.</h1>
+  <p class="sub">Exam-grade study terminals for University of Indonesia finals — concept maps,
+  worked lessons, glossaries and practice. Built by Legacy Bridge Capital, open to everyone.</p>
+</div>
+
+<div class="shell">
+  <div class="prompt">Select a course</div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="foot">
+  <span>© LEGACY BRIDGE CAPITAL · JAKARTA · MMXXVI</span>
+  <span>Learning <b>v1</b></span>
+</div>
+
+<script src="courses.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- render course cards from the registry ----
+  var courses = window.LBC_COURSES || [];
+  var grid = document.getElementById('grid');
+  if (!courses.length) {
+    grid.innerHTML = '<div class="card soon"><div class="cbody"><div class="ctitle">No courses yet</div>' +
+      '<div class="cdesc">Add entries to courses.js.</div></div></div>';
+  }
+  courses.forEach(function(c, i){
+    var ready = c.status === 'ready';
+    var num = String(i + 1).padStart(2, '0');
+    var meta = (c.meta || []).map(function(m){
+      return '<span><b>' + m.value + '</b> ' + m.label + '</span>';
+    }).join('');
+    var inner =
+      '<div class="accentpip" style="background:' + (c.accent || '#6f9cf2') + '"></div>' +
+      '<span class="cnum">' + num + '</span>' +
+      '<div class="cbody">' +
+        '<div class="crow"><span class="ccode">' + (c.code || '') + '</span>' +
+          (c.faculty ? '<span class="cfaculty">' + c.faculty + '</span>' : '') + '</div>' +
+        '<div class="ctitle">' + (c.title || '') + '</div>' +
+        (c.subtitle ? '<div class="cdesc">' + c.subtitle + '</div>' : '') +
+        (meta ? '<div class="cmeta">' + meta + '</div>' : '') +
+      '</div>' +
+      (ready ? '<span class="arrow">↗</span>' : '<span class="soon-tag">Coming soon</span>');
+
+    var node;
+    if (ready) {
+      node = document.createElement('a');
+      node.className = 'card';
+      node.href = 'courses/' + c.slug + '/';
+    } else {
+      node = document.createElement('div');
+      node.className = 'card soon';
+    }
+    node.innerHTML = inner;
+    grid.appendChild(node);
+  });
+
+  if (reduce) {
+    document.querySelectorAll('.bridge .seg').forEach(function(p){ /* draw instantly */ });
+    return;
+  }
+
+  // ---- bridge self-draw (staggered left→right) ----
+  var segs = Array.from(document.querySelectorAll('.bridge .seg'));
+  segs.forEach(function(p){ var len=p.getTotalLength(); p.style.strokeDasharray=len; p.style.strokeDashoffset=len; });
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    segs.forEach(function(p){
+      var delay = parseFloat(p.dataset.delay) || 0;
+      p.style.transition = 'stroke-dashoffset 0.9s cubic-bezier(.65,0,.35,1) ' + delay + 's';
+      p.style.strokeDashoffset = '0';
+    });
+  }); });
+
+  // ---- cursor effects: trailing glow + grid zoom-lens ----
+  var glow = document.getElementById('cglow');
+  var gridhi = document.getElementById('gridhi');
+  var rootEl = document.documentElement;
+  var tx=innerWidth/2, ty=innerHeight/2, gx=tx, gy=ty, lx=tx, ly=ty, shown=false;
+  addEventListener('mousemove', function(e){
+    tx=e.clientX; ty=e.clientY;
+    if(!shown){ shown=true; glow.style.opacity=1; gridhi.style.opacity=1; }
+  }, {passive:true});
+  document.addEventListener('mouseleave', function(){
+    shown=false; glow.style.opacity=0; gridhi.style.opacity=0;
+    rootEl.style.setProperty('--lx','-500px'); rootEl.style.setProperty('--ly','-500px');
+  });
+  (function loop(){
+    gx += (tx-gx)*0.13; gy += (ty-gy)*0.13;
+    glow.style.transform = 'translate(' + gx.toFixed(1) + 'px,' + gy.toFixed(1) + 'px) translate(-50%,-50%)';
+    lx += (tx-lx)*0.20; ly += (ty-ly)*0.20;
+    if(shown){ rootEl.style.setProperty('--lx', lx.toFixed(1)+'px'); rootEl.style.setProperty('--ly', ly.toFixed(1)+'px'); }
+    requestAnimationFrame(loop);
+  })();
+
+  // ---- card hover spotlight follows the cursor ----
+  document.querySelectorAll('.card').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX-r.left)+'px');
+      card.style.setProperty('--my', (e.clientY-r.top)+'px');
+    }, {passive:true});
+  });
+})();
+</script>
+</body></html>
