@@ -195,6 +195,8 @@
         h += '<div class="card"' + (c.chartId ? ' data-chart="' + c.chartId + '"' : '') + '>' +
           (c.title ? '<h4>' + t(c.title) + '</h4>' : '') +
           t(c.html) +
+          (c.chart && window.EconChart ? window.EconChart(c.chart) : '') +
+          (c.htmlAfter ? t(c.htmlAfter) : '') +
           (c.chartId ? '<div class="chart-wrap"><canvas id="chart-' + c.chartId + '"></canvas></div>' : '') +
         '</div>';
       });

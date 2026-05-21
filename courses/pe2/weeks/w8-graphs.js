@@ -9,6 +9,38 @@
   var u = (window.PE2_WEEKS || {}).w8;
   if (!u) return;
 
+  // Declarative spec for the budget-deficit 3-panel (rendered by EconChart).
+  // Equilibria are COMPUTED from the line equations, so they are exact:
+  // D: r = -0.875·Q + 9.375 → at S1(Q=6) r₁=4.125, at S2(Q=4) r₂=5.875 (r↑),
+  // hence NCO₂<NCO₁ and, in the FX panel, RER₂>RER₁ (appreciation).
+  var SPEC_DEFICIT = { panels: [
+    { title: '(1) LF: r ↑', w: 300, h: 250,
+      x: { min: 0, max: 10, label: 'Q (LF)' }, y: { min: 0, max: 10, label: 'r' },
+      curves: [
+        { id: 'D',  kind: 'line',  p1: [1, 8.5], p2: [9, 1.5], color: '#c0392b', label: 'D' },
+        { id: 'S1', kind: 'vline', x: 6, color: '#0e8fb8', label: 'S₁' },
+        { id: 'S2', kind: 'vline', x: 4, color: '#0e8fb8', label: 'S₂', dash: true }
+      ],
+      points: [ { on: ['D', 'S1'], guideY: 'r₁', dot: true }, { on: ['D', 'S2'], guideY: 'r₂', dot: true } ],
+      shifts: [ { from: 'S1', to: 'S2' } ] },
+    { title: '(2) r → NCO', w: 300, h: 250,
+      x: { min: 0, max: 10, label: 'NCO' }, y: { min: 0, max: 10, label: 'r' },
+      curves: [ { id: 'NCO', kind: 'line', p1: [1, 8.5], p2: [9, 1.5], color: '#b7791f', label: 'NCO(r)' } ],
+      points: [
+        { onCurve: 'NCO', atY: 4.125, guideY: 'r₁', guideX: 'NCO₁', dot: true },
+        { onCurve: 'NCO', atY: 5.875, guideY: 'r₂', guideX: 'NCO₂', dot: true }
+      ] },
+    { title: '(3) RER ↑ (apprec.)', w: 300, h: 250,
+      x: { min: 0, max: 10, label: '$ (FX)' }, y: { min: 0, max: 10, label: 'RER' },
+      curves: [
+        { id: 'D',  kind: 'line',  p1: [1, 8.5], p2: [9, 1.5], color: '#c0392b', label: 'D=NX' },
+        { id: 'S1', kind: 'vline', x: 6, color: '#0e8fb8', label: 'S₁=NCO₁' },
+        { id: 'S2', kind: 'vline', x: 4, color: '#0e8fb8', label: 'S₂=NCO₂', dash: true }
+      ],
+      points: [ { on: ['D', 'S1'], guideY: 'RER₁', dot: true }, { on: ['D', 'S2'], guideY: 'RER₂', dot: true } ],
+      shifts: [ { from: 'S1', to: 'S2' } ] }
+  ] };
+
   u.graphs = (u.graphs || []).concat([
     /* =======================================================================
        SECTION EX1 — Full three-panel exam scenarios
@@ -31,22 +63,14 @@
           html: {
             en: `<p><span class="key">Exam scenario:</span> the government runs a large <span class="key">budget deficit</span>. Trace it through all three panels and find what happens to $r$, $NCO$, the real exchange rate $RER$, and net exports $NX$.</p>
 <p>A deficit <span class="key">lowers national saving</span>, so the <span class="key">supply</span> of loanable funds shifts <span class="key">left</span> ($S_1\\!\\to\\!S_2$). That raises $r$; the higher $r$ slides $NCO$ <span class="key">down</span> its curve; the smaller $NCO$ is a smaller (left-shifted) <span class="key">supply</span> of currency in the FX market, so the $RER$ <span class="key">appreciates</span> and $NX$ falls.</p>
-${threePanel({
-  lf: { sLabel: 'S₂', s2Label: 'S₁', shift: 'left-supply', note: 'r ↑' },
-  fx: { kind: 'supply-left', curLabel: 'RER', note: 'RER ↑ (apprec.)' },
-  uid: 'd1'
-})}
+${window.EconChart ? window.EconChart(SPEC_DEFICIT) : ''}
 <div class="formula">$$\\text{deficit} \\Rightarrow S_{LF}\\downarrow \\Rightarrow r\\uparrow \\Rightarrow NCO\\downarrow \\Rightarrow S_{\\$}\\downarrow \\Rightarrow RER\\uparrow \\Rightarrow NX\\downarrow$$</div>
 <div class="tip">Takeaway: <span class="key">Deficit → r↑, NCO↓, RER appreciates, NX↓.</span> The fiscal deficit and the trade deficit move together — that is why it is called the "twin deficits."</div>
 <div class="note">Common mistake: shifting the loanable-funds <em>demand</em> instead of the <em>supply</em>. A deficit is a fall in <em>national saving</em>, so it moves the <em>supply</em> curve left. (Also: do not confuse the appreciation here with capital flight, which depreciates.)</div>
 <p style="font-size:11px;color:#777">Appeared: UAS 2019 (S1c), 2024 (MCQ4), 2025 (MCQ4).</p>`,
             id: `<p><span class="key">Skenario ujian:</span> pemerintah menjalankan <span class="key">defisit anggaran</span> yang besar. Telusuri melalui ketiga panel dan tentukan apa yang terjadi pada $r$, $NCO$, nilai tukar riil $RER$, dan ekspor neto $NX$.</p>
 <p>Defisit <span class="key">menurunkan tabungan nasional</span>, sehingga <span class="key">penawaran</span> dana pinjaman bergeser ke <span class="key">kiri</span> ($S_1\\!\\to\\!S_2$). Itu menaikkan $r$; $r$ yang lebih tinggi menggeser $NCO$ <span class="key">turun</span> di sepanjang kurvanya; $NCO$ yang lebih kecil adalah <span class="key">penawaran</span> mata uang yang lebih kecil (bergeser ke kiri) di pasar FX, sehingga $RER$ <span class="key">terapresiasi</span> dan $NX$ turun.</p>
-${threePanel({
-  lf: { sLabel: 'S₂', s2Label: 'S₁', shift: 'left-supply', note: 'r ↑' },
-  fx: { kind: 'supply-left', curLabel: 'RER', note: 'RER ↑ (apresiasi)' },
-  uid: 'd1'
-})}
+${window.EconChart ? window.EconChart(SPEC_DEFICIT) : ''}
 <div class="formula">$$\\text{defisit} \\Rightarrow S_{LF}\\downarrow \\Rightarrow r\\uparrow \\Rightarrow NCO\\downarrow \\Rightarrow S_{\\$}\\downarrow \\Rightarrow RER\\uparrow \\Rightarrow NX\\downarrow$$</div>
 <div class="tip">Inti: <span class="key">Defisit → r↑, NCO↓, RER terapresiasi, NX↓.</span> Defisit fiskal dan defisit perdagangan bergerak bersama — itulah sebabnya disebut "defisit kembar."</div>
 <div class="note">Kesalahan umum: menggeser <em>permintaan</em> dana pinjaman, bukan <em>penawaran</em>. Defisit adalah penurunan <em>tabungan nasional</em>, jadi menggeser kurva <em>penawaran</em> ke kiri. (Juga: jangan rancukan apresiasi di sini dengan pelarian modal, yang justru mendepresiasi.)</div>

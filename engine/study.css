@@ -161,6 +161,14 @@ a{color:inherit}
 .subtab.filled:not(.active)::before{content:'';display:inline-block;width:5px;height:5px;
   border-radius:50%;background:var(--green);margin-right:7px;vertical-align:middle}
 .seg-body{min-height:120px}
+
+/* declarative econ-chart panels (engine/econ-chart.js) */
+.econ-panels{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;margin:14px 0}
+.econ-panel{flex:1 1 240px;min-width:210px;margin:0;background:var(--paper-2);
+  border:1px solid var(--line);border-radius:10px;padding:12px 10px 8px}
+.econ-panel svg{display:block;margin:0 auto}
+.econ-cap{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center;
+  margin-top:6px;letter-spacing:.02em}
 .btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:99px;
   border:1px solid var(--line-2);background:var(--paper);color:var(--ink-2);cursor:pointer;transition:all .14s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
