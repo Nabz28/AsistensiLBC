@@ -24,12 +24,12 @@ window.LBC_COURSES = [
     slug: 'intecon',
     code: 'EKINTER',
     title: 'Ekonomi Internasional',
-    subtitle: 'Ricardian · Heckscher–Ohlin · trade policy · exchange rates',
+    subtitle: 'Trade policy · balance of payments · exchange rates · UIP/CIP/PPP',
     faculty: 'UI · FEB',
-    status: 'soon',
+    status: 'ready',
     accent: '#f0a830',
     meta: [
-      { label: 'Weeks', value: '13' },
+      { label: 'Weeks', value: '7' },
       { label: 'Bilingual', value: 'EN·ID' }
     ]
   }

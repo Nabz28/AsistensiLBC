@@ -50,6 +50,7 @@
     (p.curves || []).forEach(function (c) {
       if (c.kind === 'vline') byId[c.id] = { vert: true, x: c.x };
       else if (c.kind === 'hline') byId[c.id] = { horiz: true, y: c.y };
+      else if (c.kind === 'path') { /* path curves are illustrative; not used for intersections */ }
       else {
         var m = (c.p2[1] - c.p1[1]) / (c.p2[0] - c.p1[0]);
         byId[c.id] = { m: m, b: c.p1[1] - m * c.p1[0], p1: c.p1, p2: c.p2 };
@@ -85,10 +86,21 @@
     if (Y.label) s += '<text x="' + (ox + 4) + '" y="' + (topY - 9) + '" font-size="12" fill="#333" font-style="italic">' + Y.label + '</text>';
     if (X.label) s += '<text x="' + (rightX + 2) + '" y="' + (oy + 28) + '" font-size="11" fill="#666" text-anchor="end">' + X.label + '</text>';
 
+    // filled regions (e.g. tariff welfare areas) — drawn behind curves/points
+    (p.areas || []).forEach(function (a) {
+      var d = a.pts.map(function (q, i) { return (i ? 'L' : 'M') + num(sx(q[0])) + ',' + num(sy(q[1])); }).join(' ') + ' Z';
+      s += '<path d="' + d + '" fill="' + (a.fill || 'rgba(14,143,184,.13)') + '" stroke="' + (a.stroke || 'none') + '"' + (a.stroke ? ' stroke-width="1"' : '') + '/>';
+      if (a.label) {
+        var cx = 0, cy = 0; a.pts.forEach(function (q) { cx += q[0]; cy += q[1]; });
+        cx /= a.pts.length; cy /= a.pts.length;
+        s += '<text x="' + num(sx(cx)) + '" y="' + num(sy(cy) + 4) + '" font-size="11" font-weight="700" fill="' + (a.labelColor || '#333') + '" text-anchor="middle">' + a.label + '</text>';
+      }
+    });
+
     // guides + dots + labels computed from points
     var guides = '', dots = '', labels = '';
     (p.points || []).forEach(function (pt) {
-      var P = pt.on ? intersect(pt.on[0], pt.on[1]) : onCurve(pt.onCurve, pt);
+      var P = pt.on ? intersect(pt.on[0], pt.on[1]) : (pt.at ? pt.at : onCurve(pt.onCurve, pt));
       if (!P || P[0] == null || P[1] == null) return;
       var px = sx(P[0]), py = sy(P[1]);
       if (pt.guideY !== undefined) {
@@ -107,9 +119,31 @@
     });
     s += guides;
 
+    // smooth polyline (Catmull-Rom → cubic Bézier) for paths
+    function pathD(pts, smooth) {
+      var P = pts.map(function (q) { return [sx(q[0]), sy(q[1])]; });
+      if (!smooth || P.length < 3) return P.map(function (q, i) { return (i ? 'L' : 'M') + num(q[0]) + ',' + num(q[1]); }).join(' ');
+      var d = 'M' + num(P[0][0]) + ',' + num(P[0][1]);
+      for (var i = 0; i < P.length - 1; i++) {
+        var p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+        var c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        var c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        d += ' C' + num(c1x) + ',' + num(c1y) + ' ' + num(c2x) + ',' + num(c2y) + ' ' + num(p2[0]) + ',' + num(p2[1]);
+      }
+      return d;
+    }
+
     // curves
     (p.curves || []).forEach(function (c) {
       var col = c.color || '#0e8fb8', dash = c.dash ? ' stroke-dasharray="6 4"' : '';
+      if (c.kind === 'path') {
+        s += '<path d="' + pathD(c.pts, c.smooth) + '" fill="none" stroke="' + col + '" stroke-width="2.3"' + dash + ' stroke-linecap="round" stroke-linejoin="round"/>';
+        if (c.label) {
+          var lp = c.pts[c.pts.length - 1];
+          s += '<text x="' + num(sx(lp[0]) + 5) + '" y="' + num(sy(lp[1]) + 4) + '" font-size="11" fill="' + col + '" font-weight="700">' + c.label + '</text>';
+        }
+        return;
+      }
       var x1, y1, x2, y2;
       if (c.kind === 'vline') { x1 = x2 = sx(c.x); y1 = oy; y2 = topY; }
       else if (c.kind === 'hline') { y1 = y2 = sy(c.y); x1 = ox; x2 = rightX; }
