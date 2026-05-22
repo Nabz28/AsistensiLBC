@@ -19,5 +19,18 @@ window.LBC_COURSES = [
       { label: 'Weeks', value: '5' },
       { label: 'Bilingual', value: 'EN·ID' }
     ]
+  },
+  {
+    slug: 'intecon',
+    code: 'EKINTER',
+    title: 'Ekonomi Internasional',
+    subtitle: 'Ricardian · Heckscher–Ohlin · trade policy · exchange rates',
+    faculty: 'UI · FEB',
+    status: 'soon',
+    accent: '#f0a830',
+    meta: [
+      { label: 'Weeks', value: '13' },
+      { label: 'Bilingual', value: 'EN·ID' }
+    ]
   }
 ];
