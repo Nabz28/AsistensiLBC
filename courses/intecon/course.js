@@ -47,7 +47,11 @@
 
     units: order.map(function (k) { return W[k]; }).filter(Boolean),
 
-    exams: [],
+    exams: (function () {
+      var E = window.EKINTER_EXAMS || {};
+      return ['2023', '2024'].map(function (y) { return E[y]; }).filter(Boolean);
+    })(),
+
     glossary: (window.EKINTER_GLOSSARY || [])
   };
 })();
