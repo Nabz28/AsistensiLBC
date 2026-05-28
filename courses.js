@@ -32,5 +32,18 @@ window.LBC_COURSES = [
       { label: 'Weeks', value: '7' },
       { label: 'Bilingual', value: 'EN·ID' }
     ]
+  },
+  {
+    slug: 'esdmk',
+    code: 'ESDMK',
+    title: 'Ekonomi Sumber Daya Manusia & Ketenagakerjaan',
+    subtitle: 'Human capital · compensating wages · discrimination · migration',
+    faculty: 'UI · FEB',
+    status: 'ready',
+    accent: '#1f6fb8',
+    meta: [
+      { label: 'Topics', value: '4' },
+      { label: 'Bilingual', value: 'EN·ID' }
+    ]
   }
 ];
