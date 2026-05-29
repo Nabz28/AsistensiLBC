@@ -4,6 +4,11 @@ README.md
 
 # Source course materials — lecture decks, past exams, ANSWER KEYS.
 # Must never be served publicly.
-PE-2
-EKINTER
+# NOTE: anchor each to repo root with a leading slash. An unanchored "ESDMK"
+# also matches "courses/esdmk/" on case-insensitive (Windows) filesystems and
+# would wrongly exclude the published course. Leading slash = top level only.
+/PE-2
+/EKINTER
+/ESDMK
+/Indonesian Economics
 
