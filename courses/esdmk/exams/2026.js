@@ -44,98 +44,133 @@
   var GAIN = 'rgba(14,143,184,.16)';
   var LOSS = 'rgba(192,57,43,.16)';
 
-  /* ---- T1 chart: MRR–MCC with r↑ AND opportunity-cost↑ shifts -------------- */
-  var T1_CHART = { panels: [{
-    title: 'Optimal schooling: higher r OR higher opportunity cost ⇒ s* falls',
-    w: 460, h: 320,
-    x: { min: 0, max: 20, label: 'Years of schooling s' },
-    y: { min: 0, max: 16, label: 'Rate of return / discount rate (%)' },
-    curves: [
-      { id: 'MRR',  kind: 'line', p1: [0, 14], p2: [20, 4],  color: RED, label: 'MRR(s)' },
-      { id: 'MRR2', kind: 'line', p1: [0, 12], p2: [20, 2],  color: '#e09080', label: "MRR'(s) — gig opp.cost↑" , dash: true },
-      { id: 'MCC1', kind: 'hline', y: 6,  color: TEAL,  label: 'MCC₁ = 6% (r₁)' },
-      { id: 'MCC2', kind: 'hline', y: 10, color: AMBER, label: 'MCC₂ = 10% (r₂↑)' }
-    ],
-    points: [
-      { on: ['MRR',  'MCC1'], guideX: 's₁* = 16',  dot: true },
-      { on: ['MRR',  'MCC2'], guideX: 's₂* = 8',   dot: true },
-      { on: ['MRR2', 'MCC1'], guideX: "s₃* = 12",  dot: true }
-    ],
-    notes: [
-      { x: 13, y: 13.0, text: 'r↑ (credit constraint) ⇒ s*↓', color: AMBER, anchor: 'middle', size: 10 },
-      { x: 6.5, y: 1.7, text: 'opp.cost↑ (gig) ⇒ MRR↓ at every s ⇒ s*↓', color: '#cd6033', anchor: 'middle', size: 10 }
-    ]
-  }] };
-
-  /* ---- T2 chart: hedonic locus + gig "below-CWD" shortfall ----------------- */
-  var T2_CHART = { panels: [{
-    title: 'Hedonic wage h(x): gig sits below the locus ⇒ unmet CWD',
-    w: 460, h: 320,
-    x: { min: 0, max: 1.0, label: 'Risk / disamenity x' },
-    y: { min: 10, max: 45, label: 'Wage / total comp.' },
-    curves: [
-      { kind: 'path',
-        pts: [[0,16],[0.1,17.64],[0.2,19.36],[0.3,21.16],[0.4,23.04],[0.5,25.00],[0.6,27.04],[0.7,29.16],[0.8,31.36],[0.9,33.64],[1.0,36]],
-        smooth: true, color: RED, label: 'hedonic h(x)' },
-      { kind: 'path',
-        pts: [[0,16],[0.2,21.0],[0.4,27.0],[0.6,33.5],[0.8,40.5],[1.0,48.0]],
-        smooth: true, color: AMBER, label: 'risk-averse formal IC' }
-    ],
-    points: [
-      { at: [0.0, 16], label: 'A: formal job', dot: true },
-      { at: [0.85, 16], label: 'gig (w=16, x=0.85): below h', dot: true },
-      { at: [0.85, 33], label: 'B: where gig should sit on h', dot: true }
-    ],
-    notes: [
-      { x: 0.55, y: 13.0, text: 'unmet CWD ≈ 17 — total comp shortfall', color: GREEN, anchor: 'middle', size: 10 }
-    ]
-  }] };
-
-  /* ---- T3 chart: market wage-ratio equilibrium with skills-vs-discrim split -*/
-  var T3_CHART = { panels: [
-    { title: '(a) Market wage-ratio equilibrium — w_F/w_M < 1 even with equal skill',
-      w: 360, h: 270, x: { min: 0, max: 10, label: 'F-employment' }, y: { min: 0, max: 1.5, label: 'w_F/w_M' },
+  /* ---- T1 chart: (a) earnings streams + (b) MRR–MCC shifts ----------------- */
+  var T1_CHART = { panels: [
+    { title: '(a) Schooling as investment — two lifetime earnings streams',
+      w: 360, h: 270, x: { min: 18, max: 65, label: 'Age' }, y: { min: -2, max: 10, label: 'Earnings / cost outlay' },
       curves: [
-        { id: 'S',  kind: 'vline', x: 6, color: LINE, label: 'S (inelastic)' },
-        { id: 'D',  kind: 'line', p1: [0, 1.4], p2: [10, 0.2], color: RED, label: 'D (prejudice)' },
-        { id: 'one', kind: 'hline', y: 1.0, color: '#999', label: 'parity' }
+        { id: 'zero', kind: 'hline', y: 0, color: '#999' },
+        { kind: 'path', pts: [[18,2.5],[25,3.0],[35,3.4],[45,3.6],[55,3.5],[65,3.2]], smooth: true, color: TEAL, label: 'A: high-school' },
+        { kind: 'path', pts: [[18,-1.2],[22,0],[25,4.5],[35,6.8],[45,8.2],[55,8.4],[65,7.6]], smooth: true, color: RED, label: 'B: university' }
       ],
-      points: [ { on: ['D', 'S'], guideY: '(wF/wM)*≈0.67', dot: true } ] },
-    { title: '(b) Oaxaca: the unexplained portion = "discrimination"',
-      w: 360, h: 270, x: { min: 0, max: 16, label: 'years of schooling s' }, y: { min: 0, max: 12, label: 'ln w' },
+      notes: [
+        { x: 21, y: -1.6, text: 'forgone earnings + tuition', color: '#777', anchor: 'middle', size: 9 },
+        { x: 46, y: 5.2, text: 'gross benefit (B − A)', color: GREEN, anchor: 'middle', size: 9 }
+      ] },
+    { title: '(b) Optimal s*: higher r OR higher opp.cost ⇒ s* falls',
+      w: 360, h: 270, x: { min: 0, max: 20, label: 'Years of schooling s' }, y: { min: 0, max: 16, label: 'Return / discount (%)' },
+      curves: [
+        { id: 'MRR',  kind: 'line', p1: [0, 14], p2: [20, 4],  color: RED, label: 'MRR(s)' },
+        { id: 'MRR2', kind: 'line', p1: [0, 12], p2: [20, 2],  color: '#e09080', label: "MRR' (opp.cost↑)", dash: true },
+        { id: 'MCC1', kind: 'hline', y: 6,  color: TEAL,  label: 'r_low' },
+        { id: 'MCC2', kind: 'hline', y: 10, color: AMBER, label: 'r_high' }
+      ],
+      points: [
+        { on: ['MRR',  'MCC1'], guideX: 's*',  dot: true },
+        { on: ['MRR',  'MCC2'], guideX: 's₁',  dot: true },
+        { on: ['MRR2', 'MCC1'], guideX: 's₂',  dot: true }
+      ],
+      notes: [ { x: 12.5, y: 13.0, text: 'r↑ / opp.cost↑ ⇒ s↓', color: AMBER, anchor: 'middle', size: 9 } ] }
+  ] };
+
+  /* ---- T2 chart: (a) hedonic sorting (offer curve + 2 worker types) + ------
+     (b) gig "below-locus" shortfall (our own value-add Deo's set lacks) ------ */
+  var T2_CHART = { panels: [
+    { title: '(a) Hedonic equilibrium — workers sort along the offer curve',
+      w: 360, h: 280, x: { min: 0, max: 1.0, label: 'Risk / disamenity x' }, y: { min: 10, max: 45, label: 'Wage W' },
+      curves: [
+        { kind: 'path', pts: [[0,15],[0.15,19],[0.3,22.5],[0.45,25.5],[0.6,28],[0.75,30],[0.9,31.5],[1.0,32.3]], smooth: true, color: LINE, label: 'offer curve (market locus)' },
+        { kind: 'path', pts: [[0.08,12],[0.2,16.5],[0.3,22.5],[0.37,30],[0.42,40]], smooth: true, color: TEAL, label: 'A: risk-averse IC' },
+        { kind: 'path', pts: [[0.42,13],[0.62,18.5],[0.76,24],[0.86,30.5],[0.96,39]], smooth: true, color: RED, label: 'B: risk-tolerant IC' }
+      ],
+      points: [
+        { at: [0.30, 22.5], label: 'A', dot: true },
+        { at: [0.84, 30.8], label: 'B', dot: true }
+      ],
+      notes: [
+        { x: 0.55, y: 36, text: 'slope of offer curve = compensating differential', color: '#777', anchor: 'middle', size: 9 },
+        { x: 0.5, y: 13, text: 'A → low risk, low pay · B → high risk, high pay', color: '#777', anchor: 'middle', size: 9 }
+      ] },
+    { title: '(b) Gig job sits BELOW the locus ⇒ unmet differential',
+      w: 360, h: 280, x: { min: 0, max: 1.0, label: 'Risk x' }, y: { min: 10, max: 40, label: 'Wage / total comp.' },
+      curves: [
+        { kind: 'path', pts: [[0,16],[0.2,19.36],[0.4,23.04],[0.6,27.04],[0.8,31.36],[1.0,36]], smooth: true, color: LINE, label: 'hedonic h(x)' }
+      ],
+      points: [
+        { at: [0.0, 16],  label: 'formal (safe)', dot: true },
+        { at: [0.85, 16.5], label: 'gig: paid like formal, but x high', dot: true },
+        { at: [0.85, 32.8], label: 'where gig SHOULD sit on h(x)', dot: true }
+      ],
+      notes: [ { x: 0.5, y: 13, text: 'unmet compensating differential', color: GREEN, anchor: 'middle', size: 9 } ] }
+  ] };
+
+  /* ---- T3 chart: (a) Becker VMP under-employment + (b) statistical at T* +
+     (c) Oaxaca decomposition — the two named models plus the measurement ----- */
+  var T3_CHART = { panels: [
+    { title: '(a) Becker: employer acts on W_F(1+d) ⇒ E_d < E*',
+      w: 320, h: 250, x: { min: 0, max: 10, label: 'Women employed E' }, y: { min: 0, max: 10, label: '$' },
+      curves: [
+        { id: 'VMP', kind: 'line', p1: [0, 10], p2: [10, 0], color: TEAL, label: 'VMP_E' },
+        { id: 'Wf',  kind: 'hline', y: 4, color: GREEN, label: 'W_F (true)' },
+        { id: 'Wfd', kind: 'hline', y: 6, color: RED,   label: 'W_F(1+d)', dash: true }
+      ],
+      points: [
+        { on: ['VMP', 'Wfd'], guideX: 'E_d', dot: true },
+        { on: ['VMP', 'Wf'],  guideX: 'E*',  dot: true }
+      ],
+      notes: [ { x: 6.8, y: 8.4, text: 'fewer women hired', color: '#777', anchor: 'middle', size: 9 } ] },
+    { title: '(b) Statistical: same signal T*, lower wage for women',
+      w: 320, h: 250, x: { min: 0, max: 10, label: 'Individual signal T' }, y: { min: 0, max: 10, label: 'Wage offered' },
+      curves: [
+        { id: 'men',   kind: 'line', p1: [0, 3],   p2: [10, 9],   color: TEAL, label: "men's predicted wage" },
+        { id: 'women', kind: 'line', p1: [0, 1.5], p2: [10, 7.5], color: RED,  label: "women's predicted wage" },
+        { id: 'Tstar', kind: 'vline', x: 6, color: '#999', label: 'T*' }
+      ],
+      points: [
+        { on: ['men',   'Tstar'], guideY: 'w_M', dot: true },
+        { on: ['women', 'Tstar'], guideY: 'w_F', dot: true }
+      ],
+      notes: [ { x: 7.6, y: 4.6, text: 'gap at identical T*', color: '#777', anchor: 'middle', size: 9 } ] },
+    { title: '(c) Oaxaca: the unexplained gap = discrimination',
+      w: 320, h: 250, x: { min: 0, max: 16, label: 'schooling s' }, y: { min: 0, max: 12, label: 'ln w' },
       curves: [
         { id: 'M', kind: 'line', p1: [0, 4], p2: [16, 11], color: TEAL, label: 'wM' },
         { id: 'F', kind: 'line', p1: [0, 3], p2: [16, 8],  color: RED,  label: 'wF' },
-        { id: 'sF', kind: 'vline', x: 8, color: '#999' }
+        { id: 'sF', kind: 'vline', x: 8, color: '#999', label: 's̄_F' }
       ],
       points: [
-        { on: ['F', 'sF'], guideY: 'w_F', dot: true },
+        { on: ['F', 'sF'], guideY: 'w_F',  dot: true },
         { on: ['M', 'sF'], guideY: 'w*_F', dot: true }
       ],
-      notes: [
-        { x: 5.5, y: 9.5, text: 'discrimination = w*_F − w_F', color: GREEN, anchor: 'middle', size: 10 }
-      ] }
+      notes: [ { x: 5.5, y: 9.5, text: 'discrimination = w*_F − w_F', color: GREEN, anchor: 'middle', size: 9 } ] }
   ] };
 
-  /* ---- T4 chart: Lewis (left) + PV-with-abuse-cost (right) ----------------- */
+  /* ---- T4 chart: (a) Lewis + (b) Sjaastad PV-with-abuse + (c) age hump ----- */
   var T4_CHART = { panels: [
     { title: '(a) Lewis macro engine — persistent gap drives flow',
-      w: 360, h: 270, x: { min: 0, max: 10, label: 'L abroad' }, y: { min: 0, max: 8, label: 'wage' },
+      w: 300, h: 250, x: { min: 0, max: 10, label: 'L abroad' }, y: { min: 0, max: 8, label: 'wage' },
       curves: [
         { id: 'S', kind: 'hline', y: 2, color: '#999', label: 'OS rural ID' },
         { id: 'W', kind: 'hline', y: 5.5, color: LINE, label: 'OW HK/SG/MY' },
         { id: 'M', kind: 'line', p1: [0, 7], p2: [5, 5.5], color: RED, label: 'MRP abroad' }
       ],
       points: [ { on: ['M', 'W'], guideX: 'Q*', dot: true } ],
-      notes: [ { x: 7.5, y: 6.5, text: 'gap unbounded ⇒ supply unbounded', color: '#777', anchor: 'middle', size: 10 } ] },
+      notes: [ { x: 7.2, y: 6.5, text: 'gap unbounded ⇒ supply unbounded', color: '#777', anchor: 'middle', size: 9 } ] },
     { title: '(b) Sjaastad PV — abuse raises C, but U_j − U_i still dominates',
-      w: 360, h: 270, x: { min: 0, max: 10, label: 'period t' }, y: { min: -3, max: 8, label: 'flow gain' },
+      w: 300, h: 250, x: { min: 0, max: 10, label: 'period t' }, y: { min: -3, max: 8, label: 'flow gain' },
       curves: [
         { id: 'zero', kind: 'hline', y: 0, color: '#999' },
         { kind: 'path', pts: [[0, -2.5], [1, 4.5], [3, 5.0], [6, 5.0], [9, 5.0]], smooth: true, color: TEAL, label: 'U_j − U_i' },
-        { kind: 'path', pts: [[0, -2.5], [1, -1.5], [3, -1.0], [6, -0.8], [9, -0.6]], smooth: true, color: RED, label: '−C_{ij}^t (incl. abuse risk)' }
+        { kind: 'path', pts: [[0, -2.5], [1, -1.5], [3, -1.0], [6, -0.8], [9, -0.6]], smooth: true, color: RED, label: '−C (incl. abuse)' }
       ],
-      notes: [ { x: 5, y: 6.5, text: 'PV = Σ (U_j − U_i − C)/(1+r)^t > 0', color: GREEN, anchor: 'middle', size: 10 } ] }
+      notes: [ { x: 5, y: 6.6, text: 'PV = Σ(U_j−U_i−C)/(1+r)^t > 0', color: GREEN, anchor: 'middle', size: 9 } ] },
+    { title: '(c) Age heterogeneity — migration peaks in early 20s',
+      w: 300, h: 250, x: { min: 15, max: 65, label: 'Age' }, y: { min: 0, max: 1.0, label: 'P(migrate)' },
+      curves: [
+        { kind: 'path', pts: [[15,0.30],[20,0.85],[23,0.95],[27,0.70],[33,0.42],[40,0.22],[50,0.12],[65,0.05]], smooth: true, color: TEAL, label: 'migration propensity' },
+        { id: 'pk', kind: 'vline', x: 23, color: RED, label: 'peak ~23' }
+      ],
+      notes: [ { x: 44, y: 0.74, text: 'longest horizon T ⇒ highest PV', color: '#777', anchor: 'middle', size: 9 } ] }
   ] };
 
   window.ESDMK_EXAMS['2026'] = {
@@ -234,7 +269,7 @@
               + '<div class="formula">$\\dfrac{dw}{dx}\\bigg|_{\\bar U} = -\\dfrac{U_x}{U_w} = \\text{MRS}_{xw} > 0,$</div>'
               + '<p>the worker\'s marginal willingness to accept (MWTA) one additional unit of disamenity. If the labour market contains two simple jobs — a "clean" formal job at $(w_0, 0)$ and a "dirty" gig job at $(w_1, x_g)$ — workers are indifferent only when</p>'
               + '<div class="formula">$U(w_0, 0) = U(w_0 + \\text{CWD}, x_g),\\;\\;\\text{i.e.\\;} \\text{CWD} = w_1 - w_0 \\text{ such that utility is preserved.}$</div>'
-              + '<p>The tutorial illustration $U = \\sqrt{w} - 2x$ delivered $U_0 = \\sqrt{16} = 4$ on the clean job, so the dirty job at $x = 1$ must pay $\\sqrt{w_1} - 2 = 4 \\Rightarrow w_1 = 36$ and CWD $= 20$. With many jobs covering a continuum of $x$, the equilibrium <span class="key">hedonic wage function</span> $w = h(x)$ traces the market-clearing wage at every level of risk; it slopes upward ($h\' > 0$) because firms must pay more to attract workers to riskier jobs. Each worker chooses the job where her indifference curve is tangent to $h$, $h\'(x^{*}) = \\text{MRS}^i_{xw}(x^{*}, w^{*})$. Risk-tolerant workers sort to high-$x$ jobs; risk-averse workers stay at low-$x$ formal positions. The CWD on the locus is the equilibrium price of risk.</p>'
+              + '<p>The tutorial illustration $U = \\sqrt{w} - 2x$ delivered $U_0 = \\sqrt{16} = 4$ on the clean job, so the dirty job at $x = 1$ must pay $\\sqrt{w_1} - 2 = 4 \\Rightarrow w_1 = 36$ and CWD $= 20$. With many jobs covering a continuum of $x$, the equilibrium <span class="key">hedonic wage function</span> $w = h(x)$ traces the market-clearing wage at every level of risk; it slopes upward ($h\' > 0$) because firms must pay more to attract workers to riskier jobs. The whole framework rests on three assumptions: workers <em>maximise utility</em> (not the wage), workers are <em>informed</em> about the relevant job characteristics, and they face a <em>range of offers</em> to choose among. On the firm side, reducing risk is increasingly costly, so each firm\'s zero-profit iso-profit curve is concave; the locus $h(x)$ is the <em>upper envelope</em> of the offers firms can afford to make. Each worker then chooses the job where her indifference curve is tangent to $h$, $h\'(x^{*}) = \\text{MRS}^i_{xw}(x^{*}, w^{*})$. This produces <span class="key">sorting</span> (chart panel a): a risk-averse worker A tangs at a low-$x$, low-wage point while a risk-tolerant worker B tangs at a high-$x$, high-wage point — and the upward slope of the offer curve <em>is</em> the compensating differential. The CWD on the locus is the equilibrium price of risk.</p>'
 
               + '<p><strong>Predicted gig wage under the standard theory.</strong> Indonesian platform work has a measurable disamenity bundle: no employer-paid BPJS Kesehatan, no BPJS Ketenagakerjaan / pension contribution, no paid sick leave, no paid annual leave, no minimum-hours guarantee, and a higher accident probability documented in road-safety statistics. Letting $b_{\\text{formal}}$ be the present value of these benefits in the formal sector and $\\pi$ the additional accident-risk premium, the CWD framework predicts the platform wage to satisfy</p>'
               + '<div class="formula">$w_{\\text{gig}} = w_{\\text{formal}} + b_{\\text{formal}} + \\pi \\;>\\; w_{\\text{formal}}.$</div>'
@@ -258,7 +293,7 @@
 
               + '<p><strong>Patokan teoritis — preferensi, indiferen, dan lokus hedonik.</strong> Pekerja memiliki preferensi $U(w, x)$ atas upah $w$ dan disamenity $x$ (campuran risiko kecelakaan, ketidakpastian jam, dan tanpa cuti berbayar / pensiun / asuransi kesehatan). Pembatasan standar $U_w > 0$ dan $U_x < 0$ menyiratkan IC miring naik di ruang $(x, w)$ dengan kemiringan</p>'
               + '<div class="formula">$\\dfrac{dw}{dx}\\bigg|_{\\bar U} = -\\dfrac{U_x}{U_w} = \\text{MRS}_{xw} > 0,$</div>'
-              + '<p>kesediaan marjinal pekerja menerima (MWTA) satu unit tambahan disamenity. Bila pasar mengandung dua pekerjaan sederhana — "bersih" formal di $(w_0, 0)$ dan "kotor" gig di $(w_1, x_g)$ — pekerja indiferen hanya bila $U(w_0, 0) = U(w_0 + \\text{CWD}, x_g)$. Tutorial $U = \\sqrt{w} - 2x$ memberi $U_0 = \\sqrt{16} = 4$ untuk bersih, sehingga kotor pada $x = 1$ harus bayar $\\sqrt{w_1} - 2 = 4 \\Rightarrow w_1 = 36$ dan CWD $= 20$. Dengan banyak pekerjaan mencakup kontinum $x$, fungsi <span class="key">upah hedonik</span> keseimbangan $w = h(x)$ menelusuri upah pembersih pasar pada tiap tingkat risiko; ia miring naik ($h\' > 0$). Tiap pekerja memilih pekerjaan di mana IC-nya tangen pada $h$: $h\'(x^{*}) = \\text{MRS}^i_{xw}(x^{*}, w^{*})$. Pekerja toleran risiko menyortir ke pekerjaan $x$ tinggi; pekerja averse risiko tetap pada posisi formal $x$ rendah. CWD pada lokus = harga keseimbangan risiko.</p>'
+              + '<p>kesediaan marjinal pekerja menerima (MWTA) satu unit tambahan disamenity. Bila pasar mengandung dua pekerjaan sederhana — "bersih" formal di $(w_0, 0)$ dan "kotor" gig di $(w_1, x_g)$ — pekerja indiferen hanya bila $U(w_0, 0) = U(w_0 + \\text{CWD}, x_g)$. Tutorial $U = \\sqrt{w} - 2x$ memberi $U_0 = \\sqrt{16} = 4$ untuk bersih, sehingga kotor pada $x = 1$ harus bayar $\\sqrt{w_1} - 2 = 4 \\Rightarrow w_1 = 36$ dan CWD $= 20$. Dengan banyak pekerjaan mencakup kontinum $x$, fungsi <span class="key">upah hedonik</span> keseimbangan $w = h(x)$ menelusuri upah pembersih pasar pada tiap tingkat risiko; ia miring naik ($h\' > 0$). Seluruh kerangka bertumpu pada tiga asumsi: pekerja <em>memaksimalkan utilitas</em> (bukan upah), pekerja <em>terinformasi</em> tentang karakteristik pekerjaan, dan menghadapi <em>banyak pilihan tawaran</em>. Di sisi perusahaan, menurunkan risiko makin mahal, jadi kurva iso-laba (laba-nol) tiap firma cekung; lokus $h(x)$ adalah <em>envelope atas</em> dari tawaran yang sanggup diberikan perusahaan. Tiap pekerja lalu memilih pekerjaan di mana IC-nya tangen pada $h$: $h\'(x^{*}) = \\text{MRS}^i_{xw}(x^{*}, w^{*})$. Ini menghasilkan <span class="key">penyortiran</span> (grafik panel a): pekerja averse risiko A tangen di titik $x$ rendah–upah rendah, sedangkan pekerja toleran risiko B tangen di titik $x$ tinggi–upah tinggi — dan kemiringan naik kurva tawaran <em>itulah</em> kesenjangan kompensatif. CWD pada lokus = harga keseimbangan risiko.</p>'
 
               + '<p><strong>Prediksi upah gig di bawah teori standar.</strong> Pekerjaan platform Indonesia memiliki bundel disamenity terukur: tanpa BPJS Kesehatan dibayar pengusaha, tanpa iuran BPJS Ketenagakerjaan / pensiun, tanpa cuti sakit berbayar, tanpa cuti tahunan berbayar, tanpa jaminan jam minimum, dan probabilitas kecelakaan lebih tinggi terdokumentasi dalam statistik keselamatan jalan. Misalkan $b_{\\text{formal}}$ adalah nilai sekarang tunjangan ini dalam sektor formal dan $\\pi$ premium risiko kecelakaan tambahan, kerangka CWD memprediksi upah platform memenuhi</p>'
               + '<div class="formula">$w_{\\text{gig}} = w_{\\text{formal}} + b_{\\text{formal}} + \\pi \\;>\\; w_{\\text{formal}}.$</div>'
@@ -301,7 +336,7 @@
 
               + '<p><strong>Theoretical benchmark 2 — statistical discrimination.</strong> The Arrow / Phelps mechanism replaces the assumption of taste with the assumption of imperfect information. Employers cannot observe individual productivity; they observe a noisy signal $T_i$ (CV, interview, test) and combine it with the perceived group mean $\\bar y_g$:</p>'
               + '<div class="formula">$\\hat y_i = (1 - \\alpha)\\,\\bar y_g + \\alpha\\, T_i,$</div>'
-              + '<p>where $\\alpha \\in (0,1)$ measures how reliable the individual signal is for that group. Two channels generate a gap. First, if employers (rightly or wrongly) believe $\\bar y_F < \\bar y_M$, every F worker faces a parallel downward shift in the wage-score line — even the high-scoring F worker pays a group penalty. Second, if the signal is noisier for F ($\\alpha_F < \\alpha_M$), the wage-score slope is flatter for F, so high-scoring F workers gain less from their score and low-scoring F workers are paradoxically overpaid relative to low-scoring M workers. The mechanism is rational and Bayesian, so competition does <em>not</em> erode it: the lower expected price for F is the correct unbiased estimate given the signal. Worse, the gap is self-reinforcing — anticipating fewer career rewards, F workers invest less in firm-specific human capital, confirming the original belief.</p>'
+              + '<p>where $\\alpha \\in (0,1)$ measures how reliable the individual signal is for that group. Two channels generate a gap. First, if employers (rightly or wrongly) believe $\\bar y_F < \\bar y_M$, every F worker faces a parallel downward shift in the wage-score line — even the high-scoring F worker pays a group penalty. Second, if the signal is noisier for F ($\\alpha_F < \\alpha_M$), the wage-score slope is flatter for F, so high-scoring F workers gain less from their score and low-scoring F workers are paradoxically overpaid relative to low-scoring M workers. The mechanism is rational and Bayesian, so competition does <em>not</em> erode it: the lower expected price for F is the correct unbiased estimate given the signal. Worse, the gap is self-reinforcing — anticipating fewer career rewards, F workers invest less in firm-specific human capital, confirming the original belief. Chart panel (b) makes this concrete: at an <em>identical</em> individual signal $T^{*}$, the woman is offered a strictly lower wage than the man, because the employer anchors partly on the lower (perceived) group mean — the entire gap here is discrimination, not a skill difference.</p>'
 
               + '<p><strong>The Oaxaca decomposition bridges theory to data.</strong> Running separate Mincer regressions for M and F and applying the Oaxaca (1973) algebra to the raw gap $\\Delta\\bar w = \\bar w_M - \\bar w_F$:</p>'
               + '<div class="formula">$\\Delta \\bar w = \\underbrace{(\\alpha_M - \\alpha_F) + (\\beta_M - \\beta_F)\\,\\bar s_F}_{\\text{unexplained / discrimination}} \\;+\\; \\underbrace{\\beta_M\\,(\\bar s_M - \\bar s_F)}_{\\text{explained / skill gap}}.$</div>'
@@ -323,7 +358,7 @@
 
               + '<p><strong>Patokan teoritis 2 — diskriminasi statistik.</strong> Mekanisme Arrow / Phelps mengganti asumsi selera dengan asumsi informasi tak sempurna. Pengusaha tak bisa mengamati produktivitas individu; mereka mengamati sinyal bising $T_i$ dan menggabungkannya dengan rata-rata kelompok yang dipersepsi $\\bar y_g$:</p>'
               + '<div class="formula">$\\hat y_i = (1 - \\alpha)\\,\\bar y_g + \\alpha\\, T_i,$</div>'
-              + '<p>$\\alpha \\in (0,1)$ mengukur keandalan sinyal individu untuk kelompok itu. Dua jalur menghasilkan kesenjangan. Pertama, bila pengusaha (benar atau salah) percaya $\\bar y_F < \\bar y_M$, tiap pekerja F menghadapi pergeseran paralel ke bawah pada garis upah-skor — bahkan F skor tinggi membayar penalti kelompok. Kedua, bila sinyal lebih bising untuk F ($\\alpha_F < \\alpha_M$), kemiringan upah-skor lebih datar untuk F. Mekanisme rasional dan Bayesian, jadi persaingan <em>tidak</em> mengikisnya: harga ekspektasi lebih rendah untuk F adalah estimasi tak bias yang benar. Lebih buruk, celah memperkuat diri — mengantisipasi imbalan karier lebih sedikit, pekerja F berinvestasi lebih sedikit pada modal manusia khusus-perusahaan, mengonfirmasi keyakinan awal.</p>'
+              + '<p>$\\alpha \\in (0,1)$ mengukur keandalan sinyal individu untuk kelompok itu. Dua jalur menghasilkan kesenjangan. Pertama, bila pengusaha (benar atau salah) percaya $\\bar y_F < \\bar y_M$, tiap pekerja F menghadapi pergeseran paralel ke bawah pada garis upah-skor — bahkan F skor tinggi membayar penalti kelompok. Kedua, bila sinyal lebih bising untuk F ($\\alpha_F < \\alpha_M$), kemiringan upah-skor lebih datar untuk F. Mekanisme rasional dan Bayesian, jadi persaingan <em>tidak</em> mengikisnya: harga ekspektasi lebih rendah untuk F adalah estimasi tak bias yang benar. Lebih buruk, celah memperkuat diri — mengantisipasi imbalan karier lebih sedikit, pekerja F berinvestasi lebih sedikit pada modal manusia khusus-perusahaan, mengonfirmasi keyakinan awal. Grafik panel (b) memperjelasnya: pada sinyal individu yang <em>identik</em> $T^{*}$, perempuan ditawari upah lebih rendah daripada laki-laki, karena pengusaha sebagian menjangkar pada rata-rata kelompok (yang dipersepsi) lebih rendah — seluruh celah di sini adalah diskriminasi, bukan perbedaan keterampilan.</p>'
 
               + '<p><strong>Dekomposisi Oaxaca menjembatani teori ke data.</strong> Menjalankan regresi Mincer terpisah untuk M dan F dan menerapkan aljabar Oaxaca (1973) ke kesenjangan mentah $\\Delta\\bar w$:</p>'
               + '<div class="formula">$\\Delta \\bar w = \\underbrace{(\\alpha_M - \\alpha_F) + (\\beta_M - \\beta_F)\\,\\bar s_F}_{\\text{tak terjelaskan / diskriminasi}} \\;+\\; \\underbrace{\\beta_M\\,(\\bar s_M - \\bar s_F)}_{\\text{terjelaskan / kesenjangan skill}}.$</div>'
