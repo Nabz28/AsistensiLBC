@@ -266,6 +266,16 @@
     }
     h += '</div>';
 
+    // optional call-to-action banner (e.g. link to an interactive model)
+    if (ov.cta && ov.cta.href) {
+      h += '<a class="ov-cta" href="' + ov.cta.href + '"' +
+        (ov.cta.newTab ? ' target="_blank" rel="noopener"' : '') + '>' +
+        '<span class="ov-cta-ico">' + (ov.cta.icon || '◆') + '</span>' +
+        '<span class="ov-cta-txt"><b>' + t(ov.cta.title) + '</b>' +
+        (t(ov.cta.desc) ? '<span>' + t(ov.cta.desc) + '</span>' : '') + '</span>' +
+        '<span class="ov-cta-arrow">→</span></a>';
+    }
+
     if (ov.objectives && ov.objectives.length) {
       h += '<div class="ov-objectives"><h3>' + S('objectives') + '</h3><ul>';
       ov.objectives.forEach(function (o) { h += '<li>' + t(o) + '</li>'; });

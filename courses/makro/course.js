@@ -31,6 +31,15 @@
         en: 'The UAS half of intermediate open-economy & financial macroeconomics. We move from the textbook IS–LM–BP world into the machinery central banks and finance ministries actually use: capital-flow surges and the policy trilemma, the monetary-transmission mechanism through financial markets, labour-market mismatch and the New-Keynesian model with financial frictions, exchange-rate balance-sheet effects in emerging markets, macroprudential policy, MMT and DSGE as competing paradigms, and the frontier topics — climate macro, crypto, CBDC and welfare. Built directly from the Week 8–14 lecture decks plus the two UAS review sessions, with every diagram redrawn and every Indonesian case kept.',
         id: 'Paruh UAS makroekonomi menengah terbuka & keuangan. Kita beranjak dari dunia IS–LM–BP buku teks ke perangkat yang benar-benar dipakai bank sentral dan kementerian keuangan: lonjakan arus modal dan trilema kebijakan, mekanisme transmisi moneter lewat pasar keuangan, mismatch pasar kerja dan model New-Keynesian dengan friksi keuangan, efek neraca nilai tukar di negara berkembang, kebijakan makroprudensial, MMT dan DSGE sebagai paradigma yang bersaing, serta topik perbatasan — makro iklim, kripto, CBDC, dan kesejahteraan. Dibangun langsung dari slide kuliah Minggu 8–14 plus dua sesi review UAS, dengan setiap diagram digambar ulang dan setiap kasus Indonesia dipertahankan.'
       },
+      cta: {
+        href: 'model/',
+        newTab: true,
+        icon: '🪜',
+        title: { en: 'Open the Interactive Model — graphs you can drag, Weeks 1–14',
+                 id: 'Buka Model Interaktif — grafik yang bisa digeser, Minggu 1–14' },
+        desc: { en: 'Five-market macro model + SUPER SUMMARY: every diagram with live sliders, exam scenarios and step-by-step explanations, ordered short → medium → long run.',
+                id: 'Model makro lima-pasar + SUPER SUMMARY: tiap diagram dengan slider langsung, skenario ujian, dan penjelasan langkah-demi-langkah, urut jangka pendek → menengah → panjang.' }
+      },
       objectives: [
         { en: 'Analyse capital-flow surges and sudden stops with the policy trilemma, and explain the monetary, fiscal and FX-intervention responses (Week 8).',
           id: 'Menganalisis lonjakan arus modal dan sudden stop dengan trilema kebijakan, serta menjelaskan respons moneter, fiskal, dan intervensi nilai tukar (Minggu 8).' },
