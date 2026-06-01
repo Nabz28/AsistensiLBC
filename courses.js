@@ -45,5 +45,18 @@ window.LBC_COURSES = [
       { label: 'Topics', value: '4' },
       { label: 'Bilingual', value: 'EN·ID' }
     ]
+  },
+  {
+    slug: 'makro',
+    code: 'MAKRO',
+    title: 'Makroekonomi',
+    subtitle: 'Open economy · capital flows · monetary transmission · financial frictions · macroprudential · MMT/DSGE · climate/crypto/CBDC',
+    faculty: 'UI · FEB',
+    status: 'ready',
+    accent: '#6d28d9',
+    meta: [
+      { label: 'Weeks', value: '7' },
+      { label: 'Bilingual', value: 'EN·ID' }
+    ]
   }
 ];
