@@ -122,7 +122,7 @@
 
   window.MAKRO_WEEKS.w12 = {
     id: 'w12',
-    label: { en: 'Week 12', id: 'Pertemuan 12' },
+    label: { en: 'Week 12', id: 'Minggu 12' },
     title: { en: 'Macroprudential Policy · MMT · DSGE', id: 'Kebijakan Makroprudensial · MMT · DSGE' },
     subtitle: {
       en: "Why micro-soundness is not enough, the central bank's widening mandate, Indonesia's macroprudential toolkit (CAR, LTV/FTV, CCyB, MIR, RPIM) and OJK's stability indicators — then Modern Monetary Theory, Monetary Finance, and DSGE models with financial frictions.",

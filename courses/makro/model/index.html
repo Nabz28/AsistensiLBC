@@ -174,29 +174,35 @@ svg.dimmed .zone-label{opacity:.15}
 .wk-no-graphs{text-align:center;padding:40px 20px;color:#bbb;font-size:14px;font-style:italic}
 
 /* ===== SUPER SUMMARY (staircase of all graphs) ===== */
-#supersummary-view{flex:1;display:none;overflow-y:auto;padding:28px 32px 80px;max-width:920px;margin:0 auto;width:100%}
+#supersummary-view{flex:1;display:none;overflow-y:auto;padding:24px 28px 80px;max-width:880px;margin:0 auto;width:100%}
 #supersummary-view.open{display:block}
-.ss-hero{background:linear-gradient(135deg,#1B2A4A,#2563EB);color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:8px}
-.ss-hero h2{font-size:24px;font-weight:800;letter-spacing:-.4px;margin-bottom:8px}
-.ss-hero p{font-size:13.5px;line-height:1.65;opacity:.92;max-width:680px}
+.ss-hero{background:linear-gradient(135deg,#1B2A4A,#2563EB);color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:18px}
+.ss-hero h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:8px}
+.ss-hero p{font-size:13px;line-height:1.6;opacity:.92;max-width:680px}
 .ss-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .ss-legend span{font-size:11px;font-weight:600;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:6px}
-.ss-progress{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);display:flex;gap:6px;flex-wrap:wrap;padding:12px 2px;margin:14px 0 6px;border-bottom:1px solid #E8E8E4}
+/* collapsible "jump to" — NOT sticky (the sticky bar was the annoying one) */
+.ss-progress{display:flex;gap:6px;flex-wrap:wrap;padding:14px 16px;margin:0 0 22px;background:#F8F9FB;border:1px solid #E8E8E4;border-radius:12px}
+.ss-progress-title{flex-basis:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#999;margin-bottom:2px}
 .ss-jump{padding:5px 11px;border-radius:7px;border:1.5px solid #D0D0CC;background:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:#555;transition:all .12s}
 .ss-jump:hover{background:#EFF6FF;border-color:#2563EB;color:#2563EB}
-.ss-stage{margin:30px 0 10px}
-.ss-stage-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
-.ss-stage-badge{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.13)}
+.ss-stage{margin:34px 0 10px}
+.ss-stage:first-of-type{margin-top:6px}
+.ss-stage-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.ss-stage-badge{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.13)}
 .ss-stage-1 .ss-stage-badge{background:#2563EB}.ss-stage-2 .ss-stage-badge{background:#D97706}.ss-stage-3 .ss-stage-badge{background:#059669}.ss-stage-4 .ss-stage-badge{background:#7C3AED}.ss-stage-5 .ss-stage-badge{background:#0E7490}.ss-stage-6 .ss-stage-badge{background:#9D174D}
 .ss-stage-meta .ss-stage-kicker{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#999}
-.ss-stage-meta h3{font-size:19px;font-weight:800;letter-spacing:-.3px;color:#1a1a1a;line-height:1.2}
-.ss-stage-desc{font-size:13px;line-height:1.65;color:#555;margin:8px 0 4px;padding-left:60px}
-.ss-stage-body{padding-left:60px;border-left:2px dashed #E0E0DC;margin-left:22px}
-@media(max-width:760px){.ss-stage-desc,.ss-stage-body{padding-left:0;border-left:none;margin-left:0}}
-.ss-step{margin:18px 0 4px}
-.ss-step-label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:#1B2A4A;margin-bottom:6px}
+.ss-stage-meta h3{font-size:18px;font-weight:800;letter-spacing:-.3px;color:#1a1a1a;line-height:1.2}
+.ss-stage-desc{font-size:13px;line-height:1.6;color:#555;margin:0 0 14px}
+.ss-stage-body{}
+.ss-step{margin:0 0 18px}
+.ss-step-label{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#1B2A4A;margin-bottom:4px}
 .ss-step-num{background:#1B2A4A;color:#fff;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.ss-step-why{font-size:12px;line-height:1.6;color:#777;font-style:italic;margin:-2px 0 8px 30px}
+.ss-step-why{font-size:12px;line-height:1.55;color:#777;font-style:italic;margin:0 0 10px 30px}
+/* EMBED MODE — chrome-less, for hosting inside the LBC course as a tab */
+body.embed .topbar,body.embed .footer{display:none!important}
+body.embed #app{height:100%}
+body.embed #supersummary-view{padding-top:18px}
 
 /* ===== GLOSSARY ===== */
 #glossary-view{flex:1;display:none;overflow-y:auto;padding:24px 28px;max-width:920px}
@@ -2275,8 +2281,8 @@ function renderSuperSummary(){
   let h='<div class="ss-hero"><h2>🪜 Super Summary — every graph, step by step</h2>'+
     '<p>One climb through the whole course. Each graph below is fully interactive — drag the sliders and click the exam-scenario buttons, and the step-by-step explanation updates live. We go <b>short run → medium run → long run → synthesis</b>, so each stair builds on the one before.</p>'+
     '<div class="ss-legend"><span>🟦 Short run (demand)</span><span>🟧 Medium run (prices)</span><span>🟩 Long run (growth)</span><span>🟪 Synthesis (shocks)</span></div></div>';
-  // sticky quick-jump
-  h+='<div class="ss-progress">';
+  // quick-jump (static, not sticky)
+  h+='<div class="ss-progress"><div class="ss-progress-title">Jump to a graph</div>';
   SUPER_STAIRS.forEach(s=>s.steps.forEach(st=>{h+=`<button class="ss-jump" onclick="document.getElementById('ss-anchor-${st.gid}').scrollIntoView({behavior:'smooth',block:'start'})">${st.label}</button>`}));
   h+='</div>';
   // stages
@@ -2389,6 +2395,19 @@ function gPath(svg,d,color,width=2,fill='none'){svg.appendChild(mkEl('path',{d,s
 function gText(svg,x,y,text,size=11,color='#555',anchor='middle',weight=500){const t=mkEl('text',{x,y,fill:color,'font-size':size,'font-family':'Inter,sans-serif','font-weight':weight,'text-anchor':anchor,'dominant-baseline':'middle'});t.textContent=text;svg.appendChild(t)}
 function gCircle(svg,x,y,r,fill,stroke='none'){svg.appendChild(mkEl('circle',{cx:x,cy:y,r,fill,stroke,'stroke-width':stroke!=='none'?2:0}))}
 function gRect(svg,x,y,w,h,fill,rx=0){svg.appendChild(mkEl('rect',{x,y,width:w,height:h,fill,rx}))}
+// curved shift arrow with an arrowhead — used to show curve shifts
+function gArrow(svg,x1,y1,x2,y2,color='#444'){
+const mx=(x1+x2)/2,my=Math.min(y1,y2)-16;
+svg.appendChild(mkEl('path',{d:`M${x1},${y1} Q${mx},${my} ${x2},${y2}`,fill:'none',stroke:color,'stroke-width':1.5}));
+const ang=Math.atan2(y2-my,x2-mx),L=7;
+svg.appendChild(mkEl('path',{d:`M${x2},${y2} L${x2-L*Math.cos(ang-0.4)},${y2-L*Math.sin(ang-0.4)} M${x2},${y2} L${x2-L*Math.cos(ang+0.4)},${y2-L*Math.sin(ang+0.4)}`,fill:'none',stroke:color,'stroke-width':1.5}));
+}
+// dashed guide lines from an equilibrium point to both axes + tick labels
+function gGuides(svg,px,py,M,W,H,xLbl,yLbl,color='#DC2626'){
+gLine(svg,px,py,px,H-M.b,color,1,'3 3');gLine(svg,px,py,M.l,py,color,1,'3 3');
+if(xLbl)gText(svg,px,H-M.b+14,xLbl,10,color,'middle',700);
+if(yLbl)gText(svg,M.l-14,py,yLbl,10,color,'middle',700);
+}
 function makeAxes(svg,W,H,M,xLabel,yLabel){
 gLine(svg,M.l,M.t,M.l,H-M.b,'#333',1.5);gLine(svg,M.l,H-M.b,W-M.r,H-M.b,'#333',1.5);
 gText(svg,W/2+M.l/2,H-6,xLabel,11,'#555');gText(svg,14,(H-M.b-M.t)/2+M.t,yLabel,11,'#555','middle');
@@ -4185,17 +4204,26 @@ const pW=W-M.l-M.r,pH=H-M.t-M.b;const toX=v=>M.l+v*pW,toY=v=>M.t+(1-v)*pH;
 const bpSlope=0.55*(1-mob/120);
 gPath(svg,`M${toX(0.05)},${toY(0.45-bpSlope*0.45)} L${toX(0.95)},${toY(0.45+bpSlope*0.5)}`,'#DC2626',2.2);
 gText(svg,toX(0.95),toY(0.45+bpSlope*0.5)-8,mob>80?'BP (≈ horizontal)':'BP',11,'#DC2626','end',700);
+const isSh=dIS*0.004,lmSh=dLM*0.004;
+// ghost baselines when shifted
+if(isSh!==0){gPath(svg,`M${toX(0.1)},${toY(0.82)} L${toX(0.9)},${toY(0.18)}`,'#cdd6e8',1.6);gText(svg,toX(0.9),toY(0.18)+10,'IS₀',9,'#bbb','end')}
+if(lmSh!==0){gPath(svg,`M${toX(0.18)},${toY(0.12)} L${toX(0.82)},${toY(0.88)}`,'#cfe6d8',1.6);gText(svg,toX(0.82),toY(0.88)-6,'LM₀',9,'#bbb','start')}
 // IS
-const isSh=dIS*0.004;
 gPath(svg,`M${toX(0.1)},${toY(0.82+isSh)} L${toX(0.9)},${toY(0.18+isSh)}`,'#2563EB',2.2);
 gText(svg,toX(0.9),toY(0.18+isSh)+10,isSh!==0?"IS'":'IS',11,'#2563EB','end',700);
 // LM
-const lmSh=dLM*0.004;
 gPath(svg,`M${toX(0.18)},${toY(0.12+lmSh)} L${toX(0.82)},${toY(0.88+lmSh)}`,'#059669',2.2);
 gText(svg,toX(0.82),toY(0.88+lmSh)-6,lmSh!==0?"LM'":'LM',11,'#059669','start',700);
-// approx equilibrium (IS∩LM)
-const eqx=0.5+isSh*0.6-lmSh*0.6;const eqy=0.5+isSh*0.3+lmSh*0.3;
-gCircle(svg,toX(Math.max(.08,Math.min(.92,eqx))),toY(Math.max(.08,Math.min(.92,eqy))),5,'#1B2A4A');
+// equilibria: baseline A (if shifted) + new B, with shift arrow + guides
+const baseX=0.5,baseY=0.5;
+const eqx=Math.max(.08,Math.min(.92,0.5+isSh*0.6-lmSh*0.6));
+const eqy=Math.max(.08,Math.min(.92,0.5+isSh*0.3+lmSh*0.3));
+if(isSh!==0||lmSh!==0){
+  gCircle(svg,toX(baseX),toY(baseY),4,'#ddd','#bbb');gText(svg,toX(baseX)-10,toY(baseY)-10,'A',10,'#aaa','end');
+  gArrow(svg,toX(baseX),toY(baseY),toX(eqx),toY(eqy),'#888');
+}
+gCircle(svg,toX(eqx),toY(eqy),5,'#1B2A4A');gText(svg,toX(eqx)+9,toY(eqy)-9,(isSh!==0||lmSh!==0)?'B':'E',11,'#1B2A4A','start',700);
+gGuides(svg,toX(eqx),toY(eqy),M,W,H,'Y*','i*','#1B2A4A');
 const ex={
 mp_float:'<b>Monetary easing under FLOATING — fully effective:</b><br>Step 1: M↑ → LM shifts right/down → i↓<br>Step 2: i&lt;i* → capital flows OUT → E depreciates<br>Step 3: depreciation → NX↑ → IS shifts right<br>Step 4: new equilibrium back on BP at higher Y<br><b>Result: Y↑↑.</b> Floating + mobile capital ⇒ monetary policy is powerful (the trilemma corner you keep: autonomy + mobility, give up the peg).',
 fp_fixed:'<b>Fiscal expansion under FIXED ER — very effective:</b><br>Step 1: G↑ → IS shifts right → i pressure up<br>Step 2: i&gt;i* → capital flows IN → pressure to appreciate<br>Step 3: to hold the peg the CB BUYS forex → M↑ → LM shifts right<br>Step 4: no exchange-rate crowding out → Y↑↑<br><b>Result: Y↑↑.</b> Fixed ER + mobility ⇒ you surrender monetary autonomy, so fiscal policy dominates.',
@@ -4309,8 +4337,10 @@ if(mm>0){gPath(svg,bc(0),'#ccc',1.6);gText(svg,toX(0.8),toY(0.22),'BC₀',9,'#bb
 gPath(svg,bc(mm),'#059669',2.4);gText(svg,toX(0.82),toY(Math.min(0.95,(0.12+mm)/0.82))+4,mm>0?"BC' (mismatch↑)":'BC',11,'#059669','start',700);
 // point on curve from cycle position (low cy => high u/low V)
 const u=0.2+(1-cy/100)*0.55;const V=Math.max(0.05,Math.min(0.95,(0.12+mm)/u));
+// when mismatch shifts, show where you WERE (same u, on BC₀) and arrow out
+if(mm>0){const V0=Math.max(0.05,Math.min(0.95,0.12/u));gCircle(svg,toX(u),toY(V0),4,'#ddd','#bbb');gArrow(svg,toX(u),toY(V0),toX(u),toY(V),'#888');}
 gCircle(svg,toX(u),toY(V),5,'#DC2626','#fff');
-gLine(svg,toX(u),toY(V),toX(u),H-M.b,'#DC2626',1,'3 3');gLine(svg,toX(u),toY(V),M.l,toY(V),'#DC2626',1,'3 3');
+gGuides(svg,toX(u),toY(V),M,W,H,'u*','V*','#DC2626');
 const ex={
 boom:'<b>Boom — move UP-LEFT along the curve:</b><br>Strong demand → firms post many vacancies (V↑) and unemployment falls (u↓). No shift, just a movement along BC. The labour market is tight.',
 recession:'<b>Recession — move DOWN-RIGHT along the curve:</b><br>Weak demand → vacancies dry up (V↓) and unemployment rises (u↑). Still on the same BC — this is cyclical, not structural.',
@@ -4361,6 +4391,7 @@ let d='';for(let E=0.05;E<=0.95;E+=.02){let Y;if(E<=thr){Y=0.2+ (E)*0.8;}else{Y=
 gPath(svg,d,'#7C3AED',2.4);gText(svg,toX(0.5),toY(0.92),fx>0.5?'AD (backward-bending)':'AD',11,'#7C3AED','middle',700);
 // current depreciation marker
 const Em=e/100;let Yc;if(Em<=thr){Yc=0.2+Em*0.8}else{Yc=0.2+thr*0.8-(Em-thr)*1.6}Yc=Math.max(0.04,Math.min(0.96,Yc));
+gGuides(svg,toX(Yc),toY(Em),M,W,H,'Y','','#DC2626');
 gCircle(svg,toX(Yc),toY(Em),5,'#DC2626','#fff');gText(svg,toX(Yc)+8,toY(Em),Em>thr?'BS channel':'NX channel',9,Em>thr?'#DC2626':'#059669','start',700);
 gLine(svg,M.l,toY(thr),W-M.r,toY(thr),'#bbb',1,'4 3');gText(svg,W-M.r,toY(thr)-4,'turning point',8,'#aaa','end');
 const ex={
@@ -4472,8 +4503,9 @@ function inter(shift){const adA=0.9,adB=-0.9375; /*P=adA+slope*Y approx*/ // sol
  // numeric
  let best=0.5,bd=9;for(let Y=0.08;Y<=0.95;Y+=.005){const Pad=0.9-(0.75)*((Y-0.08)/0.84);const Pas=0.12+(0.78)*((Y-(0.1+shift))/0.8);const dd=Math.abs(Pad-Pas);if(dd<bd){bd=dd;best=Y}}const Pad=0.9-(0.75)*((best-0.08)/0.84);return [best,Pad];}
 const e0=inter(0),e1=inter(sh);
-gCircle(svg,X(e0[0]),toY(e0[1]),4,'#ddd','#bbb');
-gCircle(svg,X(e1[0]),toY(e1[1]),5,'#DC2626','#fff');
+if(sh>0.005){gCircle(svg,X(e0[0]),toY(e0[1]),4,'#ddd','#bbb');gText(svg,X(e0[0])-9,toY(e0[1])-9,'A',10,'#aaa','end');gArrow(svg,X(e0[0]),toY(e0[1]),X(e1[0]),toY(e1[1]),'#888');}
+gCircle(svg,X(e1[0]),toY(e1[1]),5,'#DC2626','#fff');gText(svg,X(e1[0])+9,toY(e1[1])-9,sh>0.005?'B':'E',10,'#DC2626','start',700);
+gGuides(svg,X(e1[0]),toY(e1[1]),M,W,H,'Y','P','#DC2626');
 const ex={
 mild:'<b>Mild warming:</b><br>small damage D=αT² → AS shifts left a little → Y slightly down, P slightly up. Manageable, but note it is a <i>supply</i> shock — you can’t cure it with demand stimulus without adding inflation.',
 severe:'<b>Severe warming:</b><br>D=αT² is convex, so damage accelerates → large leftward AS shift → output falls, prices rise (climate-driven stagflation). Agriculture/food hit first (ENSO, El Niño) → food prices spike.',
@@ -4546,6 +4578,20 @@ tfp:`<b>TFP / technology shock (A↑), horizon = ${hz<0.34?'SHORT':hz<0.67?'MEDI
 };
 document.getElementById('wh-insight').innerHTML=exMap[sc]||'Pick a shock and slide the horizon from short → long run.';
 }
+
+/* ===== EMBED MODE BOOT =====
+   When loaded with ?embed (e.g. inside the LBC Makro course's Super Summary
+   tab), hide the chrome and open straight into the Super Summary staircase. */
+(function(){
+  try{
+    var params=new URLSearchParams(location.search);
+    if(params.has('embed')){
+      document.body.classList.add('embed');
+      var sel=document.getElementById('view-mode'); if(sel) sel.value='supersummary';
+      switchView('supersummary');
+    }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

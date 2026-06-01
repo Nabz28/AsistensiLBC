@@ -109,7 +109,7 @@
 
   window.MAKRO_WEEKS.w11 = {
     id: 'w11',
-    label: { en: 'Week 11', id: 'Pertemuan 11' },
+    label: { en: 'Week 11', id: 'Minggu 11' },
     title: { en: 'Exchange Rate & Balance-Sheet Effects', id: 'Nilai Tukar & Efek Neraca' },
     subtitle: {
       en: 'ER regimes (peg → float) and de jure vs de facto, nominal/real/effective rates, and the balance-sheet effect: how currency & maturity mismatch turn a depreciation contractionary, producing a backward-bending demand curve in emerging markets.',

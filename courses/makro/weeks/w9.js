@@ -153,7 +153,7 @@
      ===================================================================== */
   window.MAKRO_WEEKS.w9 = {
     id: 'w9',
-    label: { en: 'Week 9', id: 'Pertemuan 9' },
+    label: { en: 'Week 9', id: 'Minggu 9' },
     title: { en: 'Monetary Policy & Financial Markets', id: 'Kebijakan Moneter & Pasar Keuangan' },
     subtitle: {
       en: 'How the central bank changes the money supply (balance-sheet operations, the money multiplier) and transmits policy through bond, stock and capital markets; the COVID BI–MoF burden-sharing episode; credibility, time-inconsistency under uncertainty, inflation targeting and the Taylor rule; and macro-policy in crisis — financial frictions, UIP-in-crisis and the 1997-98 speculative attack.',

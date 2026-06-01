@@ -169,6 +169,7 @@
     });
     if (exams.length) items.push({ key: 'exams', label: S('pastExams') });
     if (glossary.length) items.push({ key: 'glossary', label: S('glossary') });
+    if (COURSE.superSummary) items.push({ key: 'super', label: t(COURSE.superSummary.label) || 'Super Summary' });
 
     nav.innerHTML = '';
     items.forEach(function (it) {
@@ -467,11 +468,25 @@
       active = 'exams'; viewExams();
     } else if (hash === 'glossary' && glossary.length) {
       active = 'glossary'; viewGlossary();
+    } else if (hash === 'super' && COURSE.superSummary) {
+      active = 'super'; viewSuper();
     } else {
       viewOverview();
     }
     buildNav(active);
     window.scrollTo(0, 0);
+  }
+
+  function viewSuper() {
+    var ss = COURSE.superSummary || {};
+    var h = '<div class="eyebrow">' + (t(ss.label) || 'Super Summary') + '</div>' +
+      '<h1 class="ov-title">' + (t(ss.title) || t(ss.label) || 'Super Summary') + '</h1>' +
+      (t(ss.blurb) ? '<p class="ov-sub">' + t(ss.blurb) + '</p>' : '') +
+      '<div class="super-frame"><iframe src="' + ss.src + '" title="' + (t(ss.label) || 'Super Summary') +
+      '" loading="lazy" allowfullscreen></iframe></div>' +
+      (ss.fullHref ? '<a class="super-open" href="' + ss.fullHref + '" target="_blank" rel="noopener">' +
+        (t(ss.fullLabel) || 'Open full-screen ↗') + '</a>' : '');
+    view.innerHTML = h;
   }
 
   document.title = (meta.code ? meta.code + ' — ' : '') + t(meta.title);

@@ -249,7 +249,7 @@
 
   window.MAKRO_WEEKS.w14 = {
     id: 'w14',
-    label: { en: 'Week 14', id: 'Pertemuan 14' },
+    label: { en: 'Week 14', id: 'Minggu 14' },
     title: { en: 'Course Summary — The Workhorse Model & Emerging Issues',
              id: 'Ringkasan Kuliah — Model Workhorse & Isu-Isu Mutakhir' },
     subtitle: {

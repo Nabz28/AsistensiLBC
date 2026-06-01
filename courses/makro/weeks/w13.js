@@ -181,7 +181,7 @@
 
   window.MAKRO_WEEKS.w13 = {
     id: 'w13',
-    label: { en: 'Week 13', id: 'Pertemuan 13' },
+    label: { en: 'Week 13', id: 'Minggu 13' },
     title: { en: 'Emerging Issues: Climate, Crypto/CBDC & Welfare',
              id: 'Isu Baru: Iklim, Kripto/CBDC & Kesejahteraan' },
     subtitle: {
