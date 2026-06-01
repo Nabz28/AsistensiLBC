@@ -201,6 +201,9 @@ svg.dimmed .zone-label{opacity:.15}
 .ss-step-why{font-size:12px;line-height:1.55;color:#777;font-style:italic;margin:0 0 10px 30px}
 /* EMBED MODE — chrome-less, for hosting inside the LBC course as a tab */
 body.embed .topbar,body.embed .footer{display:none!important}
+/* the sidebar (flowchart/explorer node panel) is unused in Super Summary —
+   hide it so it doesn't reserve its 440px slot as an empty box on the right */
+body.embed #sidebar{display:none!important}
 body.embed #app{height:100%}
 body.embed #supersummary-view{padding-top:18px}
 
