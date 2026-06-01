@@ -37,6 +37,28 @@
 
   function num(v) { return Math.round(v * 100) / 100; }
 
+  // Resolve a text leaf that may be a plain string OR a bilingual { en, id }
+  // object (same convention as the study engine). Without this, an { en, id }
+  // label/title/caption would render as "[object Object]".
+  function curLang() {
+    try {
+      var s = (typeof localStorage !== 'undefined') && localStorage.getItem('lbc-lang');
+      if (s === 'en' || s === 'id') return s;
+    } catch (e) {}
+    try {
+      var d = (typeof document !== 'undefined') && document.documentElement && document.documentElement.lang;
+      if (d === 'en' || d === 'id') return d;
+    } catch (e2) {}
+    return 'en';
+  }
+  function txt(v) {
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      var l = curLang();
+      return v[l] != null ? v[l] : (v.en != null ? v.en : (v.id != null ? v.id : ''));
+    }
+    return v == null ? '' : String(v);
+  }
+
   function curvePanel(p) {
     var W = p.w || 360, H = p.h || 300;
     var pad = p.pad || { l: 46, r: 32, t: 26, b: 42 };
@@ -83,8 +105,8 @@
     // axes
     s += '<line x1="' + ox + '" y1="' + oy + '" x2="' + ox + '" y2="' + (topY - 2) + '" stroke="#555" stroke-width="1.3" marker-end="url(#' + uid + '-ax)"/>';
     s += '<line x1="' + ox + '" y1="' + oy + '" x2="' + (rightX + 2) + '" y2="' + oy + '" stroke="#555" stroke-width="1.3" marker-end="url(#' + uid + '-ax)"/>';
-    if (Y.label) s += '<text x="' + (ox + 4) + '" y="' + (topY - 9) + '" font-size="12" fill="#333" font-style="italic">' + Y.label + '</text>';
-    if (X.label) s += '<text x="' + (rightX + 2) + '" y="' + (oy + 28) + '" font-size="11" fill="#666" text-anchor="end">' + X.label + '</text>';
+    if (Y.label) s += '<text x="' + (ox + 4) + '" y="' + (topY - 9) + '" font-size="12" fill="#333" font-style="italic">' + txt(Y.label) + '</text>';
+    if (X.label) s += '<text x="' + (rightX + 2) + '" y="' + (oy + 28) + '" font-size="11" fill="#666" text-anchor="end">' + txt(X.label) + '</text>';
 
     // filled regions (e.g. tariff welfare areas) — drawn behind curves/points
     (p.areas || []).forEach(function (a) {
@@ -93,7 +115,7 @@
       if (a.label) {
         var cx = 0, cy = 0; a.pts.forEach(function (q) { cx += q[0]; cy += q[1]; });
         cx /= a.pts.length; cy /= a.pts.length;
-        s += '<text x="' + num(sx(cx)) + '" y="' + num(sy(cy) + 4) + '" font-size="11" font-weight="700" fill="' + (a.labelColor || '#333') + '" text-anchor="middle">' + a.label + '</text>';
+        s += '<text x="' + num(sx(cx)) + '" y="' + num(sy(cy) + 4) + '" font-size="11" font-weight="700" fill="' + (a.labelColor || '#333') + '" text-anchor="middle">' + txt(a.label) + '</text>';
       }
     });
 
@@ -105,16 +127,16 @@
       var px = sx(P[0]), py = sy(P[1]);
       if (pt.guideY !== undefined) {
         guides += '<line x1="' + ox + '" y1="' + py + '" x2="' + px + '" y2="' + py + '" stroke="#bbb" stroke-width="1" stroke-dasharray="3 3"/>';
-        if (pt.guideY) labels += '<text x="' + (ox - 5) + '" y="' + (py + 4) + '" font-size="10.5" fill="#333" text-anchor="end">' + pt.guideY + '</text>';
+        if (pt.guideY) labels += '<text x="' + (ox - 5) + '" y="' + (py + 4) + '" font-size="10.5" fill="#333" text-anchor="end">' + txt(pt.guideY) + '</text>';
       }
       if (pt.guideX !== undefined) {
         guides += '<line x1="' + px + '" y1="' + oy + '" x2="' + px + '" y2="' + py + '" stroke="#bbb" stroke-width="1" stroke-dasharray="3 3"/>';
-        if (pt.guideX) labels += '<text x="' + px + '" y="' + (oy + 14) + '" font-size="10.5" fill="#333" text-anchor="middle">' + pt.guideX + '</text>';
+        if (pt.guideX) labels += '<text x="' + px + '" y="' + (oy + 14) + '" font-size="10.5" fill="#333" text-anchor="middle">' + txt(pt.guideX) + '</text>';
       }
       if (pt.dot !== false) dots += '<circle cx="' + px + '" cy="' + py + '" r="3.4" fill="#111"/>';
       if (pt.label) {
         var dx = pt.labelDx != null ? pt.labelDx : 7, dy = pt.labelDy != null ? pt.labelDy : -7;
-        labels += '<text x="' + (px + dx) + '" y="' + (py + dy) + '" font-size="11" fill="#111" font-weight="700">' + pt.label + '</text>';
+        labels += '<text x="' + (px + dx) + '" y="' + (py + dy) + '" font-size="11" fill="#111" font-weight="700">' + txt(pt.label) + '</text>';
       }
     });
     s += guides;
@@ -140,7 +162,7 @@
         s += '<path d="' + pathD(c.pts, c.smooth) + '" fill="none" stroke="' + col + '" stroke-width="2.3"' + dash + ' stroke-linecap="round" stroke-linejoin="round"/>';
         if (c.label) {
           var lp = c.pts[c.pts.length - 1];
-          s += '<text x="' + num(sx(lp[0]) + 5) + '" y="' + num(sy(lp[1]) + 4) + '" font-size="11" fill="' + col + '" font-weight="700">' + c.label + '</text>';
+          s += '<text x="' + num(sx(lp[0]) + 5) + '" y="' + num(sy(lp[1]) + 4) + '" font-size="11" fill="' + col + '" font-weight="700">' + txt(c.label) + '</text>';
         }
         return;
       }
@@ -155,7 +177,7 @@
         else if (c.kind === 'hline') { lx = rightX - 2; ly = y1 - 5; anc = 'end'; }
         else if (c.labelAt === 'start') { lx = x1 - 4; ly = y1 - 4; anc = 'end'; }
         else { lx = x2 + 5; ly = y2 + 4; anc = 'start'; }
-        s += '<text x="' + lx + '" y="' + ly + '" font-size="11" fill="' + col + '" font-weight="700" text-anchor="' + anc + '">' + c.label + '</text>';
+        s += '<text x="' + lx + '" y="' + ly + '" font-size="11" fill="' + col + '" font-weight="700" text-anchor="' + anc + '">' + txt(c.label) + '</text>';
       }
     });
 
@@ -176,10 +198,16 @@
 
     s += dots + labels;
     (p.notes || []).forEach(function (n) {
-      s += '<text x="' + sx(n.x) + '" y="' + sy(n.y) + '" font-size="' + (n.size || 10.5) + '" fill="' + (n.color || '#666') + '" text-anchor="' + (n.anchor || 'start') + '">' + n.text + '</text>';
+      s += '<text x="' + sx(n.x) + '" y="' + sy(n.y) + '" font-size="' + (n.size || 10.5) + '" fill="' + (n.color || '#666') + '" text-anchor="' + (n.anchor || 'start') + '">' + txt(n.text) + '</text>';
     });
 
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;height:auto" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">' + s + '</svg>';
+    // Pad the viewBox so end-of-curve labels, axis labels and notes that sit
+    // just outside the plot rectangle are never clipped. mR gives room for the
+    // right-hand curve labels (e.g. "bond"/"stock"); mT/mL/mB small safety.
+    var mL = 4, mR = 78, mT = 10, mB = 6;
+    return '<svg viewBox="' + (-mL) + ' ' + (-mT) + ' ' + (W + mL + mR) + ' ' + (H + mT + mB) +
+      '" width="100%" style="max-width:' + (W + mL + mR) + 'px;height:auto;overflow:visible" ' +
+      'xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">' + s + '</svg>';
   }
 
   function barsPanel(p) {
@@ -200,8 +228,8 @@
       var top = byTop(b.value), x = cx(i) - bw / 2;
       var col = b.color || '#0e8fb8';
       s += '<rect x="' + x + '" y="' + top + '" width="' + bw + '" height="' + (base - top) + '" rx="4" fill="' + col + '22" stroke="' + col + '" stroke-width="1.6"/>';
-      s += '<text x="' + cx(i) + '" y="' + ((top + base) / 2) + '" font-size="13" font-weight="700" fill="' + col + '" text-anchor="middle">' + b.label + '</text>';
-      if (b.caption) s += '<text x="' + cx(i) + '" y="' + (base + 16) + '" font-size="10.5" fill="#777" text-anchor="middle">' + b.caption + '</text>';
+      s += '<text x="' + cx(i) + '" y="' + ((top + base) / 2) + '" font-size="13" font-weight="700" fill="' + col + '" text-anchor="middle">' + txt(b.label) + '</text>';
+      if (b.caption) s += '<text x="' + cx(i) + '" y="' + (base + 16) + '" font-size="10.5" fill="#777" text-anchor="middle">' + txt(b.caption) + '</text>';
     });
     // gap bracket between two bar tops (e.g. NX = NCO = Y - (C+I+G))
     if (p.gap) {
@@ -211,9 +239,12 @@
       s += '<line x1="' + (cx(p.gap.to) + bw / 2) + '" y1="' + lo + '" x2="' + bx + '" y2="' + lo + '" stroke="' + col + '" stroke-width="1" stroke-dasharray="3 3"/>';
       s += '<line x1="' + (cx(p.gap.from) + bw / 2) + '" y1="' + hi + '" x2="' + bx + '" y2="' + hi + '" stroke="' + col + '" stroke-width="1" stroke-dasharray="3 3"/>';
       s += '<path d="M' + bx + ',' + hi + ' L' + (bx + 6) + ',' + hi + ' L' + (bx + 6) + ',' + lo + ' L' + bx + ',' + lo + '" fill="none" stroke="' + col + '" stroke-width="1.6"/>';
-      if (p.gap.label) s += '<text x="' + (bx + 11) + '" y="' + ((hi + lo) / 2 + 4) + '" font-size="12" font-weight="700" fill="' + col + '">' + p.gap.label + '</text>';
+      if (p.gap.label) s += '<text x="' + (bx + 11) + '" y="' + ((hi + lo) / 2 + 4) + '" font-size="12" font-weight="700" fill="' + col + '">' + txt(p.gap.label) + '</text>';
     }
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;height:auto" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">' + s + '</svg>';
+    var bmL = 4, bmR = 20, bmT = 8, bmB = 6;
+    return '<svg viewBox="' + (-bmL) + ' ' + (-bmT) + ' ' + (W + bmL + bmR) + ' ' + (H + bmT + bmB) +
+      '" width="100%" style="max-width:' + (W + bmL + bmR) + 'px;height:auto;overflow:visible" ' +
+      'xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">' + s + '</svg>';
   }
 
   function panel(p) { return p.kind === 'bars' ? barsPanel(p) : curvePanel(p); }
@@ -223,10 +254,10 @@
     if (spec.panels) {
       return '<div class="econ-panels">' + spec.panels.map(function (p) {
         return '<figure class="econ-panel">' + panel(p) +
-          (p.title ? '<figcaption class="econ-cap">' + p.title + '</figcaption>' : '') + '</figure>';
+          (p.title ? '<figcaption class="econ-cap">' + txt(p.title) + '</figcaption>' : '') + '</figure>';
       }).join('') + '</div>';
     }
     return '<div class="econ-panels"><figure class="econ-panel">' + panel(spec) +
-      (spec.title ? '<figcaption class="econ-cap">' + spec.title + '</figcaption>' : '') + '</figure></div>';
+      (spec.title ? '<figcaption class="econ-cap">' + txt(spec.title) + '</figcaption>' : '') + '</figure></div>';
   };
 })();
