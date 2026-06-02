@@ -1,351 +1,389 @@
 /* ============================================================================
    CSPD · Week 8 — The Tobit (Censored Regression) Model
-   Final-exam Topic 1: Tobit, censoring, and comparison with OLS.
-   Sources: "Tobit and Truncated Regression" deck (Wk 8), WEEK 7 Tobit deck
-   (Christoper Jhonatan), tobit_guided_lab.docx, Lab.do, Wooldridge ch. 17.7.
-   Registers on window.CSPD_WEEKS.w8. English-primary, exam-optimised.
+   Final-exam Topic 1. Rewritten for flow + plain language; Read Data = numbered
+   interactive cases (hover/tap any number). Sources: Tobit & Truncated deck,
+   WEEK 7 Tobit deck, tobit_guided_lab.docx, UCLA apt example, Wooldridge 17.7.
    ============================================================================ */
 (function () {
   'use strict';
   window.CSPD_WEEKS = window.CSPD_WEEKS || {};
+  var S = window.STATA;
 
   window.CSPD_WEEKS.w8 = {
     id: 'w8',
     label: 'Week 8',
-    title: 'The Tobit Model — Censoring & why OLS fails',
-    subtitle: 'Corner solutions, the latent variable, MLE, marginal effects, Tobit vs OLS vs Probit',
+    title: 'The Tobit Model — when the outcome piles up at a limit',
+    subtitle: 'Why OLS breaks on censored data, the latent variable, MLE, and reading Tobit output',
 
-    /* ===================== NOTES ===================== */
+    /* ============================ NOTES ============================ */
     notes: [
       {
-        heading: 'The problem: a limited dependent variable',
+        heading: 'Start here: a number that gets stuck',
         num: '1',
         cards: [
           {
-            title: 'When the outcome piles up at a limit',
+            title: 'The bimbel story',
             html: String.raw`
-<p>A <span class="key">limited dependent variable</span> is a continuous outcome whose range is
-<b>constrained</b> — most often, a large share of observations sit exactly at a boundary (usually
-$0$). Classic examples:</p>
+<p>A principal in Depok asks 200 Grade-6 students one question: <i>"How many hours of <b>bimbel</b>
+(private tutoring) do you do each week?"</i> Many write <b>0</b>. Some write 2, 4, or 10. A few write 20 —
+the biggest package any local bimbel sells. She wants to know: <b>does family income predict tutoring
+hours?</b> She runs an ordinary regression (OLS) and gets a clean-looking number. Her friend says:
+<i>"That's wrong — you have a censoring problem."</i> Is the friend right? This week is the answer.</p>
+<p>The thing that makes this data special is the outcome <code>hours</code>. It is a number, but its range
+is <b>squeezed</b>: it can't go below 0, and in this sample it can't go above 20. A big clump of students
+sit exactly on those edges. We call any outcome like this a
+<span class="key">limited dependent variable</span> — a continuous variable whose range is constrained, so
+many observations land exactly on a boundary (most often <b>0</b>).</p>
+<p>You meet this everywhere once you look:</p>
 <ul>
-  <li>Household spending on durable goods, tobacco, or charity — many households spend <b>0</b>.</li>
-  <li>Hours worked per week — many people work <b>0</b>.</li>
-  <li>Hours of <i>bimbel</i> (private tutoring) — many students do <b>0</b>.</li>
-  <li>Test scores with a ceiling (e.g. aptitude capped at 800) or top-coded income.</li>
-</ul>
-<p>The pile-up is not noise — it is the data-generating process. A model must explain
-<b>two margins at once</b>:</p>
-<div class="formula">extensive margin = <b>whether</b> $y>0$   (participate or not)
-intensive margin = <b>how much</b>, given $y>0$   (the amount)</div>
-<div class="note">💡 The Tobit model assumes the <b>same</b> latent process — the same $\beta$ and the
-same $\sigma$ — drives <i>both</i> margins. That is its power and its key limitation.</div>`
+  <li><b>Spending</b> on tobacco, durable goods, or charity — lots of households spend exactly 0.</li>
+  <li><b>Hours worked</b> per week — lots of people work 0.</li>
+  <li><b>Test scores with a ceiling</b> (aptitude capped at 800) or <b>top-coded income</b> ("Rp50jt+").</li>
+</ul>`
           },
           {
-            title: 'Two reasons a zero appears: "can’t" vs "won’t"',
+            title: 'A zero hides two completely different stories',
             html: String.raw`
-<p>Zeros look identical in a spreadsheet but arise from two very different mechanisms:</p>
+<p>Here is the key idea that everything else builds on. When you see a <b>0</b>, you actually can't tell
+which of two things happened — and they are very different:</p>
 <table>
-  <tr><th>Mechanism</th><th>Story</th><th>What the 0 means</th></tr>
-  <tr><td><b>Corner solution</b> ("won't")</td>
-      <td>The zero is the true optimum — utility-maximising choice lands on the boundary.</td>
-      <td>$y^*\le 0$ is genuine: the person truly wants 0 (or "negative" desire).</td></tr>
-  <tr><td><b>Censoring</b> ("can't")</td>
-      <td>A positive latent value exists but is hidden / capped by how we observe it.</td>
-      <td>The 0 (or the cap) <b>masks</b> a true $y^*$ we cannot see.</td></tr>
+  <tr><th></th><th>"Won't" — a corner solution</th><th>"Can't" — censoring</th></tr>
+  <tr><td>What the 0 means</td><td>The person <b>genuinely wants 0</b>. Zero is their best choice.</td><td>The person <b>would have a positive value</b>, but we can't see it.</td></tr>
+  <tr><td>Bimbel example</td><td>A student who rationally does 0 hours — for them the benefit isn't worth the cost.</td><td>A student who'd love tutoring but the family can't afford it, so we record 0.</td></tr>
 </table>
-<p>Example — desired work hours: a student who rationally studies 0 hours (marginal benefit &lt;
-marginal cost) is a <b>corner solution</b>; a person who wants to work but cannot find a job
-(observed 0, but $y^*>0$) is <b>censored</b>. Standard Tobit handles both with one latent equation.</p>`
+<p>So a single outcome is really driven by <b>two decisions at once</b>, and a good model has to respect
+both:</p>
+<div class="formula">extensive margin  =  <b>WHETHER</b> hours &gt; 0   (do you participate at all?)
+intensive margin  =  <b>HOW MUCH</b>, once hours &gt; 0   (if you do, how many hours?)</div>
+<p>Hold on to those two words — <b>extensive</b> (in or out) and <b>intensive</b> (how much) — because the
+whole Tobit story, and next week's Heckman story, is about how these two margins relate.</p>
+<div class="note">💡 The Tobit model's big assumption is that <b>one single process</b> — the same $\beta$ and
+the same $\sigma$ — drives <b>both</b> margins. That makes it simple and powerful, but as you'll see, it's
+also its main weakness.</div>`
           }
         ]
       },
       {
-        heading: 'Why not OLS?',
+        heading: 'Why can\'t we just run OLS?',
         num: '2',
         cards: [
           {
-            title: 'OLS on censored data is biased and inconsistent',
+            title: 'OLS quietly treats a fake number as if it were real',
             html: String.raw`
-<p>OLS assumes the <b>full range</b> of $y$ is observed and that $E(y\mid x)$ is linear. With a mass
-point at the limit, the true conditional mean is <b>non-linear</b> — it mixes "probability of being
-above the limit" with "expected amount given above". Forcing a straight line through this produces:</p>
+<p>OLS assumes it can see the <b>full range</b> of the outcome and that the average of $y$ moves in a
+straight line with $x$. But our outcome is squashed at the edges, so a big pile of points sits exactly on
+0 (or on 20). When OLS draws its straight line through that pile-up, three things go wrong:</p>
 <ul>
-  <li><b>Attenuation / biased slopes.</b> The pile-up at the limit pulls the fitted line toward the
-      boundary, so the slope is <b>biased toward zero</b> (relationship looks weaker than it is).
-      This bias <b>does not vanish</b> as $N\to\infty$ — the model is misspecified.</li>
-  <li><b>Heteroskedasticity.</b> Near the limit almost everything is censored (low variance);
-      far from it observations spread out (high variance) ⇒ OLS standard errors are wrong.</li>
-  <li><b>Impossible predictions.</b> OLS can predict $\hat y<0$, meaningless when $y\ge 0$.</li>
+  <li><b>The slope gets flattened (attenuation bias).</b> The clump of zeros acts like an anchor that drags
+      the line down. So OLS reports a relationship that looks <b>weaker than it truly is</b> — the slope is
+      biased <b>toward zero</b>. Crucially, this does <b>not</b> go away with more data: the model itself is
+      wrong, so collecting 10,000 students won't fix it.</li>
+  <li><b>The error spread changes across the line (heteroskedasticity).</b> Near the boundary almost
+      everything is stuck at 0 (little spread); far from it the points fan out (lots of spread). So the
+      standard errors OLS prints are wrong, and your t-stats can't be trusted.</li>
+  <li><b>It predicts impossible values.</b> OLS can happily predict $\hat y = -3$ hours, which is meaningless
+      when hours can't be negative.</li>
 </ul>
-<div class="note">💡 "Just drop the zeros and run OLS on positives"? <b>Also inconsistent.</b> That creates a
-<b>truncated</b> sample: conditional on $y>0$, the error no longer has mean zero
-($E[\varepsilon\mid y>0]\ne 0$) — see Week 9.</div>
-<div class="tip">📝 Exam line: <i>"OLS treats the censored value as if it were the true value, injecting
-measurement error → attenuation bias → biased & inconsistent estimates of $(\beta,\sigma)$."</i></div>`
+<div class="note">💡 "Fine — I'll just delete the zeros and run OLS on the students who actually do bimbel."
+That's <b>also</b> broken, and in a sneakier way. By keeping only $y>0$ you've created a <b>truncated</b>
+sample, and in that sample the error no longer averages to zero. That's exactly Week 9's topic — and it's
+the bridge to sample selection in Week 10.</div>
+<div class="tip">📝 Exam one-liner: <i>"OLS treats each censored value as if it were the true value, which
+injects measurement error and pulls the slope toward zero — biased and inconsistent for $(\beta,\sigma)$,
+and not fixed by a bigger sample."</i></div>`
           }
         ]
       },
       {
-        heading: 'The standard Tobit model',
+        heading: 'The fix: model the number you WISH you could see',
         num: '3',
         cards: [
           {
-            title: 'Latent variable + observation rule',
+            title: 'The latent variable y* — the "true desire"',
             html: String.raw`
-<p>Start from a latent (desired, unconstrained) outcome $y_i^*$ — e.g. desired tobacco spending —
-driven by a normal regression:</p>
-<div class="formula">$$ y_i^* = x_i'\beta + \varepsilon_i, \qquad \varepsilon_i \sim NID(0,\sigma^2),\quad E(\varepsilon_i\mid x_i)=0 $$</div>
-<p>We only observe the <b>censored</b> outcome (here, left-censored at 0):</p>
-<div class="formula">$$ y_i = \begin{cases} y_i^* & \text{if } y_i^* > 0 \;(\text{they spend what they want})\\[4pt] 0 & \text{if } y_i^* \le 0 \;(\text{corner / "negative desire"})\end{cases} $$</div>
-<p>This is also called the <span class="key">censored regression model</span>: every negative latent
-value is mapped to 0. Censoring from above (a ceiling), at a value other than 0, or at <b>both</b>
-ends (interval censoring) is incorporated the same way.</p>`
+<p>Tobit's trick is to imagine the number behind the number. Picture each student's <b>true desired</b>
+tutoring hours if nothing stopped them — call it $y^*$ (read "y-star"). It's the
+<span class="key">latent variable</span>: latent just means <b>hidden / not directly observed</b>. We let
+$y^*$ follow a perfectly ordinary regression with a normal error:</p>
+<div class="formula">$$ y_i^* = x_i'\beta + \varepsilon_i, \qquad \varepsilon_i \sim N(0,\sigma^2) $$</div>
+<p>The catch is the world won't let us see $y^*$ directly. We only see what the student actually does, and
+that is <b>chopped off at the boundary</b>. For a floor at 0:</p>
+<div class="formula">$$ y_i = \begin{cases} y_i^* & \text{if } y_i^* > 0 \quad(\text{they do what they want})\\[3pt] 0 & \text{if } y_i^* \le 0 \quad(\text{the corner: we just record 0})\end{cases} $$</div>
+<p>In words: <b>if the true desire is positive, we see it; if it's zero or "negative", we see a flat 0.</b>
+A "negative desire" sounds odd, but it just means someone who would actively avoid the activity (hates
+tobacco, has no use for tutoring). Mapping all those negatives to 0 is what we mean by
+<span class="key">censoring</span> — the value is capped, not missing.</p>
+<p>This is why Tobit is also called the <b>censored regression model</b>. Censoring at the <b>top</b>
+(a ceiling like 800), at some value other than 0, or at <b>both</b> ends at once (interval censoring) all
+work the same way — you just tell Stata where the limits are.</p>`
           },
           {
-            title: 'Tobit vs Probit — same skeleton, different mapping',
+            title: 'Tobit and Probit are twins — same skeleton, different eyes',
             html: String.raw`
-<p>Tobit and Probit share the latent equation $y^*=x'\beta+\varepsilon$. The difference is the
-mapping from $y^*$ to what we see:</p>
+<p>If "latent variable" rings a bell, it should — <b>Probit</b> uses the exact same idea. Both start from
+$y^* = x'\beta + \varepsilon$. The only difference is <b>what part of $y^*$ we get to observe</b>:</p>
 <table>
-  <tr><th>Aspect</th><th>Tobit</th><th>Probit</th></tr>
-  <tr><td>Error</td><td>$\varepsilon\sim N(0,\sigma^2)$ — $\sigma$ <b>estimated</b></td><td>$\varepsilon\sim N(0,1)$ — $\sigma$ <b>normalised</b> to 1</td></tr>
-  <tr><td>Observed $y$</td><td>$y=y^*$ if $y^*>0$, else $0$</td><td>$y=1$ if $y^*>0$, else $0$</td></tr>
-  <tr><td>Outcome type</td><td>Continuous with a pile-up at 0</td><td>Binary (0/1)</td></tr>
-  <tr><td>Identify $\sigma$?</td><td>Yes</td><td>No</td></tr>
-  <tr><td>Use it for…</td><td>Cigarette spending (0 or positive amount)</td><td>Does the person smoke? (yes/no)</td></tr>
+  <tr><th>Question</th><th>Tobit</th><th>Probit</th></tr>
+  <tr><td>What do we see?</td><td>the <b>amount</b> $y$ whenever $y^*>0$ (else 0)</td><td>only a <b>0/1</b>: did $y^*>0$ or not?</td></tr>
+  <tr><td>Outcome type</td><td>continuous, with a clump at 0</td><td>binary (yes/no)</td></tr>
+  <tr><td>The error</td><td>$\varepsilon\sim N(0,\sigma^2)$ — $\sigma$ is <b>estimated</b></td><td>$\varepsilon\sim N(0,1)$ — $\sigma$ is <b>fixed to 1</b></td></tr>
+  <tr><td>Real example</td><td>How much do you spend on cigarettes?</td><td>Do you smoke, yes or no?</td></tr>
 </table>
-<p>Because positive $y$ carries amount information, Tobit can identify the scale $\sigma$, whereas in
-Probit we only see signs of $y^*$ so $\sigma$ must be normalised. Hence the ratio $\beta/\sigma$ in
-Tobit plays the role of probit-style coefficients:
-$P\{y_i=0\}=\Phi(-x_i'\beta/\sigma)=1-\Phi(x_i'\beta/\sigma)$.</p>`
+<p>Why can Tobit estimate $\sigma$ but Probit can't? Because Tobit gets to <b>see actual magnitudes</b>
+(35 hours vs 2 hours), which reveals the scale of the spread. Probit only sees a yes/no, so the scale is
+invisible and has to be pinned to 1 by convention. That's a small but very examinable difference.</p>`
           }
         ]
       },
       {
-        heading: 'Estimation by Maximum Likelihood',
+        heading: 'How Tobit is actually estimated (MLE)',
         num: '4',
         cards: [
           {
-            title: 'The likelihood splits in two: a Probit part + a regression part',
+            title: 'The likelihood splits into a "regression part" and a "probit part"',
             html: String.raw`
-<p>Tobit cannot use OLS, so it is estimated by <span class="key">Maximum Likelihood</span> — find
-$(\beta,\sigma)$ most likely to have generated the data. Each observation contributes differently:</p>
-<div class="formula">$$ \ln L(\beta,\sigma)=\!\!\sum_{y_i>0}\ln\!\Big[\tfrac{1}{\sigma}\phi\!\Big(\tfrac{y_i-x_i'\beta}{\sigma}\Big)\Big]\; +\!\!\sum_{y_i=0}\ln\!\Big[\Phi\!\Big(\tfrac{-x_i'\beta}{\sigma}\Big)\Big] $$</div>
+<p>We can't use OLS, so Tobit is fit by <span class="key">Maximum Likelihood Estimation (MLE)</span>. The
+idea of MLE is simple: <b>pick the $(\beta,\sigma)$ that make the data we actually saw most likely.</b> The
+clever bit is that the two kinds of observations contribute in two different ways:</p>
+<div class="formula">$$ \ln L(\beta,\sigma)=\underbrace{\sum_{y_i>0}\ln\Big[\tfrac{1}{\sigma}\phi\!\Big(\tfrac{y_i-x_i'\beta}{\sigma}\Big)\Big]}_{\textbf{positives: a normal density}}\; +\;\underbrace{\sum_{y_i=0}\ln\Phi\!\Big(\tfrac{-x_i'\beta}{\sigma}\Big)}_{\textbf{zeros: a probit-style probability}} $$</div>
 <ul>
-  <li><b>Uncensored</b> $(y_i>0)$: contributes the <b>normal density</b> — like an ordinary regression,
-      because here $y_i=y_i^*$.</li>
-  <li><b>Censored</b> $(y_i=0)$: contributes the <b>probability</b> $P\{y_i^*\le 0\}=\Phi(-x_i'\beta/\sigma)$
-      — exactly a <b>Probit</b> contribution. ($\phi=$ normal pdf, $\Phi=$ normal cdf.)</li>
+  <li>For a student with <b>positive</b> hours, we know the exact value, so they contribute the usual
+      bell-curve density $\phi$ — exactly like an ordinary regression.</li>
+  <li>For a student with <b>0</b> hours, we only know their desire was $\le 0$, so they contribute the
+      <b>probability</b> of that, $\Phi(-x'\beta/\sigma)$ — which is precisely a Probit's contribution.
+      ($\phi$ = the bell curve; $\Phi$ = the area under it up to a point.)</li>
 </ul>
-<div class="note">💡 One vector $\beta$ governs both pieces — the single-index restriction. Both
-$P(y>0)=\Phi(x'\beta/\sigma)$ and the amount $E[y\mid y>0]=x'\beta+\sigma\lambda$ rise with $x'\beta$,
-so a single $\beta_j$ <b>must</b> move both margins the <b>same</b> way. If you believe participation and
-amount are driven by different forces, Tobit is misspecified — use the <span class="key">Heckman</span>
-selection model (Type-2 Tobit, Week 10), or <span class="key">Cragg's double-hurdle / two-part model</span>
-which give the zero/positive decision and the amount their own equations.</div>
-<div class="tip">📝 Big exam contrast: OLS only loses <i>efficiency</i> if errors are non-normal or
-heteroskedastic, but <b>Tobit MLE becomes inconsistent</b> if $\varepsilon$ is non-normal or
-heteroskedastic — the likelihood is built on the normality + homoskedasticity assumptions.</div>`
+<p>So Tobit literally is "a regression glued to a probit," held together by <b>one</b> shared $\beta$.</p>
+<div class="note">💡 That single shared $\beta$ is the <b>single-index restriction</b> again. Both the chance of
+participating, $P(y>0)=\Phi(x'\beta/\sigma)$, and the amount once you participate, $E[y\mid y>0]$, rise
+together with $x'\beta$ — so one coefficient is forced to push <b>both</b> margins the <b>same</b> way. If
+you think participation and amount are driven by different forces, Tobit is the wrong tool: switch to the
+<b>Heckman</b> model (Week 10) or <b>Cragg's double-hurdle / two-part model</b>, which give the two
+decisions their own equations.</p>
+<div class="tip">📝 Big exam contrast: if the errors are non-normal or heteroskedastic, OLS only loses
+<i>efficiency</i> — but <b>Tobit MLE becomes inconsistent</b>, because the whole likelihood is built on
+normality + constant variance. Tobit buys you a lot, but it asks for stronger assumptions in return.</div>`
           }
         ]
       },
       {
-        heading: 'Interpreting Tobit: three different marginal effects',
+        heading: 'Reading a Tobit coefficient (the #1 exam trap)',
         num: '5',
         cards: [
           {
-            title: 'The raw coefficient is NOT the effect on observed y',
+            title: 'The raw coefficient is NOT the effect on what you observe',
             html: String.raw`
-<p>This is the single most-tested Tobit idea. The raw $\beta$ is the effect on the <b>latent</b>
-$y^*$, not on the observed $y$. There are three quantities:</p>
+<p>This single point earns more marks than anything else this week, so go slowly. A Tobit coefficient
+$\beta_j$ is the effect of $x_j$ on the <b>latent</b> $y^*$ — the hidden "true desire" — <b>not</b> on the
+observed, capped $y$. If you write "a 1-point higher math score raises the observed aptitude by 5.91," you
+lose marks. The correct sentence is "...raises the <b>latent</b> aptitude $y^*$ by 5.91."</p>
+<p>To say something about the number you actually observe, you need a <b>marginal effect</b>, and there are
+<b>three</b> of them — three different questions:</p>
 <table>
-  <tr><th>Effect on…</th><th>Meaning</th><th>Value</th></tr>
-  <tr><td><b>$E[y^*]$</b> latent</td><td>Effect "as if no limit existed" — the underlying propensity.</td><td>just $\beta$</td></tr>
-  <tr><td><b>$P(\text{uncensored})$</b></td><td>Effect on the probability of being above the limit (extensive margin).</td><td>$\propto \beta\cdot\phi(\cdot)/\sigma$</td></tr>
-  <tr><td><b>$E[y]$</b> observed</td><td>Effect on the actual average outcome, blending both margins.</td><td>$\beta\cdot\Phi(x'\beta/\sigma)$ (scaled by the share uncensored)</td></tr>
+  <tr><th>Effect on…</th><th>The question it answers</th><th>Value (left-censored at 0)</th></tr>
+  <tr><td><b>$E[y^*]$</b> — the latent</td><td>"If there were no limit at all, what's the effect?"</td><td>just $\beta_j$</td></tr>
+  <tr><td><b>$E[y\mid x]$</b> — the observed (everyone)</td><td>"Across all students, including the zeros, what's the average effect?" <i>(the policy number)</i></td><td>$\beta_j\,\Phi(z)$</td></tr>
+  <tr><td><b>$E[y\mid x,\,y>0]$</b> — the doers only</td><td>"Among students who already do bimbel, what's the effect?"</td><td>$\beta_j[1-z\lambda(z)-\lambda(z)^2]$</td></tr>
 </table>
-<p>The <b>unconditional ME</b> on $E[y]$ is the policy-relevant number (it averages over the chance of
-being pushed past the limit). The <b>conditional ME</b> on $E[y\mid \text{uncensored}]$ uses only the
-interior observations and involves a correction term (the inverse Mills ratio, Week 9–10).</p>
-<div class="note">💡 Which is bigger, conditional or unconditional? It depends on the <b>censoring share</b>, not a fixed
-rule. The deck's worked (right-censored) intuition: raising $x$ also pushes students <i>into</i> the 800
-ceiling, compressing the uncensored group from above, so there <b>uncond ME &gt; cond ME</b>
-(2.70 vs 2.50 below). Don't memorise a blanket "left vs right" flip — read it off the formulas
-$\beta\Phi(z)$ vs $\beta[1-z\lambda-\lambda^2]$.</div>
-<div class="tip">📝 If only a few obs are censored (e.g. 17/200 ≈ 8.5%), all three MEs are <b>numerically close</b>
-to $\beta$ — censoring barely bites.</div>`
+<p>where $z=x'\beta/\sigma$ and $\lambda(z)=\phi(z)/\Phi(z)$. Don't panic at the formulas — the point is
+that both observed-effects are the latent $\beta_j$ <b>shrunk</b> by a factor between 0 and 1. Intuitively:
+the effect on what you <i>see</i> is gentler than the effect on the hidden desire, because some of the push
+gets "absorbed" by people stuck at the boundary.</p>
+<div class="note">💡 Good news: when only a <b>few</b> observations are censored (e.g. 17 out of 200, about
+8.5%), $\Phi(z)$ is close to 1, so all three numbers are <b>nearly the same</b>. Censoring barely bites, and
+you can read the coefficient almost like an OLS slope. The trap only bites hard when lots of obs sit at the
+limit.</div>
+<div class="tip">📝 In Stata you'd get these three after <code>tobit</code> with <code>margins</code> and the
+<code>xb</code> / <code>ystar()</code> / <code>e()</code> options — but for the exam you mostly need to
+<b>read</b> them and <b>say the right sentence</b>, which is exactly what the Read Data cases drill.</div>`
           }
         ]
       }
     ],
 
-    /* ===================== FORMULAS ===================== */
+    /* ============================ FORMULAS ============================ */
     formulas: [
       {
         cards: [
           {
-            title: 'The model in one box',
+            title: 'The whole model in one box',
             html: String.raw`
-<div class="formula">Latent:      $y_i^* = x_i'\beta + \varepsilon_i,\quad \varepsilon_i\sim N(0,\sigma^2)$
-Observed (left-cens. at 0):  $y_i=\max(0,\,y_i^*)$
-
-$P\{y_i=0\}=\Phi\!\big(-x_i'\beta/\sigma\big)=1-\Phi\!\big(x_i'\beta/\sigma\big)$</div>`
+<div class="formula">Hidden desire:    $y_i^* = x_i'\beta + \varepsilon_i,\quad \varepsilon\sim N(0,\sigma^2)$
+What we observe (floor at 0):  $y_i=\max(0,\,y_i^*)$
+Chance of a zero:  $P\{y_i=0\}=\Phi(-x_i'\beta/\sigma)=1-\Phi(x_i'\beta/\sigma)$</div>
+<p>Read $\Phi(\cdot)$ as "the probability the bell curve is below this point." The ratio $\beta/\sigma$
+behaves like a probit coefficient for the <i>participation</i> decision.</p>`
           },
           {
-            title: 'Conditional & unconditional expectations (the Mills ratio appears)',
+            title: 'The two observed means (where the Mills ratio sneaks in)',
             html: String.raw`
-<p>Let $z=x'\beta/\sigma$ and $\lambda(z)=\phi(z)/\Phi(z)$ be the <b>inverse Mills ratio</b>.</p>
-<div class="formula">$E[y\mid x, y>0] = x'\beta + \sigma\,\lambda(z)$
-$E[y\mid x]\;\;\;\;\;\; = \Phi(z)\,\big(x'\beta\big) + \sigma\,\phi(z)$</div>
-<p>Differentiate to get the three marginal effects (left-censored at 0, $z=x'\beta/\sigma$):</p>
-<div class="formula">latent:        $\partial E[y^*]/\partial x_j = \beta_j$
-unconditional: $\partial E[y\mid x]/\partial x_j = \beta_j\,\Phi(z)$   (McDonald–Moffitt)
-conditional:   $\partial E[y\mid x,y>0]/\partial x_j = \beta_j\big[1-z\,\lambda(z)-\lambda(z)^2\big]$</div>
-<p>Both the unconditional ($\beta_j\Phi(z)$) and conditional ($\beta_j[1-z\lambda-\lambda^2]$) effects are
-$\beta_j$ <b>shrunk</b> by a factor in $(0,1)$. McDonald–Moffitt decomposition:</p>
-<div class="formula">$\underbrace{\partial E[y]/\partial x_j}_{\text{unconditional}} = \Phi(z)\cdot\underbrace{\partial E[y\mid y>0]/\partial x_j}_{\text{conditional}} \;+\; E[y\mid y>0]\cdot\underbrace{\partial \Phi(z)/\partial x_j}_{\text{extensive margin}}$</div>
-<p>i.e. the total (unconditional) effect = (effect on the amount, among the uncensored) + (effect of moving
-units across the 0 boundary). When few obs are censored ($\Phi(z)\to 1$) all three nearly coincide.</p>`
+<p>Let $z=x'\beta/\sigma$ and define the <b>inverse Mills ratio</b> $\lambda(z)=\phi(z)/\Phi(z)$ — you'll
+meet it properly in Weeks 9–10.</p>
+<div class="formula">Among the doers:   $E[y\mid x,\,y>0]=x'\beta+\sigma\,\lambda(z)$
+Across everyone:    $E[y\mid x]=\Phi(z)\,x'\beta+\sigma\,\phi(z)$</div>
+<p>Differentiating gives the three marginal effects:</p>
+<div class="formula">latent:         $\partial E[y^*]/\partial x_j=\beta_j$
+unconditional:  $\partial E[y\mid x]/\partial x_j=\beta_j\,\Phi(z)$   (McDonald–Moffitt)
+conditional:    $\partial E[y\mid x,y>0]/\partial x_j=\beta_j[1-z\lambda(z)-\lambda(z)^2]$</div>
+<p>Both observed effects are $\beta_j$ scaled by a number in $(0,1)$; with little censoring they ≈ $\beta_j$.</p>`
           },
           {
-            title: 'Log-likelihood (left-censored at 0)',
+            title: 'The log-likelihood',
             html: String.raw`
-<div class="formula">$\ln L=\displaystyle\sum_{y_i>0}\Big[-\ln\sigma+\ln\phi\!\Big(\tfrac{y_i-x_i'\beta}{\sigma}\Big)\Big]+\sum_{y_i=0}\ln\Phi\!\Big(\tfrac{-x_i'\beta}{\sigma}\Big)$</div>
-<p>First sum = density (regression part); second sum = censoring probability (probit part). For
-<b>right</b>-censoring at $UL$ (e.g. the UCLA 800 example), the censored term becomes
-$\sum_{y_i=UL}\ln\Phi\!\big((x_i'\beta-UL)/\sigma\big)$ — the probability $y^*\ge UL$.</p>`
+<div class="formula">$\ln L=\displaystyle\sum_{y_i>0}\Big[-\ln\sigma+\ln\phi\!\big(\tfrac{y_i-x_i'\beta}{\sigma}\big)\Big]+\sum_{y_i=0}\ln\Phi\!\big(\tfrac{-x_i'\beta}{\sigma}\big)$</div>
+<p>First sum = the regression (density) part for the values we see; second sum = the probit (probability)
+part for the zeros. For a <b>ceiling</b> at $UL$, the censored term becomes
+$\sum_{y_i=UL}\ln\Phi\!\big((x_i'\beta-UL)/\sigma\big)$.</p>`
           }
         ]
       }
     ],
 
-    /* ===================== READ DATA ===================== */
+    /* ============================ READ DATA ============================ */
     readdata: [
       {
-        heading: 'Reading Tobit output in Stata',
+        heading: 'Read the output — hover or tap any highlighted number',
         num: 'R',
         cards: [
           {
-            title: 'Diagnose before you model — see the censoring with your eyes',
+            title: 'Case 1 — Warm-up: how to read ANY regression table',
             html: String.raw`
-<span class="rd-tag">Case · UCLA aptitude data</span>
-<p>200 students; <code>apt</code> = aptitude score, capped at <b>800</b>; predictors <code>read</code>,
-<code>math</code>. <b>Always plot first</b> — Tobit problems are visible to the eye.</p>
-<div class="stata"><span class="ttl">diagnose the pile-up</span><span class="cmd">histogram apt, normal bin(10) xline(800)</span>
-<span class="cmd">count if apt == 800</span>
-  <span class="hl">17</span>            &lt;- 17 of 200 students (8.5%) sit exactly at the ceiling</div>
-<ul class="annot">
-  <li>A spike at 800 against an otherwise roughly-normal shape ⇒ <b>right-censoring</b> at 800.</li>
-  <li><b>17/200</b> censored is the headline number: it tells you how badly OLS will be biased and
-      whether conditional ≈ unconditional MEs (here, yes — only 8.5%).</li>
-</ul>`
+<span class="rd-tag">Case 1 · learn the layout</span>
+<p>Before Tobit, let's make sure you can read a plain regression. <b>The scenario:</b> we have 500 workers
+and we regress monthly income (in Rp '000) on years of <code>education</code> and years of
+<code>experience</code>. This is ordinary OLS. Hover (or tap on a phone) each
+<span style="color:var(--accent);font-weight:700;border-bottom:1px dashed">highlighted</span> number to see
+what it means — these five things (Coef, Std. err., t, P&gt;|t|, R²) appear in <b>every</b> table you'll
+read this semester.</p>` + S({
+              cmd: 'reg income education experience',
+              title: 'Linear regression (OLS)',
+              info: [
+                ['Number of obs', '500'],
+                ['F(2, 497)', '128.4'],
+                ['Prob > F', '0.0000', '<b>Overall model p-value.</b> Tests "are the regressors <i>jointly</i> useless?" Here p&lt;0.05 ⇒ at least one matters ⇒ the model is jointly significant.'],
+                ['R-squared', '0.341', '<b>R² = 0.341.</b> 34.1% of the variation in income is explained by education + experience together. The other ~66% is everything else (luck, ability, sector…).']
+              ],
+              dep: 'income',
+              cols: ['Coef.', 'Std. err.', 't', 'P>|t|', '[95% conf. interval]'],
+              rows: [
+                { v: 'education', c: ['320.5', '28.1', '11.40', '0.000', '265.3   375.7'],
+                  tips: { v: '<b>education</b> — a predictor (years of schooling).', 0: '<b>Coefficient = 320.5.</b> Each extra year of education is associated with Rp 320,500 higher monthly income, <i>holding experience constant</i> (ceteris paribus).', 1: '<b>Std. err. = 28.1.</b> How precise the estimate is — smaller means more precise. It is the building block of the t-stat: t = Coef ÷ SE.', 2: '<b>t-stat = 11.40</b> = 320.5 ÷ 28.1. Rule of thumb: <b>|t| &gt; 1.96 ⇒ significant at 5%.</b> 11.4 is huge ⇒ very strong.', 3: '<b>p-value = 0.000</b> (i.e. &lt;0.001). The chance of seeing a t this big if the true effect were zero. p &lt; 0.05 ⇒ statistically significant ⇒ reject "education has no effect".', 4: '<b>95% confidence interval [265, 376].</b> We\'re 95% confident the true coefficient lies in here. It excludes 0 ⇒ significant (same conclusion as the t-test).' } },
+                { v: 'experience', c: ['180.2', '22.0', '8.19', '0.000', '137.0   223.4'],
+                  tips: { 0: '<b>180.2:</b> each extra year of experience ⇒ ~Rp 180,200 more income, ceteris paribus. Smaller than the education effect (320.5).' } },
+                { v: '_cons', c: ['1500.0', '410.5', '3.65', '0.000', '693   2307'],
+                  tips: { v: '<b>_cons</b> = the intercept: predicted income for someone with 0 education and 0 experience. Often not economically meaningful, but it anchors the line.' } }
+              ]
+            })
           },
           {
-            title: 'tobit: read the coefficient as an effect on the LATENT score',
+            title: 'Case 2 — A real Tobit: the aptitude ceiling',
             html: String.raw`
-<span class="rd-tag">Core output</span>
-<div class="stata"><span class="ttl">right-censored Tobit at 800</span><span class="cmd">tobit apt read math, ul(800)</span>
-            |  Coef.   Std.Err.    t
-   read     |  <span class="hl">2.70</span>     ...
-   math     |  <span class="hl">5.91</span>     ...
-  _cons     |  ...
-  /sigma    |  ...
-LR chi2(2) = <span class="hl">188.97</span>   Prob &gt; chi2 = 0.000   Pseudo R2 = 0.083</div>
-<ul class="annot">
-  <li><b>read = 2.70:</b> holding math constant, a 1-point higher reading score is associated with a
-      <b>2.70-point increase in <i>latent</i> aptitude</b> $y^*$, ceteris paribus — <u>not</u> the
-      observed score.</li>
-  <li><b>math = 5.91:</b> stronger than reading — math raises latent aptitude ~2× as much.</li>
-  <li><b>/sigma:</b> the estimated SD of the error — Tobit identifies it (unlike Probit).</li>
-  <li><b>LR chi2 / Pseudo R²:</b> joint significance and fit for explaining <i>both</i> who is censored
-      and the level. (Pseudo R² is not the OLS R².)</li>
-</ul>
-<div class="note">💡 <code>ll(#)</code> = lower limit, <code>ul(#)</code> = upper limit. Use both for
-interval censoring: <code>tobit y x, ll(200) ul(800)</code>.</div>`
+<span class="rd-tag">Case 2 · UCLA apt data, ceiling = 800</span>
+<p><b>The scenario:</b> 200 students; <code>apt</code> is an aptitude score that <b>cannot exceed 800</b>
+(the test maxes out there), and 17 students hit exactly 800. We regress <code>apt</code> on reading
+(<code>read</code>) and math (<code>math</code>) using right-censored Tobit. Now the trap matters: every
+coefficient is an effect on the <b>latent</b> score $y^*$, not the capped score. Hover each number.</p>` + S({
+              cmd: 'tobit apt read math, ul(800)',
+              title: 'Tobit regression',
+              info: [
+                ['Number of obs', '200'],
+                ['LR chi2(2)', '188.97', '<b>The Tobit version of the F-test.</b> Tests whether read + math are <i>jointly</i> useful. It compares the full model to one with no regressors. Big value ⇒ they matter.'],
+                ['Prob > chi2', '0.0000', 'p &lt; 0.05 ⇒ the model as a whole is highly significant.'],
+                ['Pseudo R2', '0.0832', '<b>NOT</b> the OLS R². A rough MLE fit measure — don\'t interpret it as "% explained". Low pseudo-R² is normal for Tobit; ignore the temptation to over-read it.']
+              ],
+              dep: 'apt',
+              cols: ['Coef.', 'Std. err.', 't', 'P>|t|', '[95% conf. interval]'],
+              rows: [
+                { v: 'read', c: ['2.6979', '.6132', '4.40', '0.000', '1.489   3.907'],
+                  tips: { v: '<b>read</b> — reading score.', 0: '<b>2.70 = effect on the LATENT aptitude $y^*$</b>, NOT the observed capped score. Holding math fixed, +1 reading point ⇒ +2.70 in underlying aptitude, ceteris paribus. <b>This is the #1 Tobit exam trap</b> — never call it the effect on the observed score.', 2: '<b>t = 4.40</b> = 2.698 ÷ 0.613. |t| &gt; 1.96 ⇒ significant at 5%.', 3: '<b>p = 0.000:</b> reject "reading doesn\'t matter".' } },
+                { v: 'math', c: ['5.9145', '.7012', '8.43', '0.000', '4.532   7.297'],
+                  tips: { 0: '<b>5.91 on the latent $y^*$.</b> Compare to read\'s 2.70 — math matters about <b>twice</b> as much as reading for latent aptitude.', 2: 't = 8.43, even stronger than reading.' } },
+                { v: '_cons', c: ['209.56', '32.55', '6.44', '0.000', '145.4   273.8'],
+                  tips: { v: 'The intercept of the latent equation.' } },
+                '-',
+                { v: '/sigma', c: ['65.68', '3.48', '', '', ''],
+                  tips: { v: '<b>σ̂ = 65.68 = the estimated standard deviation of the error.</b> The fact that Tobit can <b>estimate</b> σ (whereas Probit fixes it to 1) is a classic exam point — Tobit sees magnitudes, Probit only sees 0/1.' } }
+              ],
+              notes: [
+                { t: '0 left-censored · 17 right-censored at apt = 800 · 183 uncensored',
+                  tip: '<b>17 of 200 (8.5%) hit the 800 ceiling.</b> This single number tells you two things: (1) OLS would be biased (it ignores the ceiling), and (2) since 8.5% is small, the three marginal effects (latent / observed / among-doers) will be <b>numerically close</b> here.' }
+              ]
+            })
           },
           {
-            title: 'margins: turning Tobit coefficients into reportable effects',
+            title: 'Case 3 — OLS vs Tobit: watch the slope shrink',
             html: String.raw`
-<span class="rd-tag">Marginal effects</span>
-<div class="stata"><span class="ttl">three different questions, three commands</span><span class="cmd">margins, dydx(*) predict(xb)</span>          <span class="dim">* effect on latent y*  (= raw coef)</span>
-<span class="cmd">margins, dydx(*) predict(e(0,800))</span>     <span class="dim">* effect on E[y | uncensored]  (conditional)</span>
-<span class="cmd">margins, dydx(*) predict(ystar(0,800))</span> <span class="dim">* effect on E[y]  (unconditional)</span></div>
-<ul class="annot">
-  <li><code>predict(xb)</code> ⇒ effect on $y^*$, equals the raw coefficient (Tobit is linear in $y^*$).</li>
-  <li><code>e(LL,UL)</code> ⇒ <b>conditional</b> ME, $E[y\mid LL<y<UL]$ — among the uncensored only.</li>
-  <li><code>ystar(LL,UL)</code> ⇒ <b>unconditional</b> ME, $E[y]$ — the policy number.</li>
-  <li>Result here: reading uncond. ≈ 2.70 vs cond. ≈ 2.50; math 5.91 vs 5.48. Uncond &gt; cond because
-      right-censoring means raising $x$ also pushes students into the 800 ceiling.</li>
-</ul>`
-          },
-          {
-            title: 'Compare OLS vs Tobit side by side',
-            html: String.raw`
-<span class="rd-tag">Lab.do · GRE data (ll 200, ul 800)</span>
-<div class="stata"><span class="cmd">reg gre gpa topnotch</span>
-<span class="cmd">estimates store ols_model</span>
-<span class="cmd">tobit gre gpa topnotch, ll(200) ul(800)</span>
-<span class="cmd">estimates store tobit_model</span>
-<span class="cmd">esttab ols_model tobit_model</span></div>
-<ul class="annot">
-  <li>The Tobit slope is typically <b>larger in magnitude</b> than OLS, because OLS is attenuated by the
-      censored pile-up.</li>
-  <li>Reporting tip: never report the raw Tobit coefficient as "the effect on $y$" — always state it is
-      the effect on $y^*$, then add a marginal-effect line for $E[y]$.</li>
-</ul>`
+<span class="rd-tag">Case 3 · same data, two estimators</span>
+<p><b>The scenario:</b> same aptitude data, run <b>both</b> ways and line up the coefficients. This is the
+picture of <b>attenuation bias</b>: because OLS ignores the 800 ceiling, its slopes are pulled
+<b>toward zero</b> — smaller than Tobit's. Hover the numbers to compare.</p>` + S({
+              title: 'Coefficients: OLS vs Tobit (apt on read, math)',
+              dep: 'apt',
+              cols: ['OLS', 'Tobit (ul 800)'],
+              rows: [
+                { v: 'read', c: ['2.557', '2.698'],
+                  tips: { 0: '<b>OLS read = 2.56.</b> Smaller than Tobit\'s 2.70 — the ceiling pile-up drags the OLS slope down (attenuation).', 1: '<b>Tobit read = 2.70</b> (effect on latent $y^*$). Bigger because Tobit corrects for the censoring.' } },
+                { v: 'math', c: ['5.383', '5.914'],
+                  tips: { 0: '<b>OLS math = 5.38</b> — again attenuated.', 1: '<b>Tobit math = 5.91</b> — the corrected, larger effect on latent aptitude.' } }
+              ],
+              notes: [
+                { t: 'OLS slopes are biased toward 0; Tobit recovers the latent-model effect.',
+                  tip: 'Report rule: never present the Tobit coefficient as "the effect on observed apt" — it\'s the effect on latent $y^*$. Add a marginal-effect line if you need the effect on the observed score.' }
+              ]
+            })
           }
         ]
       }
     ],
 
-    /* ===================== QUIZ ===================== */
+    /* ============================ QUIZ ============================ */
     quiz: [
       {
         type: 'concept',
-        q: 'A principal in Depok regresses weekly bimbel hours (many students report 0, a few report the 20-hour package maximum) on family income with OLS. Your friend says "that’s wrong, you have a censoring problem." Is the friend right, and what breaks?',
+        q: 'Back to the principal in Depok: many students report 0 bimbel hours, a few report the 20-hour maximum, and she ran OLS of hours on family income. Is her friend right that OLS is "wrong", and what exactly breaks?',
         answer: [
-          'Friend is essentially right: the outcome is limited — a floor at 0 (corner solutions / non-participants) and a ceiling at 20 (package cap, right-censoring).',
-          'OLS forces a straight line through a distribution with mass points at 0 and 20, misspecifying E[y|x]. Result: slopes biased toward 0 (attenuation), heteroskedastic errors, and possible impossible predictions (ŷ<0 or >20).',
-          'The bias does NOT disappear with more data — it is a specification problem, not a sampling problem.',
+          'Friend is right. The outcome is limited — a floor at 0 (non-participants / corner solutions) and a ceiling at 20 (the package cap, i.e. right-censoring).',
+          'OLS draws a straight line through a distribution with big clumps at 0 and 20, so it misreads the relationship: the slope is biased TOWARD zero (attenuation), the standard errors are wrong (heteroskedasticity), and it can predict impossible values (<0 or >20).',
+          'This bias does NOT shrink with more data — it is a wrong-model problem, not a small-sample problem.',
           'Fix: an interval-censored Tobit, tobit hours income, ll(0) ul(20).'
         ],
-        tip: 'Name the bias (attenuation/toward zero) AND say it is not cured by N→∞.'
+        tip: 'Name the bias (toward zero) AND say more data won\'t cure it.'
       },
       {
         type: 'concept',
-        q: 'In Tobit output, math has coefficient 5.91. A classmate writes: "a 1-point higher math score raises a student’s observed aptitude by 5.91 points." Correct the statement.',
+        q: 'A classmate reads a Tobit and writes: "a 1-point higher math score raises a student\'s observed aptitude by 5.91 points." Fix the sentence.',
         answer: [
-          'Wrong: 5.91 is the effect on the LATENT aptitude y*, not the observed (capped) score.',
+          'Wrong because 5.91 is the effect on the LATENT aptitude y*, not the observed (capped) score.',
           'Correct: holding reading constant, a 1-point higher math score is associated with a 5.91-point increase in latent aptitude y*, ceteris paribus.',
-          'To talk about the observed score you need a marginal effect: unconditional ME on E[y] via margins, dydx(math) predict(ystar(.,800)) ≈ 5.48–5.91 depending on censoring share.'
+          'To talk about the observed score you need a marginal effect on E[y] (the unconditional ME, β·Φ(z)), which is a bit smaller than 5.91.'
         ],
-        tip: 'Raw Tobit coef = effect on y*. Observed-y effect needs margins.'
+        tip: 'Raw Tobit coefficient = effect on y*; observed-y effect needs a marginal effect.'
       },
       {
         type: 'concept',
-        q: 'Why can Tobit estimate σ while Probit must normalise σ = 1?',
+        q: 'Why can Tobit estimate σ while Probit has to fix σ = 1?',
         answer: [
-          'Probit only observes the SIGN of y* (0/1), so the scale of y* is unidentified — multiply β and σ by the same constant and the 0/1 pattern is unchanged. Hence σ is normalised to 1.',
-          'Tobit observes the actual MAGNITUDE of y whenever y>0, which pins down the scale of the error. So σ is identified and estimated.',
-          'Consequence: in Tobit the ratio β/σ behaves like a probit coefficient for the participation margin, while β itself measures the latent-level effect.'
+          'Probit only sees a 0/1 outcome, so the scale of y* is invisible — you could blow up β and σ together and the 0/1 pattern wouldn\'t change. So σ is normalised to 1.',
+          'Tobit sees the actual amount whenever y>0, which reveals the scale of the spread, so σ is identified and estimated.',
+          'That is why /sigma appears in Tobit output but never in Probit output.'
         ]
       },
       {
         type: 'scenario',
-        q: 'Only 8 of 250 firms hit the regulatory cap on reported emissions. Will the conditional and unconditional marginal effects differ much? Which would you report to a regulator and why?',
+        q: 'Only 8 of 250 firms hit a regulatory emissions cap. Will the three Tobit marginal effects differ much, and which one would you quote to a regulator?',
         answer: [
-          'With only ~3% censored, the extensive-margin channel (pushing firms into the cap) is tiny, so conditional ME ≈ unconditional ME.',
-          'Report the UNCONDITIONAL ME on E[y]: the regulator cares about the whole population of firms, including the chance of being pushed to the cap.',
-          'Use the conditional ME only if the question is explicitly restricted to firms below the cap.'
+          'With only ~3% censored, Φ(z) is close to 1, so the latent, unconditional (E[y]) and conditional (E[y|uncensored]) effects are all nearly equal.',
+          'Quote the UNCONDITIONAL marginal effect on E[y]: the regulator cares about all firms, including the chance of being pushed to the cap.',
+          'Use the conditional effect only if the question is explicitly restricted to firms below the cap.'
         ],
-        tip: 'Few censored obs ⇒ the two MEs nearly coincide; choose by the policy question.'
+        tip: 'Few censored ⇒ the three MEs nearly coincide; pick by the policy question.'
       },
       {
         type: 'concept',
-        q: 'Explain in one sentence each why (a) OLS on the FULL sample and (b) OLS after DROPPING the zeros are both inconsistent for the latent parameters.',
+        q: 'In one sentence each, why are BOTH (a) OLS on the full sample and (b) OLS after dropping the zeros inconsistent for the latent parameters?',
         answer: [
-          '(a) Full-sample OLS treats censored zeros as true values, misspecifying the non-linear E[y|x] and pulling the slope toward zero (attenuation) — inconsistent.',
-          '(b) Dropping the zeros creates a truncated, non-random subsample where E[ε | y>0] ≠ 0, so the error correlates with x — also inconsistent (this motivates truncated regression / Heckman).',
+          '(a) Full-sample OLS treats censored zeros as if they were true values, misspecifying the curved relationship and flattening the slope toward zero — inconsistent.',
+          '(b) Dropping the zeros makes a truncated, non-random sample where the error no longer averages zero among the survivors (E[ε|y>0]≠0), so the error correlates with x — also inconsistent (this is the door to truncated regression and Heckman).',
           'Only the Tobit MLE, which uses the censoring probability for the zeros and the density for the positives, is consistent for (β, σ).'
         ]
       }
