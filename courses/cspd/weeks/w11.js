@@ -85,9 +85,12 @@ keep the main effect.</b></div>`
             html: String.raw`
 <p>To test whether <b>all</b> coefficients differ across two periods (a structural break), use the
 <span class="key">Chow test</span> — an F-test that all the time-interaction terms are jointly zero:</p>
-<div class="formula">$$ F=\frac{(SSR_{pooled}-SSR_{unrestricted})/k}{SSR_{unrestricted}/(n-2k)} $$</div>
-<p>Equivalently, run the fully-interacted model and F-test all interactions $=0$. Rejecting ⇒ structural
-change ⇒ the pooled (constant-coefficient) model is invalid and would bias your conclusions.</p>`
+<div class="formula">$$ F=\frac{(SSR_{pooled}-SSR_{unrestricted})/k}{SSR_{unrestricted}/(n-2k)}\ \sim\ F_{k,\;n-2k} $$</div>
+<p>where $k=$ number of parameters per period (the number of restrictions tested = every slope + the
+intercept), $SSR_{pooled}$ is from the restricted single model, and $SSR_{unrestricted}=SSR_1+SSR_2$ is
+the sum of the two <b>separate</b> per-period regressions. <b>Equivalently</b> (and easier): run the
+fully-interacted model and F-test all $k$ interaction terms $=0$. Rejecting ⇒ structural change ⇒ the
+pooled constant-coefficient model is invalid and biases your conclusions.</p>`
           }
         ]
       },
@@ -124,6 +127,10 @@ group but not a <b>control</b> group, with <b>before</b> and <b>after</b> data. 
 incinerator effect was about −13.2% with controls.</p>
 <div class="note">💡 Key identifying assumption: <b>parallel trends</b> — absent treatment, the two groups
 would have changed by the same amount. Groups need not <b>start</b> equal, only <b>trend</b> equally.</div>
+<div class="tip">📝 How to <b>support</b> parallel trends (exam-ready answer): with ≥2 pre-treatment periods,
+plot/compare the groups' <b>pre-trends</b>, or run a <b>placebo DiD</b> on a fake pre-period treatment date
+— if its interaction is insignificant, the trends were parallel before treatment. You assert parallel
+trends; pre-trends evidence is how you defend it.</div>
 <div class="tip">📝 DiD is just first-differencing applied to two groups. It is the bridge from pooled
 cross-sections (this week) to panel methods (next week).</div>`
           }

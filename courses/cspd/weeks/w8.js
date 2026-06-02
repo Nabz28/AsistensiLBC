@@ -137,8 +137,15 @@ $(\beta,\sigma)$ most likely to have generated the data. Each observation contri
   <li><b>Censored</b> $(y_i=0)$: contributes the <b>probability</b> $P\{y_i^*\le 0\}=\Phi(-x_i'\beta/\sigma)$
       — exactly a <b>Probit</b> contribution. ($\phi=$ normal pdf, $\Phi=$ normal cdf.)</li>
 </ul>
-<div class="note">💡 One vector $\beta$ governs both pieces — the single-index restriction. That is why a
-variable that pushes the participation probability up <b>must</b> push the amount up too.</div>`
+<div class="note">💡 One vector $\beta$ governs both pieces — the single-index restriction. Both
+$P(y>0)=\Phi(x'\beta/\sigma)$ and the amount $E[y\mid y>0]=x'\beta+\sigma\lambda$ rise with $x'\beta$,
+so a single $\beta_j$ <b>must</b> move both margins the <b>same</b> way. If you believe participation and
+amount are driven by different forces, Tobit is misspecified — use the <span class="key">Heckman</span>
+selection model (Type-2 Tobit, Week 10), or <span class="key">Cragg's double-hurdle / two-part model</span>
+which give the zero/positive decision and the amount their own equations.</div>
+<div class="tip">📝 Big exam contrast: OLS only loses <i>efficiency</i> if errors are non-normal or
+heteroskedastic, but <b>Tobit MLE becomes inconsistent</b> if $\varepsilon$ is non-normal or
+heteroskedastic — the likelihood is built on the normality + homoskedasticity assumptions.</div>`
           }
         ]
       },
@@ -160,11 +167,13 @@ $y^*$, not on the observed $y$. There are three quantities:</p>
 <p>The <b>unconditional ME</b> on $E[y]$ is the policy-relevant number (it averages over the chance of
 being pushed past the limit). The <b>conditional ME</b> on $E[y\mid \text{uncensored}]$ uses only the
 interior observations and involves a correction term (the inverse Mills ratio, Week 9–10).</p>
-<div class="note">💡 Direction rule: with <b>right</b>-censoring (ceiling), unconditional ME &gt; conditional ME
-— raising $x$ also pushes people <i>into</i> the ceiling, compressing the uncensored group from above.
-With <b>left</b>-censoring at 0 the direction reverses.</div>
-<div class="tip">📝 If only a few obs are censored (e.g. 17/200 ≈ 8.5%), conditional and unconditional MEs are
-<b>numerically close</b> — censoring barely bites.</div>`
+<div class="note">💡 Which is bigger, conditional or unconditional? It depends on the <b>censoring share</b>, not a fixed
+rule. The deck's worked (right-censored) intuition: raising $x$ also pushes students <i>into</i> the 800
+ceiling, compressing the uncensored group from above, so there <b>uncond ME &gt; cond ME</b>
+(2.70 vs 2.50 below). Don't memorise a blanket "left vs right" flip — read it off the formulas
+$\beta\Phi(z)$ vs $\beta[1-z\lambda-\lambda^2]$.</div>
+<div class="tip">📝 If only a few obs are censored (e.g. 17/200 ≈ 8.5%), all three MEs are <b>numerically close</b>
+to $\beta$ — censoring barely bites.</div>`
           }
         ]
       }
@@ -188,16 +197,23 @@ $P\{y_i=0\}=\Phi\!\big(-x_i'\beta/\sigma\big)=1-\Phi\!\big(x_i'\beta/\sigma\big)
 <p>Let $z=x'\beta/\sigma$ and $\lambda(z)=\phi(z)/\Phi(z)$ be the <b>inverse Mills ratio</b>.</p>
 <div class="formula">$E[y\mid x, y>0] = x'\beta + \sigma\,\lambda(z)$
 $E[y\mid x]\;\;\;\;\;\; = \Phi(z)\,\big(x'\beta\big) + \sigma\,\phi(z)$</div>
-<p>Differentiate the second to get the <b>unconditional</b> marginal effect:</p>
-<div class="formula">$\dfrac{\partial E[y\mid x]}{\partial x_j} = \beta_j\,\Phi(z)$   (McDonald–Moffitt)</div>
-<p>Since $0<\Phi(z)<1$, the effect on observed $y$ is a <b>shrunken</b> version of $\beta_j$, scaled by
-the probability of being uncensored.</p>`
+<p>Differentiate to get the three marginal effects (left-censored at 0, $z=x'\beta/\sigma$):</p>
+<div class="formula">latent:        $\partial E[y^*]/\partial x_j = \beta_j$
+unconditional: $\partial E[y\mid x]/\partial x_j = \beta_j\,\Phi(z)$   (McDonald–Moffitt)
+conditional:   $\partial E[y\mid x,y>0]/\partial x_j = \beta_j\big[1-z\,\lambda(z)-\lambda(z)^2\big]$</div>
+<p>Both the unconditional ($\beta_j\Phi(z)$) and conditional ($\beta_j[1-z\lambda-\lambda^2]$) effects are
+$\beta_j$ <b>shrunk</b> by a factor in $(0,1)$. McDonald–Moffitt decomposition:</p>
+<div class="formula">$\underbrace{\partial E[y]/\partial x_j}_{\text{unconditional}} = \Phi(z)\cdot\underbrace{\partial E[y\mid y>0]/\partial x_j}_{\text{conditional}} \;+\; E[y\mid y>0]\cdot\underbrace{\partial \Phi(z)/\partial x_j}_{\text{extensive margin}}$</div>
+<p>i.e. the total (unconditional) effect = (effect on the amount, among the uncensored) + (effect of moving
+units across the 0 boundary). When few obs are censored ($\Phi(z)\to 1$) all three nearly coincide.</p>`
           },
           {
             title: 'Log-likelihood (left-censored at 0)',
             html: String.raw`
 <div class="formula">$\ln L=\displaystyle\sum_{y_i>0}\Big[-\ln\sigma+\ln\phi\!\Big(\tfrac{y_i-x_i'\beta}{\sigma}\Big)\Big]+\sum_{y_i=0}\ln\Phi\!\Big(\tfrac{-x_i'\beta}{\sigma}\Big)$</div>
-<p>First sum = density (regression part); second sum = censoring probability (probit part).</p>`
+<p>First sum = density (regression part); second sum = censoring probability (probit part). For
+<b>right</b>-censoring at $UL$ (e.g. the UCLA 800 example), the censored term becomes
+$\sum_{y_i=UL}\ln\Phi\!\big((x_i'\beta-UL)/\sigma\big)$ — the probability $y^*\ge UL$.</p>`
           }
         ]
       }

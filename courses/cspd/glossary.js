@@ -41,7 +41,7 @@
     { group: 'Panel data', term: 'Panel (longitudinal) data', def: 'The SAME units observed over multiple periods. Lets you control for time-invariant unobserved heterogeneity. Declare: xtset id year.' },
     { group: 'Panel data', term: 'Unobserved effect a_i', def: 'Time-invariant individual heterogeneity (ability, culture, geography) bundled into one term. Source of OVB in a cross-section if correlated with x.' },
     { group: 'Panel data', term: 'Pooled OLS (POLS)', def: 'OLS ignoring the panel structure. Biased if a_i correlates with x; SEs wrong (serial correlation) — use cluster-robust SEs. A baseline only.' },
-    { group: 'Panel data', term: 'Fixed Effects (FE)', def: 'Removes a_i by within transformation (demeaning). Allows Corr(a_i, x)≠0; the most credible estimator of ceteris-paribus effects. Drops time-invariant regressors.' },
+    { group: 'Panel data', term: 'Fixed Effects (FE)', def: 'Removes a_i by within transformation (demeaning). Allows Corr(a_i, x)≠0; the most credible estimator for controlling time-invariant confounding (but not time-varying confounders or reverse causality). Drops time-invariant regressors.' },
     { group: 'Panel data', term: 'Within transformation', def: 'Subtract each unit’s own time-mean from every variable; anything constant within the unit (incl. a_i) vanishes. OLS on demeaned data = within (FE) estimator.' },
     { group: 'Panel data', term: 'LSDV', def: 'Least Squares Dummy Variables: a dummy intercept per unit. Gives the IDENTICAL slope to the within estimator; costs many df. reg y x i.id.' },
     { group: 'Panel data', term: 'First Differencing (FD)', def: 'Subtract the previous period: Δy=β₁Δx+Δu. Removes a_i; loses the first period. Identical to FE at T=2; differs at T≥3. reg D.y D.x.' },

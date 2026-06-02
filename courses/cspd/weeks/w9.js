@@ -163,6 +163,9 @@ because out-of-range units never enter).</p>`
 <span class="cmd">margins, dydx(*) predict(ystar(40,.))</span> <span class="dim">* effect on E[y | truncation]</span></div>
 <ul class="annot">
   <li><code>predict(xb)</code> equals the raw coefficient — fine to report.</li>
+  <li><b>Reading the bounds:</b> for <b>lower</b> truncation at 40 use <code>ystar(40,.)</code> — the
+      "<code>.</code>" means $+\infty$ (no upper limit). For an upper truncation at $UL$ you'd write
+      <code>ystar(.,UL)</code>; for two-sided, <code>ystar(LL,UL)</code>.</li>
   <li>Do <b>not</b> report a "probability in interval" effect for truncreg: out-of-range units are not
       in the population you are modelling, so that quantity is meaningless.</li>
 </ul>`

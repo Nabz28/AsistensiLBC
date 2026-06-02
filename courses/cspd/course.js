@@ -63,6 +63,8 @@ final.`,
 
     glossary: (window.CSPD_GLOSSARY || []),
 
-    readDataLab: window.CSPD_READLAB || null
+    readDataLab: window.CSPD_READLAB || null,
+
+    cheatsheet: window.CSPD_CHEAT || null
   };
 })();

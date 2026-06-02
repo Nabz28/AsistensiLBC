@@ -76,9 +76,13 @@ error mean is <b>not zero</b> — it equals $\rho\sigma_\varepsilon\lambda$. OLS
 dumps this term into the other coefficients ⇒ <b>omitted-variable bias</b>. Heckman simply <b>adds
 $\hat\lambda$ as a regressor</b>: it absorbs the conditional error mean, and the remaining $\hat\beta$
 become consistent.</p>
-<div class="note">💡 IMR intuition: $\lambda$ is the "average pull" of selection. As selection becomes
-near-universal ($\Phi\to 1$), $\lambda\to 0$ — the correction vanishes and Heckman ≈ OLS. When few are
-selected, $\lambda$ is large and the correction matters a lot. (E.g. λ(0)=0.798, λ(1)=0.287.)</div>`
+<div class="note">💡 IMR intuition: $\lambda(z)$ is the "average pull" of selection. As selection becomes
+near-universal ($z\to\infty$, $\Phi\to 1$), $\lambda\to 0$ — the correction vanishes and Heckman ≈ OLS.
+When few are selected, $\lambda$ is large and the correction matters a lot. (E.g. $\lambda(0)=0.798$,
+$\lambda(1)=0.288$.)</div>
+<div class="tip">📝 Don't confuse two things called "lambda": the <b>regressor</b> $\lambda_i$ (the IMR value,
+typically ~0.3–0.8 per person) versus the <b>coefficient on</b> $\hat\lambda$ that Stata prints as
+<code>/mills lambda</code> — that number equals $\rho\,\sigma_\varepsilon$ and can be large (e.g. 4.0).</div>`
           }
         ]
       },
@@ -152,7 +156,7 @@ each $x$ relates to selection — direction is empirical, not a theorem).</div>`
             html: String.raw`
 <div class="formula">$E[y\mid x,\ \text{selected}] = x'\beta + \rho\,\sigma_\varepsilon\,\lambda(w'\gamma)$
 $\lambda(z)=\phi(z)/\Phi(z)\quad(\text{inverse Mills ratio})$
-Bias of omitting $\lambda$: proportional to $\rho$. If $\rho=0$, OLS on the selected sample is fine.</div>`
+Bias of omitting $\lambda$: proportional to $\rho\,\sigma_\varepsilon$. If $\rho=0$, OLS on the selected sample is fine.</div>`
           },
           {
             title: 'Stata commands (two equivalent dialects)',
