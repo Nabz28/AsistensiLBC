@@ -28,7 +28,10 @@ draw uncorrelated with the regressors</b>. The composite error $v_{it}=a_i+u_{it
 correlated (the $a_i$ part is common across $t$), so OLS is inefficient. RE fixes this with
 <b>GLS / quasi-demeaning</b>:</p>
 <div class="formula">$$ (y_{it}-\theta\bar y_i)=\beta_0(1-\theta)+\beta_1(x_{it}-\theta\bar x_i)+(v_{it}-\theta\bar v_i) $$
-$$ \theta=1-\sqrt{\dfrac{\sigma_u^2}{\sigma_u^2+T\sigma_a^2}},\qquad 0\le\theta\le 1 $$</div>
+$$ \theta=1-\sqrt{\dfrac{\sigma_u^2}{\sigma_u^2+T\sigma_a^2}},\qquad 0\le\theta\le 1 $$
+$$ \text{intraclass corr: } \mathrm{Corr}(v_{it},v_{is})=\dfrac{\sigma_a^2}{\sigma_a^2+\sigma_u^2}\ \ (t\ne s) $$</div>
+<p>That positive serial correlation in the composite error $v_{it}=a_i+u_{it}$ is exactly why pooled-OLS
+default SEs are wrong and why GLS (RE) is more efficient.</p>
 <table>
   <tr><th>θ value</th><th>RE collapses to</th></tr>
   <tr><td>$\theta=0$</td><td>Pooled OLS (no quasi-demeaning).</td></tr>
@@ -63,8 +66,8 @@ the exception, justified mainly when the key regressor is time-invariant.</div>`
 <p>Is there any panel-level variance ($\sigma_a^2>0$) at all?</p>
 <div class="formula">$H_0:\ \sigma_a^2=0$ (POLS fine)   vs   $H_1:\ \sigma_a^2>0$ (use RE)
 Stata:  xttest0   (after xtreg, re)</div>
-<p>Reject $H_0$ ⇒ significant individual effects ⇒ RE preferred over POLS. (Even if the LM test is
-unsurprising, Wooldridge notes RE is generally preferable to POLS: it removes a fraction $\theta$ of
+<p>Reject $H_0$ ⇒ significant individual effects ⇒ RE preferred over POLS. (Even when the LM test is
+borderline, Wooldridge notes RE is generally preferable to POLS: it removes a fraction $\theta$ of
 $a_i$ — less bias — and mops up serial correlation, so it is more efficient.)</p>`
           },
           {
@@ -79,7 +82,11 @@ Stata:  hausman fe re</div>
 <p>Small $p$ (e.g. $<0.05$) ⇒ <b>reject $H_0$ ⇒ use Fixed Effects</b> (RE is inconsistent). Failing to
 reject means either RE and FE are close enough that it doesn't matter, or FE sampling variation is large.</p>
 <div class="note">💡 If the main regressor is <b>time-invariant</b> (e.g. gender), you <b>must</b> use RE —
-FE can't estimate it. Then justify RE with many time-constant controls, or use CRE (next).</div>`
+FE can't estimate it. Then justify RE with many time-constant controls, or use CRE (next).</div>
+<div class="tip">📝 Why is FE often <b>less precise</b> (bigger SEs) than RE? FE uses only <b>within</b>-unit
+variation and throws away all the <b>between</b>-unit variation; RE uses both. When a regressor barely
+moves within units, FE has little signal left and its SEs blow up. The trade-off: FE buys consistency
+(robust to $a_i$–$x$ correlation) at the cost of efficiency.</div>`
           }
         ]
       },

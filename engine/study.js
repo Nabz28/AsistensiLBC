@@ -174,6 +174,7 @@
       items.push({ key: 'unit/' + u.id, label: t(u.label) || t(u.title), doneId: u.id });
     });
     if (COURSE.readDataLab) items.push({ key: 'readlab', label: t(COURSE.readDataLab.label) || S('readdata') });
+    if (COURSE.cheatsheet) items.push({ key: 'cheatsheet', label: t(COURSE.cheatsheet.label) || 'Cheatsheet' });
     if (exams.length) items.push({ key: 'exams', label: S('pastExams') });
     if (glossary.length) items.push({ key: 'glossary', label: S('glossary') });
     if (COURSE.superSummary) items.push({ key: 'super', label: t(COURSE.superSummary.label) || 'Super Summary' });
@@ -473,6 +474,8 @@
       viewUnit(id, seg);
     } else if (hash === 'readlab' && COURSE.readDataLab) {
       active = 'readlab'; viewReadLab();
+    } else if (hash === 'cheatsheet' && COURSE.cheatsheet) {
+      active = 'cheatsheet'; viewCheat();
     } else if (hash.indexOf('exams') === 0 && exams.length) {
       active = 'exams'; viewExams();
     } else if (hash === 'glossary' && glossary.length) {
@@ -497,6 +500,22 @@
     view.innerHTML = h;
     renderMath(view);
     wireQuiz();
+  }
+
+  // Course-level one-page Cheatsheet — dense, printable reference rendered with
+  // the section/card machinery. A "Print / save PDF" button calls window.print().
+  function viewCheat() {
+    var cs = COURSE.cheatsheet || {};
+    var h = '<div class="eyebrow">' + (t(cs.label) || 'Cheatsheet') + '</div>' +
+      '<h1 class="ov-title">' + (t(cs.title) || t(cs.label) || 'Cheatsheet') + '</h1>' +
+      (t(cs.blurb) ? '<p class="ov-sub">' + t(cs.blurb) + '</p>' : '') +
+      '<div class="lesson-toolbar"><button class="btn primary" id="cheat-print">🖨️ ' +
+        (t(cs.printLabel) || 'Print / save as PDF') + '</button></div>';
+    h += '<div class="cheatsheet seg-body" style="margin-top:14px">' + sectionsHTML(cs.sections) + '</div>';
+    view.innerHTML = h;
+    renderMath(view);
+    var pb = document.getElementById('cheat-print');
+    if (pb) pb.onclick = function () { window.print(); };
   }
 
   function viewSuper() {

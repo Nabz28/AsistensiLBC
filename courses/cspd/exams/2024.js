@@ -23,12 +23,15 @@ optional. Tables reproduced from the paper; answers from the official key. This 
             n: '1a',
             q: String.raw`Women’s-wage study: 2,000 women, wage observed for only 67.15% (the rest don’t work). Model
 $wage_i=\beta_0+\beta_1 educ_i+\beta_2 age_i+\varepsilon_i$. <b>What conditions must hold for OLS to be unbiased?</b>`,
-            answer: String.raw`<p>Three conditions:</p><ul>
+            answer: String.raw`<p>The selection-relevant conditions the key wants:</p><ul>
 <li><b>Random sampling</b> from the population.</li>
 <li><b>Zero conditional mean:</b> no correlation between the regressors and the error,
 $E(\varepsilon\mid x)=0$.</li>
 <li><b>Selection unrelated to the outcome:</b> the rule deciding who is <b>observed</b> (has a wage) must
-not be correlated with the outcome (wage). This is crucial here because only 67.15% are observed.</li></ul>`
+not be correlated with the outcome (wage). This is crucial here because only 67.15% are observed.</li></ul>
+<p class="dimnote"><i>For full marks you may also note the rest of the Gauss–Markov unbiasedness set:
+linearity in parameters and no perfect collinearity. Homoskedasticity is <b>not</b> required for
+unbiasedness — only for efficient/valid standard errors.</i></p>`
           },
           {
             n: '1b',
@@ -54,12 +57,13 @@ biased, inconsistent OLS. The significant λ is the smoking gun.</p>`
             answer: String.raw`<p>All ceteris paribus:</p>
 <p><b>Wage equation:</b> <b>educ 0.983</b> — +1 year education ⇒ wage higher by ~0.98, sig 1%.
 <b>age 0.212</b> — +1 year age ⇒ +0.21 wage, sig 1%. (_cons 0.734 not significant, p=0.557.)</p>
-<p><b>Selection (probability of working):</b> <b>married 0.431</b> and <b>children 0.447</b> — being
-married and having more children <b>raise</b> the probability of working (sig 1%) in this synthetic data
-(likely reflecting economic need). <b>educ 0.058</b>, <b>age 0.035</b> — more education and being older
-raise participation (sig 1%). _cons −2.467: low baseline participation when all regressors are 0.</p>
-<div class="note">💡 In real Indonesian data (SAKERNAS) young children usually <i>reduce</i> maternal labour
-supply — read signs against the data context.</div>`
+<p><b>Selection (probability of working):</b> <b>married 0.431</b> and <b>children 0.447</b> — in this
+<b>synthetic teaching dataset</b> being married and having more children <b>raise</b> the probability of
+working (sig 1%). <b>educ 0.058</b>, <b>age 0.035</b> — more education and being older raise participation
+(sig 1%). _cons −2.467: low baseline participation when all regressors are 0.</p>
+<div class="note">💡 Interpret the SIGN of <code>children</code> with care: this is womenwk, a synthetic dataset,
+so don't read economic meaning into it. In real Indonesian data (SAKERNAS) young children usually
+<i>reduce</i> maternal labour supply — always read signs against the data-generating context.</div>`
           },
           {
             n: '1e',

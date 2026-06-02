@@ -60,8 +60,11 @@ Simpson's paradox.</div>`
             title: 'Stack everything and ignore the panel structure',
             html: String.raw`
 <p><span class="key">Pooled OLS</span> (<code>reg y x</code>) treats all $N\times T$ rows as one big
-cross-section. Assumptions: linearity, no perfect collinearity, <b>zero conditional mean</b>
-$E(u_{it}\mid x)=0$ for all $i,t$, homoskedasticity, no serial correlation.</p>
+cross-section. For <b>consistency</b> it needs only linearity, no perfect collinearity, and
+<b>zero conditional mean</b> $E(v_{it}\mid x)=0$ where $v_{it}=a_i+u_{it}$ — i.e. $a_i$ uncorrelated with
+$x$. Homoskedasticity and no-serial-correlation are <b>not</b> needed for consistency; they are only needed
+for the default standard errors to be valid (which they are not here, since $a_i$ makes $v_{it}$ serially
+correlated).</p>
 <p><b>Limitations:</b></p>
 <ul>
   <li><b>Ignores $a_i$:</b> if $a_i$ correlates with $x_{it}$, POLS is <b>biased &amp; inconsistent</b>
@@ -111,10 +114,11 @@ small N; impractical for thousands of units.</p>`
 (re-introduce it / add period dummies for ≥3 periods). With $T$ periods you get $T-1$ differenced obs
 per unit, so FD <b>loses the first period</b> (e.g. T=2 → N differenced rows).</p>
 <div class="formula">Stata:  reg D.y D.x        (or with time dummies for T≥3)</div>
-<p><b>FD assumptions for unbiased &amp; consistent (BLUE):</b> (1) the model holds with time-invariant
-$a_i$; (2) random sampling; (3) each $x$ varies over time and no perfect collinearity; (4)
-<b>strict exogeneity</b> $E[\Delta u\mid \Delta x]=0$; (5) homoskedastic differenced errors;
-(6) no autocorrelation in $\Delta u$. Violations of (5)/(6) ⇒ robust / cluster-robust SEs.</p>`
+<p><b>For unbiased &amp; consistent:</b> (1) the model holds with time-invariant $a_i$; (2) random sampling;
+(3) each $x$ varies over time and no perfect collinearity; (4) <b>strict exogeneity</b>
+$E[\Delta u\mid \Delta x]=0$. Adding (5) homoskedastic differenced errors and (6) no autocorrelation in
+$\Delta u$ makes FD <b>efficient (BLUE)</b>. So: (1)–(4) ⇒ unbiased &amp; consistent; (1)–(6) ⇒ BLUE.
+Violations of (5)/(6) don't bias the coefficient — they only break the SEs ⇒ use robust / cluster-robust SEs.</p>`
           }
         ]
       },
