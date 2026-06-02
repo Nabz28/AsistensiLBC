@@ -322,6 +322,52 @@ details[open]>summary::before{transform:rotate(90deg)}
 .empty .em-ico{font-size:30px;margin-bottom:12px;opacity:.5}
 .empty p{font-size:14px;line-height:1.6;max-width:420px;margin:0 auto}
 
+/* ---- Interactive Stata-output table (window.STATA) ----------------------- */
+/* Looks like a real Stata results window pasted into the exam: light, mono,
+   rule lines, right-aligned numbers. Hoverable values carry a popup. */
+.stata2-wrap{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
+.stata2{display:inline-block;min-width:min(100%,520px);font-family:var(--mono);font-size:12px;line-height:1.55;
+  color:#1b2a3a;background:#fcfcfa;border:1px solid var(--line-2);border-radius:10px;padding:13px 15px}
+.stata2 .st-cmd{color:#0a7d57;font-weight:500;margin-bottom:9px;white-space:nowrap}
+.stata2 .st-cmd::before{content:". ";color:#9aa7b6}
+.st-head{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.st-title{font-weight:600;color:var(--ink-2);font-size:12px;align-self:flex-end}
+.st-info{margin-left:auto;font-size:11.5px;min-width:230px}
+.st-info-row{display:flex;gap:6px;justify-content:flex-end;white-space:nowrap}
+.st-info-l{color:var(--ink-3);min-width:120px;text-align:right}
+.st-info-eq{color:var(--ink-3)}
+.st-info-v{min-width:64px;text-align:right;font-weight:600}
+.st-tbl{border-collapse:collapse;width:100%;margin-top:4px}
+.st-tbl th,.st-tbl td{padding:3px 10px;white-space:nowrap;text-align:right}
+.st-tbl thead th{border-bottom:1.5px solid var(--line-2);color:var(--ink-2);font-weight:600;font-size:11.5px}
+.st-tbl .st-dep,.st-tbl .st-var{text-align:right;color:#1b2a3a;border-right:1.5px solid var(--line-2);
+  padding-right:12px;font-weight:600}
+.st-tbl thead .st-dep,.st-tbl thead .st-colh:first-of-type{}
+.st-tbl .st-num{color:#23364a}
+.st-tbl .st-rule td{border-top:1px solid var(--line);padding:0;height:6px}
+.st-tbl .st-grp .st-grp-l{text-align:left;border-right:none;color:var(--accent);font-weight:700;
+  padding-top:6px;font-size:11.5px}
+.st-foot{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-2)}
+.st-foot-row{margin:3px 0;white-space:normal}
+/* a hoverable value */
+.st-cell{position:relative;cursor:help;color:var(--accent);font-weight:700;
+  border-bottom:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);outline:none}
+.st-cell:hover,.st-cell:focus{background:var(--accent-soft);border-radius:3px}
+.st-tip{display:none}
+/* the floating popup (single, reused) */
+#st-pop{position:fixed;z-index:90;display:none;max-width:320px;
+  background:#0f1726;color:#e6edf6;border:1px solid #243349;border-radius:10px;
+  padding:11px 13px;font-family:var(--sans);font-size:12.5px;line-height:1.55;
+  box-shadow:0 10px 30px rgba(10,18,30,.28)}
+#st-pop.show{display:block}
+#st-pop b,#st-pop strong{color:#ffd479}
+#st-pop code{font-family:var(--mono);font-size:11.5px;color:#9fe0c0}
+#st-pop::after{content:"";position:absolute;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-bottom-color:#0f1726;top:-14px}
+#st-pop.above::after{top:auto;bottom:-14px;border-bottom-color:transparent;border-top-color:#0f1726}
+.rd-hint{font-size:12px;color:var(--ink-3);margin:6px 0 2px;font-style:italic}
+.rd-hint b{color:var(--accent);font-style:normal}
+
 /* ---- Cheatsheet (dense, printable one-pager) ----------------------------- */
 .cheatsheet{column-gap:16px}
 .cheatsheet .sec-head{margin:18px 0 8px;font-size:14px}

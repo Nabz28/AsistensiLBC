@@ -258,6 +258,57 @@
     });
   }
 
+  // ---- interactive Stata-output popups (window.STATA tables) --------------
+  var stPop = null, stPinned = null;
+  function ensureStPop() {
+    if (stPop) return stPop;
+    stPop = document.createElement('div');
+    stPop.id = 'st-pop';
+    document.body.appendChild(stPop);
+    document.addEventListener('click', function (e) {
+      if (stPinned && !stPinned.contains(e.target)) hideStPop(true);
+    });
+    window.addEventListener('scroll', function () { if (!stPinned) hideStPop(false); }, true);
+    return stPop;
+  }
+  function showStPop(cell) {
+    var tip = cell.querySelector('.st-tip');
+    if (!tip) return;
+    var p = ensureStPop();
+    p.innerHTML = tip.innerHTML;
+    p.classList.add('show');
+    renderMath(p);
+    var r = cell.getBoundingClientRect();
+    // measure then place above/below depending on room
+    p.style.left = '0px'; p.style.top = '0px';
+    var pw = Math.min(320, window.innerWidth - 24);
+    p.style.maxWidth = pw + 'px';
+    var pr = p.getBoundingClientRect();
+    var left = Math.min(Math.max(8, r.left + r.width / 2 - pr.width / 2), window.innerWidth - pr.width - 8);
+    var below = r.bottom + 8 + pr.height < window.innerHeight;
+    var top = below ? r.bottom + 8 : r.top - pr.height - 8;
+    p.style.left = left + 'px';
+    p.style.top = Math.max(8, top) + 'px';
+    p.classList.toggle('above', !below);
+  }
+  function hideStPop(clearPin) {
+    if (clearPin) stPinned = null;
+    if (stPop) stPop.classList.remove('show');
+  }
+  function wireStata(scope) {
+    (scope || view).querySelectorAll('.st-cell').forEach(function (cell) {
+      cell.addEventListener('mouseenter', function () { if (!stPinned) showStPop(cell); });
+      cell.addEventListener('mouseleave', function () { if (!stPinned) hideStPop(false); });
+      cell.addEventListener('focus', function () { if (!stPinned) showStPop(cell); });
+      cell.addEventListener('blur', function () { if (!stPinned) hideStPop(false); });
+      cell.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (stPinned === cell) { hideStPop(true); }
+        else { stPinned = cell; showStPop(cell); }
+      });
+    });
+  }
+
   // ---- views ---------------------------------------------------------------
   function viewOverview() {
     var ov = COURSE.overview || {};
@@ -363,6 +414,7 @@
     renderMath(view);
     wireQuiz();
     wireCharts();
+    wireStata(view);
 
     var mark = document.getElementById('mark-done');
     if (mark) mark.onclick = function () {
@@ -417,11 +469,13 @@
     });
     view.innerHTML = h;
     renderMath(view);
+    wireStata(view);
     view.querySelectorAll('.exam-reveal').forEach(function (b) {
       b.onclick = function () {
         var a = b.nextElementSibling;
         var open = a.classList.toggle('open');
         b.textContent = open ? S('hide') : S('reveal');
+        wireStata(a);
       };
     });
   }
@@ -465,6 +519,7 @@
 
   // ---- router --------------------------------------------------------------
   function route() {
+    hideStPop(true);
     var hash = (location.hash || '').replace(/^#\/?/, '');
     var active = 'overview';
     if (hash.indexOf('unit/') === 0) {
@@ -500,6 +555,7 @@
     view.innerHTML = h;
     renderMath(view);
     wireQuiz();
+    wireStata(view);
   }
 
   // Course-level one-page Cheatsheet — dense, printable reference rendered with
@@ -514,6 +570,7 @@
     h += '<div class="cheatsheet seg-body" style="margin-top:14px">' + sectionsHTML(cs.sections) + '</div>';
     view.innerHTML = h;
     renderMath(view);
+    wireStata(view);
     var pb = document.getElementById('cheat-print');
     if (pb) pb.onclick = function () { window.print(); };
   }

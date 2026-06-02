@@ -1,148 +1,148 @@
 /* ============================================================================
    CSPD · Week 10 — Sample Selection & the Heckman Model (Tobit II)
-   Final-exam Topic 2: the sample selection problem.
-   Sources: "Sample Selection Corrections" deck, Heckman worksheet (womenwk),
-   Salinan Week 10 deck + heckman.do (Mroz data), Wooldridge ch. 17.5.
-   Registers on window.CSPD_WEEKS.w10.
+   Final-exam Topic 2. Rewritten flowing/plain; Read Data cases use the ACTUAL
+   2024 exam Heckman table (womenwk). Sources: Sample Selection deck, Heckman
+   worksheet, Salinan Week 10 + heckman.do, past final Q1, Wooldridge 17.5.
    ============================================================================ */
 (function () {
   'use strict';
   window.CSPD_WEEKS = window.CSPD_WEEKS || {};
+  var S = window.STATA;
 
   window.CSPD_WEEKS.w10 = {
     id: 'w10',
     label: 'Week 10',
     title: 'Sample Selection & the Heckman Model',
-    subtitle: 'Incidental truncation, the inverse Mills ratio, exclusion restrictions, two-step vs MLE, ρ and the LR test',
+    subtitle: 'Why selected samples lie, the inverse Mills ratio fix, exclusion restrictions, and ρ',
 
     notes: [
       {
-        heading: 'Why go beyond Tobit?',
+        heading: 'The problem: we only see the people who said yes',
         num: '1',
         cards: [
           {
-            title: 'Tobit forces both margins to share one β — often wrong',
+            title: 'Wages exist for everyone, but we only observe workers',
             html: String.raw`
-<p>Tobit's single-index restriction says the <b>same variable</b> moves participation (extensive) and
-amount (intensive) in the <b>same direction</b>. Reality often breaks this:</p>
-<ul>
-  <li><b>Vacation spending:</b> more children ⇒ <i>less</i> likely to take a holiday, but <i>if</i> taken,
-      a family holiday costs <i>more</i>. Opposite signs ⇒ Tobit misspecified.</li>
-  <li><b>Wages &amp; age:</b> experience ⇒ higher wage (positive on amount); age discrimination /
-      retirement ⇒ lower employment (negative on participation). Tobit forces these to share a sign.</li>
-</ul>
-<p>The <span class="key">Heckman / Tobit II</span> model relaxes this: <b>two equations with different
-coefficients</b> — one for selection (work or not), one for the outcome (wage if working).</p>`
+<p>We want to know how education and age affect <b>wages</b>. Easy enough — except wages are only recorded
+for people who <b>work</b>. Someone who chose not to take a job has no wage in our data. So our sample isn't
+a random slice of the population; it's the slice that <b>selected themselves in</b> by deciding to work.</p>
+<p>Why is that dangerous? Because the decision to work isn't random — it's tied to things we <b>can't see</b>
+(motivation, ability, how much someone values staying home). And those same hidden things also affect the
+<b>wage</b>. When the rule for "who appears in my data" is linked to the very outcome I'm studying through
+unobservables, we call it <span class="key">incidental truncation</span>: the wage is missing not because of
+the wage itself, but because of a <b>separate decision</b> (to work) that's entangled with it.</p>
+<div class="note">💡 Not every gap is a selection problem. Before reaching for Heckman, classify the
+missingness — this is a favourite exam set-up:</div>
+<table>
+  <tr><th>Why is the data missing?</th><th>Is OLS OK?</th><th>What to do</th></tr>
+  <tr><td><b>Pure chance</b> — e.g. a phone didn't connect on the first call.</td><td>Yes (just less data).</td><td>Nothing special.</td></tr>
+  <tr><td><b>Depends only on things you measured</b> (observed $x$).</td><td>Yes, if you control for those $x$.</td><td>Add controls.</td></tr>
+  <tr><td><b>Depends on UNOBSERVABLES linked to $y$</b> (incidental truncation).</td><td><b>No — biased.</b></td><td><b>Heckman.</b></td></tr>
+</table>
+<p>(Panel dropout — <b>attrition</b> — is the same idea: harmless if people leave for random reasons, biasing
+if they leave for reasons tied to the outcome. More on that in Week 13.)</p>`
           },
           {
-            title: 'Incidental truncation: a missing-data problem',
+            title: 'Why Tobit isn\'t enough this time',
             html: String.raw`
-<p>We want wage determinants, but wages are observed <b>only for workers</b>. This is
-<span class="key">incidental truncation</span>: $y$ (wage) is missing not because of $y$ itself, but
-because of a <b>separate selection decision</b> (whether to work) that is correlated with unobserved
-determinants of $y$ (motivation, ability, reservation wage).</p>
-<div class="note">💡 Decision tree — classify the missingness first:</div>
-<table>
-  <tr><th>Type</th><th>Is OLS OK?</th><th>Fix</th></tr>
-  <tr><td><b>Random missingness</b> (MCAR) — e.g. a phone fails to connect.</td><td>Yes, just less efficient.</td><td>Nothing needed.</td></tr>
-  <tr><td><b>Selection on observables</b> — missingness depends only on measured $x$.</td><td>Yes, if you control for those $x$.</td><td>Add controls.</td></tr>
-  <tr><td><b>Incidental truncation</b> — selection depends on <b>unobservables</b> linked to $y$.</td><td><b>No</b> — biased.</td><td><b>Heckman</b>.</td></tr>
-</table>
-<p>Panel attrition is the same idea: dropout is harmless if random/on-observables, but biasing if it
-depends on unobservables that also drive $y$ (e.g. low-motivation students drop out <b>and</b> score lower).</p>`
+<p>You might think "limited outcome → use Tobit." But Tobit forced <b>one</b> coefficient to drive both
+"do you participate?" and "how much?" — in the <b>same direction</b>. Real life often breaks that:</p>
+<ul>
+  <li><b>Age and wages:</b> more experience pushes wages <b>up</b>, but age discrimination / retirement push
+      the chance of <b>working down</b>. Same variable, opposite signs on the two margins — Tobit can't
+      represent that.</li>
+  <li><b>Children and vacations:</b> more kids make a family <b>less</b> likely to take a holiday, but
+      <b>if</b> they do, it costs <b>more</b>. Again, the two margins disagree.</li>
+</ul>
+<p>The <span class="key">Heckman model</span> (also called <b>Tobit II</b>) fixes this by using <b>two
+separate equations with their own coefficients</b>: one for the <b>selection</b> decision (work or not) and
+one for the <b>outcome</b> (the wage, if you work). That freedom is the whole point.</p>`
           }
         ]
       },
       {
-        heading: 'The Heckman model and the inverse Mills ratio',
+        heading: 'The fix: two equations + the inverse Mills ratio',
         num: '2',
         cards: [
           {
-            title: 'Two equations: selection + outcome',
+            title: 'A selection equation and an outcome equation, linked by ρ',
             html: String.raw`
-<div class="formula">Selection (probit):  $s_i^*=w_i'\gamma+u_i,\qquad s_i=\mathbf{1}[s_i^*>0]$
-Outcome (wage):      $y_i=x_i'\beta+\varepsilon_i,\quad\text{observed only if } s_i=1$
-with $(u_i,\varepsilon_i)$ bivariate normal, $\mathrm{corr}=\rho,\ \mathrm{Var}(\varepsilon)=\sigma_\varepsilon^2$.</div>
-<p>Selection bias is entirely about $\rho$: if $\rho\ne 0$, the unobservables that push someone into the
-sample also move $y$, so the selected sample is non-random in the error.</p>`
+<div class="formula">Selection (a probit):  $s_i^*=w_i'\gamma+u_i,\qquad s_i=1$ if $s_i^*>0$ (works), else 0
+Outcome (the wage):    $y_i=x_i'\beta+\varepsilon_i$,  observed only if $s_i=1$
+with $(u_i,\varepsilon_i)$ jointly normal, correlation $\rho$.</div>
+<p>The first equation models <b>who shows up</b> (the work decision). The second is the wage equation we
+actually care about. The whole selection problem lives in <b>one number</b>, $\rho$ — the correlation
+between the two equations' errors. If $\rho=0$, the unobservables driving "who works" have nothing to do
+with wages, and ordinary OLS on workers is fine. If $\rho\ne 0$, they're entangled, and OLS is biased.</p>`
           },
           {
-            title: 'Why OLS on workers is biased — and how λ fixes it',
+            title: 'Why OLS on workers lies — and how λ rescues it',
             html: String.raw`
-<p>Condition the outcome on being selected:</p>
-<div class="formula">$$ E[y_i\mid x_i,\ s_i=1]=x_i'\beta+\underbrace{\rho\,\sigma_\varepsilon}_{=\,\beta_\lambda}\,\lambda(w_i'\gamma),\qquad \lambda(z)=\frac{\phi(z)}{\Phi(z)} $$</div>
-<p>$\lambda(\cdot)$ is the <span class="key">inverse Mills ratio (IMR)</span>. Among selected units the
-error mean is <b>not zero</b> — it equals $\rho\sigma_\varepsilon\lambda$. OLS that omits $\lambda$
-dumps this term into the other coefficients ⇒ <b>omitted-variable bias</b>. Heckman simply <b>adds
-$\hat\lambda$ as a regressor</b>: it absorbs the conditional error mean, and the remaining $\hat\beta$
-become consistent.</p>
-<div class="note">💡 IMR intuition: $\lambda(z)$ is the "average pull" of selection. As selection becomes
-near-universal ($z\to\infty$, $\Phi\to 1$), $\lambda\to 0$ — the correction vanishes and Heckman ≈ OLS.
-When few are selected, $\lambda$ is large and the correction matters a lot. (E.g. $\lambda(0)=0.798$,
-$\lambda(1)=0.288$.)</div>
-<div class="tip">📝 Don't confuse two things called "lambda": the <b>regressor</b> $\lambda_i$ (the IMR value,
-typically ~0.3–0.8 per person) versus the <b>coefficient on</b> $\hat\lambda$ that Stata prints as
-<code>/mills lambda</code> — that number equals $\rho\,\sigma_\varepsilon$ and can be large (e.g. 4.0).</div>`
+<p>Here's the heart of it, in slow motion. Look only at workers and ask what their error averages to. It is
+<b>not</b> zero — selected workers are a special group:</p>
+<div class="formula">$$ E[y_i\mid x_i,\ \text{works}]=x_i'\beta+\underbrace{\rho\,\sigma_\varepsilon}_{\text{a number}}\cdot\,\lambda(w_i'\gamma),\qquad \lambda(z)=\frac{\phi(z)}{\Phi(z)} $$</div>
+<p>$\lambda(\cdot)$ is the <span class="key">inverse Mills ratio (IMR)</span> — the same "pull of a chopped
+tail" from last week. The message: among workers there's an <b>extra term</b> in the wage that OLS knows
+nothing about. So when OLS fits wages on $x$ alone, it shoves that extra term into the coefficients,
+contaminating them — classic <b>omitted-variable bias</b>.</p>
+<p>The fix is almost embarrassingly neat: <b>just add $\hat\lambda$ as one more regressor.</b> Once $\lambda$
+is in the equation, it soaks up that extra term, and the remaining $\hat\beta$ come out clean (consistent).
+That's the entire Heckman idea in one move.</p>
+<div class="note">💡 Intuition for $\lambda$: it measures how hard selection is "pulling." When almost
+everyone is selected (the work index $z$ is large, $\Phi\to 1$), $\lambda\to 0$ — the correction fades and
+Heckman ≈ OLS. When only a few are selected, $\lambda$ is large and the correction really matters.</div>
+<div class="tip">📝 Two different things are both called "lambda" — don't mix them up. The <b>regressor</b>
+$\lambda_i$ (the IMR value) is typically ~0.3–0.8 per person. The <b>coefficient</b> Stata prints as
+<code>/mills lambda</code> is $\rho\sigma_\varepsilon$ and can be a big number (you'll see 4.00 in the exam
+table). The coefficient being significant is what flags selection bias.</div>`
           }
         ]
       },
       {
-        heading: 'Identification: the exclusion restriction',
+        heading: 'The make-or-break ingredient: the exclusion restriction',
         num: '3',
         cards: [
           {
-            title: 'You need a variable in selection that is NOT in the outcome',
+            title: 'You need a variable that moves selection but not the wage',
             html: String.raw`
-<p>Technically Heckman is identified purely by the <b>non-linearity</b> of $\lambda(\cdot)$ — but over
-much of its range $\lambda$ is nearly linear, so $\hat\lambda$ becomes <b>collinear</b> with $x$.
-"Identification through functional form" is fragile and hangs on the normality assumption.</p>
-<p>The fix is an <span class="key">exclusion restriction</span>: at least one variable that enters the
-<b>selection</b> equation but is <b>excluded</b> from the <b>outcome</b> equation.</p>
-<div class="formula">Wage (outcome):    education, experience, age
-Work (selection):  education, experience, age, <b>+ number of young children</b></div>
-<p>Argument: children shift the <b>work decision</b> (childcare cost, reservation wage) but should not
-directly shift the <b>wage offer</b>. The credibility of a Heckman estimate <b>lives or dies</b> on this
-restriction — and it is <b>argued from theory, not tested</b>.</p>
-<div class="tip">📝 Good exclusion restriction = (i) clearly affects selection, (ii) defensibly has no
-direct effect on the outcome. "Number of young children" / "distance to childcare" are typical; "years of
-education" is a bad one (it affects wages directly).</div>`
-          }
-        ]
-      },
-      {
-        heading: 'Estimation & testing',
-        num: '4',
-        cards: [
-          {
-            title: 'Two-step vs MLE',
-            html: String.raw`
-<table>
-  <tr><th></th><th>Heckman two-step (Heckit)</th><th>Heckman MLE</th></tr>
-  <tr><td>Step 1</td><td>Probit of $s$ on $w$ ⇒ get $\hat\lambda_i=\phi(w_i'\hat\gamma)/\Phi(w_i'\hat\gamma)$.</td><td>Maximise the joint likelihood of selection + outcome at once.</td></tr>
-  <tr><td>Step 2</td><td>OLS of $y$ on $x$ <b>and</b> $\hat\lambda$ (selected sample).</td><td>—</td></tr>
-  <tr><td>Efficiency</td><td>Consistent but <b>less efficient</b>; SEs need correction (generated regressor).</td><td><b>Efficient</b>; gives $\rho,\sigma$ directly.</td></tr>
-  <tr><td>Speed/robustness</td><td>Simple, fast, more robust in big samples / hard likelihoods.</td><td>Can fail to converge; relies more on normality.</td></tr>
-</table>
-<p>Coefficients from the two are usually <b>nearly identical</b>; MLE's advantage is smaller standard
-errors and clean $\rho,\sigma$ estimates.</p>`
+<p>For Heckman to be trustworthy, you need at least one <b>exclusion restriction</b>: a variable that goes
+<b>into the selection equation</b> (it affects whether you work) but is <b>left out of the wage equation</b>
+(it has no direct effect on the wage offer). The classic choice in a women's-wage study is
+<b>number of young children</b>:</p>
+<div class="formula">Wage (outcome):   education, experience, age
+Work (selection): education, experience, age, <b>+ number of children</b></div>
+<p>The argument: kids strongly shift the <b>decision to work</b> (childcare costs, time at home) but
+shouldn't directly change the <b>wage an employer offers</b>. Why do you need this? Technically Heckman is
+"identified" just by the curve of $\lambda$ — but over most of its range $\lambda$ is nearly a straight
+line, so $\hat\lambda$ becomes <b>almost a copy of the other $x$'s</b> (collinear), and the estimates get
+shaky. A real exclusion restriction gives $\lambda$ something independent to latch onto.</p>
+<div class="tip">📝 The exclusion restriction is <b>argued from theory, never tested by a regression</b>. The
+credibility of a Heckman estimate lives or dies here. Good ones (children, distance to childcare) clearly
+affect the decision but plausibly not the wage; bad ones (education, experience) belong in the wage equation
+itself, so they can't be excluded.</div>`
           },
           {
-            title: 'Testing for selection bias: ρ, λ, and the LR test',
+            title: 'Two ways to estimate it, and how to test for selection',
             html: String.raw`
-<p>The null of <b>no selection bias</b> is $H_0:\rho=0$ (equivalently $\beta_\lambda=0$).</p>
+<p><b>Two estimators, same idea:</b></p>
+<table>
+  <tr><th></th><th>Two-step (Heckit)</th><th>MLE</th></tr>
+  <tr><td>How</td><td>Step 1: probit of "work" → build $\hat\lambda$. Step 2: OLS of wage on $x$ <b>and</b> $\hat\lambda$.</td><td>Estimate both equations together by maximum likelihood.</td></tr>
+  <tr><td>Pros/cons</td><td>Simple, robust, fast — but <b>less efficient</b>; SEs need a correction.</td><td><b>Efficient</b>; gives you $\rho,\sigma$ directly. Can be fussier to converge.</td></tr>
+</table>
+<p>The two usually give <b>almost identical coefficients</b>; MLE just has smaller standard errors.</p>
+<p><b>Testing for selection bias</b> means testing $H_0:\rho=0$ ("no selection problem"):</p>
 <ul>
-  <li><b>MLE:</b> Stata reports <code>/athrho</code> $=\mathrm{atanh}(\rho)$; recover
-      $\rho=\tanh(\text{athrho})$. The <b>LR test of independent equations</b> tests $\rho=0$.</li>
-  <li><b>Two-step:</b> test whether the coefficient on $\hat\lambda$ (Stata's <code>/mills lambda</code>)
-      is zero with a $t$/$z$ test.</li>
+  <li><b>MLE:</b> Stata reports <code>/athrho</code>; recover $\rho=\tanh(\text{athrho})$. The
+      <b>LR test of independent equations</b> tests $\rho=0$.</li>
+  <li><b>Two-step:</b> just test whether the coefficient on $\hat\lambda$ (<code>/mills lambda</code>) is 0.</li>
 </ul>
-<p>If you <b>reject</b> $H_0$ (small $p$): significant selection bias ⇒ prefer Heckman. If you
-<b>fail to reject</b>: RE/OLS-style estimates are fine, and failing to reject can also mean low power —
-not proof that selection is absent.</p>
-<div class="note">💡 Sign of $\rho$ has meaning. $\rho>0$ ⇒ unobservables that raise the chance of being
-selected also raise $y$ ⇒ the selected sample has higher unobserved potential ⇒ naive OLS
-<b>overstates</b> the mean for the population (but the bias on a given slope depends on $\rho$ AND how
-each $x$ relates to selection — direction is empirical, not a theorem).</div>`
+<p><b>Reject</b> $H_0$ (small $p$) ⇒ real selection bias ⇒ report Heckman. <b>Fail to reject</b> ⇒ OLS is
+fine and more efficient (and note: failing to reject could also just mean low power, not proof there's no
+selection).</p>
+<div class="note">💡 The <b>sign</b> of $\rho$ tells a story. $\rho>0$ means the hidden traits that make
+someone more likely to work also push their wage <b>up</b> — so the workers we observe have higher unseen
+wage potential than the average person, and naive OLS <b>overstates</b> the population's average wage.</div>`
           }
         ]
       }
@@ -156,16 +156,16 @@ each $x$ relates to selection — direction is empirical, not a theorem).</div>`
             html: String.raw`
 <div class="formula">$E[y\mid x,\ \text{selected}] = x'\beta + \rho\,\sigma_\varepsilon\,\lambda(w'\gamma)$
 $\lambda(z)=\phi(z)/\Phi(z)\quad(\text{inverse Mills ratio})$
-Bias of omitting $\lambda$: proportional to $\rho\,\sigma_\varepsilon$. If $\rho=0$, OLS on the selected sample is fine.</div>`
+Bias of leaving $\lambda$ out: proportional to $\rho\,\sigma_\varepsilon$. If $\rho=0$, OLS on the selected sample is fine.</div>`
           },
           {
-            title: 'Stata commands (two equivalent dialects)',
+            title: 'Stata commands (two dialects)',
             html: String.raw`
 <div class="formula">Two-step:  heckman y x1 x2, select(s = x1 x2 z) twostep
 MLE:       heckman y x1 x2, select(s = x1 x2 z)
-Recover ρ: athrho reported  ->  rho = tanh(athrho)
-Manual λ:  probit s w ; predict zb, xb ; gen lambda = normalden(zb)/normal(zb)</div>
-<p>Here <code>z</code> is the exclusion restriction (in selection, not in the outcome).</p>`
+Recover rho:  athrho printed  ->  rho = tanh(athrho)
+Manual lambda:  probit s w ; predict zb, xb ; gen lambda = normalden(zb)/normal(zb)</div>
+<p>Here <code>z</code> is the exclusion restriction — in selection, NOT in the outcome.</p>`
           }
         ]
       }
@@ -173,81 +173,105 @@ Manual λ:  probit s w ; predict zb, xb ; gen lambda = normalden(zb)/normal(zb)<
 
     readdata: [
       {
-        heading: 'Reading Heckman output',
+        heading: 'Read the output — these are the actual 2024 exam tables',
         num: 'R',
         cards: [
           {
-            title: 'Set up: see the missingness first',
+            title: 'Case 1 — The OLS benchmark (and why it\'s biased)',
             html: String.raw`
-<span class="rd-tag">Case · womenwk (Stata teaching data)</span>
-<p>2,000 women; wage observed for the <b>1,343 (67%)</b> who work. Inspect before estimating:</p>
-<div class="stata"><span class="cmd">use https://www.stata-press.com/data/r18/womenwk, clear</span>
-<span class="cmd">tabulate work</span>             <span class="dim">* 1343 work, 657 don't</span>
-<span class="cmd">misstable summarize wage</span>   <span class="dim">* 657 missing wages — because they don't work</span></div>
-<ul class="annot">
-  <li>Wages are <b>missing for non-workers</b> — the textbook incidental-truncation setup.</li>
-  <li>67% selected ⇒ moderate correction expected (not tiny, not huge).</li>
-</ul>`
+<span class="rd-tag">Case 1 · womenwk · exam Table 1.1</span>
+<p><b>The scenario:</b> 2,000 women; wage is observed for the <b>1,343 (67%)</b> who work. The researcher
+first runs plain OLS of wage on education and age, using only the workers. It looks clean — but it's
+<b>biased</b>, because working women aren't a random sample. Hover each number. (This is the exact table
+from last year's final, Question 1.)</p>` + S({
+              cmd: 'reg wage education age if work==1',
+              title: 'Linear regression',
+              info: [
+                ['Number of obs', '1,343', '<b>Only 1,343, not 2,000.</b> The 657 non-working women have no wage and silently drop out — that\'s the selection problem hiding in plain sight.'],
+                ['Prob > F', '0.0000'],
+                ['R-squared', '0.2535', '25.4% of wage variation explained — but on a non-random sample, so the coefficients themselves are suspect.']
+              ],
+              dep: 'wage',
+              cols: ['Coef.', 'Std. err.', 't', 'P>|t|', '[95% conf. interval]'],
+              rows: [
+                { v: 'education', c: ['.8966', '.0494', '18.15', '0.000', '.7997   .9935'],
+                  tips: { 0: '<b>OLS education = 0.90.</b> Looks fine and significant — but compare it to the Heckman value (0.98) in Case 2: OLS is <b>too low</b> here, because it only sees working women (who tend to have higher unseen wage potential).', 2: 't = 18.15 — very precise, but precision doesn\'t cure bias.' } },
+                { v: 'age', c: ['.1466', '.0189', '7.76', '0.000', '.1095   .1836'],
+                  tips: { 0: '<b>OLS age = 0.15.</b> Heckman will push this up to 0.21 — OLS understates it.' } },
+                { v: '_cons', c: ['6.0849', '.8793', '6.92', '0.000', '4.360   7.810'] }
+              ]
+            })
           },
           {
-            title: 'OLS benchmark — and why it under-states the returns',
+            title: 'Case 2 — The Heckman table: the four numbers to circle',
             html: String.raw`
-<span class="rd-tag">OLS on workers only</span>
-<div class="stata"><span class="cmd">reg wage education age if work==1</span>
-            |  Coef.   Std.Err.
- education  |  <span class="hl">0.90</span>    0.045
-       age  |  <span class="hl">0.15</span>    0.011</div>
-<ul class="annot">
-  <li>OLS uses only working women — typically those with higher unobserved wage potential, so it
-      <b>misses the bottom of the distribution</b> and the slope is flattened.</li>
-  <li>Compare to Heckman below: education 0.90 → ~0.98; age 0.15 → 0.21. Here OLS <b>under</b>-states
-      (because $\rho>0$ pushes the OLS slope down for these regressors — empirical, not guaranteed).</li>
-</ul>`
+<span class="rd-tag">Case 2 · womenwk · exam Table 1.2</span>
+<p><b>The scenario:</b> the same problem done right — a Heckman two-step. It has <b>two blocks</b>: the
+<b>wage</b> equation (what we want) and the <b>select</b> equation (the probit for "does she work?"), plus
+the <b>/mills lambda</b>, <b>rho</b> and <b>sigma</b> at the bottom. The four things examiners ask about are
+highlighted. Hover each.</p>` + S({
+              cmd: 'heckman wage education age, select(work = married children education age)',
+              title: 'Heckman selection model — two-step',
+              info: [
+                ['Number of obs', '2,000', '<b>Now all 2,000</b> — Heckman uses the non-workers (via the selection equation), unlike OLS which only used 1,343.'],
+                ['Selected', '1,343'],
+                ['Nonselected', '657'],
+                ['Wald chi2(2)', '442.54', 'Joint significance of the wage equation.']
+              ],
+              dep: '',
+              cols: ['Coefficient', 'Std. err.', 'z', 'P>|z|', '[95% conf. interval]'],
+              rows: [
+                { group: 'wage' },
+                { v: 'education', c: ['.9825', '.0539', '18.23', '0.000', '.8769   1.088'],
+                  tips: { 0: '<b>0.98 = the selection-corrected return to education.</b> +1 year of education ⇒ wage higher by ~0.98, sig at 1%, ceteris paribus. Bigger than OLS\'s 0.90 (Case 1) — OLS understated it.', 2: 'z = 18.23 (MLE prints z, same rule as t).' } },
+                { v: 'age', c: ['.2119', '.0221', '9.61', '0.000', '.1687   .2551'],
+                  tips: { 0: '<b>0.21</b> — vs OLS\'s 0.15. Again the correction pushes it up.' } },
+                { v: '_cons', c: ['.7340', '1.2483', '0.59', '0.557', '-1.71   3.18'],
+                  tips: { 3: '<b>p = 0.557 ⇒ the constant is NOT significant</b> — fine, the intercept often isn\'t the interesting part.' } },
+                { group: 'select' },
+                { v: 'married', c: ['.4309', '.0742', '5.81', '0.000', '.285   .576'],
+                  tips: { 0: '<b>In the SELECTION equation:</b> married women are more likely to WORK (this is the probit for participation, NOT a wage effect). It is an <b>exclusion restriction</b> — in selection, excluded from wage.' } },
+                { v: 'children', c: ['.4473', '.0287', '15.56', '0.000', '.391   .504'],
+                  tips: { 0: '<b>Trap:</b> this is the effect of children on the PROBABILITY OF WORKING, not on wages. (In this synthetic dataset more children ⇒ more likely to work; real Indonesian data usually reverses this.) Also an exclusion restriction.' } },
+                { v: 'education', c: ['.0584', '.0110', '5.32', '0.000', '.037   .080'] },
+                { v: 'age', c: ['.0347', '.0042', '8.21', '0.000', '.026   .043'] },
+                { v: '_cons', c: ['-2.4674', '.1926', '-12.81', '0.000', '-2.84  -2.09'] },
+                { group: '/mills' },
+                { v: 'lambda', c: ['4.0016', '.6065', '6.60', '0.000', '2.813   5.190'],
+                  tips: { 0: '<b>λ coefficient = 4.00, and it\'s SIGNIFICANT (p=0.000).</b> This is the smoking gun: a significant lambda means selection IS biasing OLS ⇒ you should report Heckman, not OLS. (This 4.00 is the coefficient ρ·σ, not the per-person IMR value.)', 3: 'p = 0.000 ⇒ reject "no selection" ⇒ Heckman is needed.' } },
+                '-',
+                { v: 'rho', c: ['0.6728', '', '', '', ''],
+                  tips: { v: '<b>ρ = 0.67 > 0:</b> the hidden traits that raise the chance of working also raise wages. So observed workers have higher unseen wage potential ⇒ naive OLS overstates the population\'s mean wage.' } },
+                { v: 'sigma', c: ['5.9474', '', '', '', ''],
+                  tips: { v: 'σ = SD of the wage error. Note λ-coefficient = ρ·σ = 0.6728 × 5.9474 ≈ 4.00 — that\'s where the 4.00 comes from.' } }
+              ],
+              notes: [
+                { t: 'LR test of independent eqns (rho = 0): Prob > chi2 = 0.000',
+                  tip: '<b>Reject H0: ρ=0</b> ⇒ the two equations are NOT independent ⇒ significant sample selection ⇒ report Heckman over OLS.' }
+              ]
+            })
           },
           {
-            title: 'heckman MLE — the four numbers to circle',
+            title: 'Case 3 — OLS vs Heckman: how big was the bias?',
             html: String.raw`
-<span class="rd-tag">Heckman two-step / MLE</span>
-<div class="stata"><span class="ttl">heckman selection model — two-step</span><span class="cmd">heckman wage education age, select(work = married children education age)</span>
-<span class="dim">Number of obs = 2000 | Selected = 1343 | Nonselected = 657</span>
-<b>wage</b>     education  <span class="hl">0.9825</span>  z=18.23
-          age        0.2119  z= 9.61
-<b>select</b>   married    0.4309  z= 5.81
-          children   0.4473  z=15.56
-          education  0.0584  z= 5.32
-          age        0.0347  z= 8.21
-<b>/mills</b>   lambda     <span class="hl">4.0016</span>  z= 6.60   p=0.000
-          rho        <span class="hl">0.6728</span>
-          sigma      5.9474
-LR test of indep. eqns (rho=0): chi2(1) ... Prob &gt; chi2 = <span class="hl">0.000</span></div>
-<ul class="annot">
-  <li><b>education = 0.98 (wage eq):</b> +1 year education ⇒ wage higher by ~0.98, sig at 1%, cp —
-      the selection-corrected return.</li>
-  <li><b>lambda = 4.00, p=0.000:</b> the IMR coefficient is large and significant ⇒ <b>selection bias is
-      present</b>; OLS on workers is biased. (lambda $=\rho\sigma_\varepsilon$.)</li>
-  <li><b>rho = 0.67 &gt; 0:</b> unobservables raising the chance of working also raise wages ⇒ selected
-      workers have higher unobserved potential ⇒ naive OLS overstates the population mean wage.</li>
-  <li><b>LR test p = 0.000:</b> reject $H_0:\rho=0$ ⇒ equations are not independent ⇒ report Heckman.</li>
-  <li><b>Exclusion restriction:</b> <code>married</code>, <code>children</code> are in selection (highly
-      significant) but excluded from wage — they affect the work decision, not the wage offer directly.</li>
-</ul>
-<div class="note">💡 If instead athrho/lambda were <b>insignificant</b> (LR p &gt; 0.10), you would
-report OLS — there is no detectable selection bias to correct (or no power to detect it).</div>`
-          },
-          {
-            title: 'The Mroz / IFLS version (heckman.do)',
-            html: String.raw`
-<span class="rd-tag">heckman.do · Mroz data</span>
-<div class="stata"><span class="cmd">probit inlf nwifeinc age kidslt6 kidsge6</span>
-<span class="cmd">predict mills, xb</span>
-<span class="cmd">gen lambda = normalden(mills)/normal(mills) if inlf==1</span>
-<span class="cmd">heckman lwage educ exper exper2, select(inlf = nwifeinc age kidslt6 kidsge6) twostep</span></div>
-<ul class="annot">
-  <li><code>kidslt6</code>/<code>nwifeinc</code> are the exclusion restrictions in selection.</li>
-  <li>Context caveat: in womenwk (synthetic) children <i>raises</i> participation; in real Indonesian
-      data (SAKERNAS), young children typically <b>reduce</b> maternal labour supply. Always read the
-      sign against the data-generating context, not just the printout.</li>
-</ul>`
+<span class="rd-tag">Case 3 · the comparison</span>
+<p><b>The scenario:</b> line up the wage-equation coefficients from OLS (workers only) and Heckman. In this
+dataset OLS <b>understates</b> the returns, because it only sees working women — who tend to have higher
+unseen wage potential — so it misses the bottom of the wage distribution. Hover to compare.</p>` + S({
+              title: 'Return to education & age: OLS vs Heckman',
+              dep: 'wage',
+              cols: ['OLS (workers)', 'Heckman'],
+              rows: [
+                { v: 'education', c: ['0.90', '0.98'],
+                  tips: { 0: 'OLS 0.90 — biased down.', 1: 'Heckman 0.98 — the corrected, larger return.' } },
+                { v: 'age', c: ['0.15', '0.21'],
+                  tips: { 0: 'OLS 0.15.', 1: 'Heckman 0.21 — corrected up.' } }
+              ],
+              notes: [
+                { t: 'Direction of OLS bias is NOT a general rule.',
+                  tip: 'Here ρ>0 happens to push the OLS education and age slopes DOWN. In another dataset the sign could flip — the direction depends on ρ AND how each x relates to selection. Don\'t memorise "OLS always under-states".' }
+              ]
+            })
           }
         ]
       }
@@ -256,48 +280,49 @@ report OLS — there is no detectable selection bias to correct (or no power to 
     quiz: [
       {
         type: 'concept',
-        q: 'State, in one sentence each, (i) what the inverse Mills ratio is doing in the wage equation, and (ii) why omitting it biases OLS.',
+        q: 'In one sentence each: (i) what is the inverse Mills ratio doing in the wage equation, and (ii) why does leaving it out bias OLS?',
         answer: [
-          '(i) The IMR λ(w′γ) measures the non-zero conditional mean of the error among selected (working) individuals; adding it as a regressor absorbs that mean so the other coefficients become consistent.',
-          '(ii) Among workers E[ε | selected] = ρσ·λ ≠ 0 and depends on x; omitting λ dumps this into the slopes → omitted-variable bias on β.'
+          '(i) λ(w′γ) captures the non-zero average error among the selected (working) people; adding it as a regressor soaks up that average so the other coefficients come out consistent.',
+          '(ii) Among workers, E[ε | works] = ρσ·λ ≠ 0 and depends on x; if you omit λ, OLS dumps that term into the slopes → omitted-variable bias.'
         ],
-        tip: 'IMR = the selection correction term; its coefficient is ρσ_ε.'
+        tip: 'IMR = the selection-correction regressor; its coefficient is ρ·σ_ε.'
       },
       {
         type: 'scenario',
-        q: 'Output shows: lambda = 0.42 (insignificant), athrho = 0.08 (se 0.21, p=0.70), LR test of ρ=0: p=0.70. Do you report Heckman or OLS? Does p=0.70 prove there is no selection?',
+        q: 'A different output shows: /mills lambda = 0.42 (insignificant), athrho = 0.08 (p=0.70), LR test of ρ=0: p=0.70. Report Heckman or OLS? Does p=0.70 prove there\'s no selection?',
         answer: [
           'Fail to reject ρ=0 ⇒ no detectable selection bias ⇒ report OLS as the main result (it is consistent and more efficient here); Heckman would just add noise.',
-          'p=0.70 does NOT prove selection is absent — it means we cannot detect it (could be genuine independence OR low power / weak exclusion restriction).',
-          'A referee may still ask for the Heckman "just to show" robustness; report it in an appendix.'
+          'No — p=0.70 does NOT prove selection is absent. It means we can\'t detect it (could be genuine independence, or low power / a weak exclusion restriction).',
+          'A referee may still ask for the Heckman "just to show" as a robustness check.'
         ],
-        tip: 'Insignificant ρ/λ ⇒ OLS; "fail to reject" ≠ "no selection".'
+        tip: 'Insignificant ρ/λ ⇒ OLS. "Fail to reject" ≠ "no selection".'
       },
       {
         type: 'concept',
-        q: 'In a women’s-wage Heckman, which is the most defensible exclusion restriction and why: (A) years of education, (B) number of young children, (C) work experience?',
+        q: 'Which is the best exclusion restriction in a women\'s-wage Heckman, and why: (A) years of education, (B) number of young children, (C) work experience?',
         answer: [
-          'B — number of young children. It plausibly shifts the WORK decision (childcare cost, reservation wage) but has no direct effect on the WAGE OFFER an employer makes.',
-          'A and C are bad: education and experience enter the wage equation directly, so they cannot be excluded from it.',
-          'Remember: the exclusion restriction is argued from economic theory, not tested statistically.'
+          'B — number of young children. It plausibly shifts the WORK decision (childcare cost, time at home) but has no direct effect on the WAGE an employer offers.',
+          'A and C are bad: education and experience belong in the wage equation directly, so they cannot be excluded from it.',
+          'Remember: the exclusion restriction is justified by economic theory, not tested statistically.'
         ]
       },
       {
         type: 'concept',
-        q: 'ρ̂ = 0.70 and significant. Translate this into plain economics, and state the consequence for naive OLS on workers.',
+        q: 'A student looks at the exam table and says: "children has a positive significant coefficient, so having children raises women\'s wages." What\'s wrong?',
         answer: [
-          'ρ>0 means the unobservables that make a woman more likely to work also raise her wage — selected workers have higher unobserved wage potential than the average woman.',
-          'Therefore naive OLS on workers over-states average wages for the whole population (it samples the upper part of the unobservable distribution).',
-          'But the bias on a particular slope (e.g. education) depends on ρ AND how that x relates to selection — here it happens to push the OLS education slope down.'
-        ]
+          'Wrong block: children\'s coefficient is in the SELECTION equation (the probit for "does she work?"), not the wage equation. It is the effect on the PROBABILITY OF WORKING, not on the wage.',
+          'In this synthetic womenwk data, more children ⇒ more likely to work; you cannot read a wage effect from it.',
+          'Children is in fact the exclusion restriction — deliberately kept OUT of the wage equation.'
+        ],
+        tip: 'Selection-equation coefficients move a PROBABILITY, not the outcome.'
       },
       {
         type: 'concept',
-        q: 'Two-step and MLE give education coefficients 0.98 and 0.99, but different standard errors. What does that tell you, and which would you publish?',
+        q: 'ρ̂ = 0.67 and the LR test rejects ρ=0. Translate ρ>0 into plain economics, and say what it means for naive OLS on workers.',
         answer: [
-          'Near-identical coefficients confirm the model is stable and not sensitive to the estimation method — reassuring.',
-          'Different SEs reflect efficiency: MLE is efficient and uses the full joint likelihood; the two-step SE must be corrected for the generated regressor λ̂ and is generally larger.',
-          'Publish the MLE estimate (efficient, gives ρ and σ), and show the two-step as a robustness check; add a different exclusion restriction as a further check.'
+          'ρ>0 means the unobserved traits that make a woman more likely to work also raise her wage — observed workers have higher unseen wage potential than the average woman.',
+          'So naive OLS on workers over-states average wages for the whole population (it samples the upper part of the unobservable distribution).',
+          'Rejecting ρ=0 confirms the two equations are linked ⇒ selection bias is real ⇒ report Heckman.'
         ]
       }
     ]
