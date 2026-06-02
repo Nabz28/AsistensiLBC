@@ -248,6 +248,35 @@ details[open]>summary::before{transform:rotate(90deg)}
 .chart-wrap{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;margin:14px 0}
 .chart-wrap canvas{width:100%!important;max-height:240px}
 
+/* ---- Stata / R console output blocks (Read Data) ------------------------- */
+/* A dark "terminal" panel that mimics a Stata results window. Use inside a
+   card via the .stata helper. `.stata .cmd` = the typed command line;
+   `.stata .hl` = a highlighted number; `.stata .gap` = a faint rule. */
+.card .stata{font-family:var(--mono);font-size:11.5px;line-height:1.6;background:#0f1726;
+  color:#d7e2f2;border:1px solid #1d2c44;border-radius:var(--radius-sm);
+  padding:13px 15px;margin:12px 0;overflow-x:auto;white-space:pre;-webkit-overflow-scrolling:touch}
+.card .stata .ttl{display:block;color:#8aa6cf;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:8px;white-space:normal}
+.card .stata .cmd{color:#7ee3b0}
+.card .stata .cmd::before{content:". ";color:#4f6aa0}
+.card .stata .hl{color:#ffd166;font-weight:700;background:rgba(255,209,102,.10);border-radius:3px;padding:0 2px}
+.card .stata .neg{color:#ff8e8e}
+.card .stata .dim{color:#6f82a3}
+.card .stata .gap{display:block;border-top:1px solid #1d2c44;margin:6px 0}
+/* annotation list that reads numbers off the output above it */
+.card .annot{list-style:none;padding:0;margin:10px 0 4px;display:grid;gap:7px}
+.card .annot li{position:relative;padding:9px 12px 9px 14px;font-size:13px;line-height:1.6;color:var(--ink-2);
+  background:var(--paper-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.card .annot li b,.card .annot code{font-family:var(--mono);color:var(--accent);font-weight:700;font-size:12px}
+/* small "case" eyebrow tag inside Read-Data cards */
+.card .rd-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+  border-radius:5px;padding:3px 8px;margin-bottom:8px}
+/* decision flow: when-to-use chips */
+.card .decide{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.card .decide span{font-size:12px;background:var(--paper-3);border:1px solid var(--line-2);
+  border-radius:99px;padding:5px 11px;color:var(--ink-2)}
+
 .lesson-foot{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
 
 /* ---- glossary ------------------------------------------------------------ */

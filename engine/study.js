@@ -56,7 +56,7 @@
   var STR = {
     en: { all: '‹ All courses', overview: 'Overview', glossary: 'Glossary', weeks: 'Weeks',
       terms: 'Terms', mark: 'Mark complete', done: '✓ Completed', objectives: 'What you will be able to do',
-      notes: 'Notes', formulas: 'Formulas', graphs: 'Graphs', quiz: 'Quiz',
+      notes: 'Notes', formulas: 'Formulas', graphs: 'Graphs', quiz: 'Quiz', readdata: 'Read Data',
       reveal: 'Reveal answer', hide: 'Hide answer', worked: 'Worked answer', filter: 'Filter terms…',
       back: 'Back to overview', examPrep: 'Exam prep', noWeeks: 'No weeks yet',
       pastExams: 'Past Exams', mcq: 'Multiple choice', essay: 'Essay', no: 'No.',
@@ -65,7 +65,7 @@
       emptyT: function (l) { return 'No ' + l.toLowerCase() + ' yet'; } },
     id: { all: '‹ Semua mata kuliah', overview: 'Ringkasan', glossary: 'Glosarium', weeks: 'Minggu',
       terms: 'Istilah', mark: 'Tandai selesai', done: '✓ Selesai', objectives: 'Yang akan kamu kuasai',
-      notes: 'Catatan', formulas: 'Rumus', graphs: 'Grafik', quiz: 'Kuis',
+      notes: 'Catatan', formulas: 'Rumus', graphs: 'Grafik', quiz: 'Kuis', readdata: 'Baca Data',
       reveal: 'Lihat jawaban', hide: 'Sembunyikan jawaban', worked: 'Pembahasan', filter: 'Cari istilah…',
       back: 'Kembali ke ringkasan', examPrep: 'Persiapan ujian', noWeeks: 'Belum ada minggu',
       pastExams: 'Soal UAS', mcq: 'Pilihan ganda', essay: 'Esai', no: 'No.',
@@ -75,12 +75,18 @@
   };
   function S(k) { var d = STR[lang] || STR.en; return d[k] != null ? d[k] : STR.en[k]; }
 
-  var SEGMENTS = [
+  // Per-week sub-segments. A course may override the default set (and order) via
+  // COURSE.segments — e.g. CSPD swaps Graphs for a "Read Data" segment. Each entry
+  // is { key, str, kind } where `str` is a STR label key (or `label:{en,id}` inline)
+  // and `kind` is 'sections' (prose cards) or 'quiz'.
+  var SEGMENTS = COURSE.segments || [
     { key: 'notes',    str: 'notes',    kind: 'sections' },
     { key: 'formulas', str: 'formulas', kind: 'sections' },
     { key: 'graphs',   str: 'graphs',   kind: 'sections' },
     { key: 'quiz',     str: 'quiz',     kind: 'quiz' }
   ];
+  // Resolve a segment's tab label: explicit inline label wins, else STR[str].
+  function segLabel(s) { return s.label != null ? t(s.label) : S(s.str || 'notes'); }
   function segDef(key) {
     for (var i = 0; i < SEGMENTS.length; i++) if (SEGMENTS[i].key === key) return SEGMENTS[i];
     return SEGMENTS[0];
@@ -167,6 +173,7 @@
     units.forEach(function (u) {
       items.push({ key: 'unit/' + u.id, label: t(u.label) || t(u.title), doneId: u.id });
     });
+    if (COURSE.readDataLab) items.push({ key: 'readlab', label: t(COURSE.readDataLab.label) || S('readdata') });
     if (exams.length) items.push({ key: 'exams', label: S('pastExams') });
     if (glossary.length) items.push({ key: 'glossary', label: S('glossary') });
     if (COURSE.superSummary) items.push({ key: 'super', label: t(COURSE.superSummary.label) || 'Super Summary' });
@@ -331,17 +338,17 @@
     SEGMENTS.forEach(function (s) {
       h += '<button class="subtab' + (s.key === def.key ? ' active' : '') +
         (hasContent(u, s.key) ? ' filled' : '') + '" data-seg="' + s.key + '">' +
-        S(s.str) + '</button>';
+        segLabel(s) + '</button>';
     });
     h += '</div>';
 
     h += '<div class="seg-body">';
     if (def.kind === 'quiz') {
-      h += hasContent(u, 'quiz') ? quizHTML(u.quiz) : emptyHTML(S('emptyT')(S('quiz')), S('empty')(S('quiz')));
+      h += hasContent(u, 'quiz') ? quizHTML(u.quiz) : emptyHTML(S('emptyT')(segLabel(def)), S('empty')(segLabel(def)));
     } else {
       h += hasContent(u, def.key)
         ? sectionsHTML(u[def.key])
-        : emptyHTML(S('emptyT')(S(def.str)), S('empty')(S(def.str)));
+        : emptyHTML(S('emptyT')(segLabel(def)), S('empty')(segLabel(def)));
     }
     h += '</div>';
 
@@ -464,6 +471,8 @@
       var id = rest[0], seg = rest[1] || 'notes';
       active = 'unit/' + id;
       viewUnit(id, seg);
+    } else if (hash === 'readlab' && COURSE.readDataLab) {
+      active = 'readlab'; viewReadLab();
     } else if (hash.indexOf('exams') === 0 && exams.length) {
       active = 'exams'; viewExams();
     } else if (hash === 'glossary' && glossary.length) {
@@ -475,6 +484,19 @@
     }
     buildNav(active);
     window.scrollTo(0, 0);
+  }
+
+  // Course-level "Read Data" lab — a standalone library of annotated Stata/R
+  // output cases, rendered with the same section/card machinery as Notes.
+  function viewReadLab() {
+    var lab = COURSE.readDataLab || {};
+    var h = '<div class="eyebrow">' + (t(lab.label) || S('readdata')) + '</div>' +
+      '<h1 class="ov-title">' + (t(lab.title) || t(lab.label) || S('readdata')) + '</h1>' +
+      (t(lab.blurb) ? '<p class="ov-sub">' + t(lab.blurb) + '</p>' : '');
+    h += '<div class="seg-body" style="margin-top:22px">' + sectionsHTML(lab.sections) + '</div>';
+    view.innerHTML = h;
+    renderMath(view);
+    wireQuiz();
   }
 
   function viewSuper() {

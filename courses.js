@@ -58,5 +58,18 @@ window.LBC_COURSES = [
       { label: 'Weeks', value: '7' },
       { label: 'Bilingual', value: 'EN·ID' }
     ]
+  },
+  {
+    slug: 'cspd',
+    code: 'CSPD',
+    title: 'Cross-Section & Panel Data',
+    subtitle: 'Tobit & censoring · truncation · Heckman selection · pooled cross-section & DiD · fixed effects · first differencing · random effects & CRE',
+    faculty: 'UI · FEB',
+    status: 'ready',
+    accent: '#0e7c66',
+    meta: [
+      { label: 'Weeks', value: '7' },
+      { label: 'Focus', value: 'UAS' }
+    ]
   }
 ];
