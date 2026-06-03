@@ -173,6 +173,25 @@ FD:      $\Delta y_{it}=\beta_1\Delta x_{it}+\Delta u_{it}$              -> reg 
 <p>After removing $a_i$, the idiosyncratic error is uncorrelated with the regressors in <b>every</b> period
 (past, present, future). This rules out feedback from $y$ to future $x$, and is what makes the within / FD
 estimators unbiased and consistent (with $T$ fixed, $N\to\infty$).</p>`
+          },
+          {
+            title: 'The within estimator in closed form & the variance split',
+            html: String.raw`
+<p>Writing $\ddot x_{it}=x_{it}-\bar x_i$ (the demeaned regressor) and $\ddot y_{it}=y_{it}-\bar y_i$, the
+FE / within estimator is just OLS on demeaned data:</p>
+<div class="formula">$\hat\beta_{FE}=\dfrac{\sum_{i}\sum_{t}\ddot x_{it}\,\ddot y_{it}}{\sum_{i}\sum_{t}\ddot x_{it}^{\,2}}$
+$\widehat{\mathrm{Var}}(\hat\beta_{FE})=\dfrac{\hat\sigma_u^2}{\sum_i\sum_t \ddot x_{it}^{\,2}}$,  with df $=NT-N-k$ (LSDV loses $N$ intercepts)</div>
+<p>Total variation splits into <b>within</b> (over time, within a unit) and <b>between</b> (across units):</p>
+<div class="formula">Total SS = Within SS + Between SS  ⇒  Stata reports $R^2_{within},\ R^2_{between},\ R^2_{overall}$.
+FE uses only WITHIN variation (it discards between) ⇒ time-invariant $x$ has $\ddot x_{it}=0$ ⇒ dropped.</div>`
+          },
+          {
+            title: 'F test that all uᵢ = 0  (FE vs Pooled OLS)',
+            html: String.raw`
+<div class="formula">$H_0:\ a_1=a_2=\dots=a_N$ (no fixed effects ⇒ Pooled OLS ok)
+$F=\dfrac{(R^2_{LSDV}-R^2_{pooled})/(N-1)}{(1-R^2_{LSDV})/(NT-N-k)}\ \sim\ F_{\,N-1,\ NT-N-k}$</div>
+<p><b>Reject</b> ($p<0.05$) ⇒ the unit effects are jointly significant ⇒ <b>FE beats Pooled OLS</b> (each unit
+needs its own intercept). This is the line "F test that all u_i = 0" at the bottom of <code>xtreg, fe</code>.</p>`
           }
         ]
       }

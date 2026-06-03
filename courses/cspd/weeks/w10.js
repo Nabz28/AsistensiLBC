@@ -152,11 +152,17 @@ wage potential than the average person, and naive OLS <b>overstates</b> the popu
       {
         cards: [
           {
-            title: 'The selection-corrected mean',
+            title: 'The selection-corrected mean & the two-step',
             html: String.raw`
-<div class="formula">$E[y\mid x,\ \text{selected}] = x'\beta + \rho\,\sigma_\varepsilon\,\lambda(w'\gamma)$
-$\lambda(z)=\phi(z)/\Phi(z)\quad(\text{inverse Mills ratio})$
-Bias of leaving $\lambda$ out: proportional to $\rho\,\sigma_\varepsilon$. If $\rho=0$, OLS on the selected sample is fine.</div>`
+<div class="formula">Selection: $s_i^*=w_i'\gamma+u_i,\ s_i=\mathbf 1[s_i^*>0]$;  Outcome: $y_i=x_i'\beta+\varepsilon_i$ (seen iff $s_i{=}1$)
+$(u_i,\varepsilon_i)$ bivariate normal, $\mathrm{Var}(u){=}1,\ \mathrm{Var}(\varepsilon){=}\sigma_\varepsilon^2,\ \mathrm{corr}{=}\rho$
+$E[y\mid x,\ s{=}1] = x'\beta + \underbrace{\rho\,\sigma_\varepsilon}_{\beta_\lambda}\,\lambda(w'\gamma),\quad \lambda(z)=\dfrac{\phi(z)}{\Phi(z)}\ (\text{inverse Mills ratio})$</div>
+<p><b>Heckman two-step</b> turns that identity into a recipe:</p>
+<div class="formula">Step 1 (probit): get $\hat\gamma$, then $\hat\lambda_i=\dfrac{\phi(w_i'\hat\gamma)}{\Phi(w_i'\hat\gamma)}$
+Step 2 (OLS on selected): $y_i = x_i'\beta + \beta_\lambda\,\hat\lambda_i + \text{error}$   ⇒ consistent $\hat\beta$</div>
+<p>The coefficient on $\hat\lambda$ is $\beta_\lambda=\rho\,\sigma_\varepsilon$. Bias of omitting it is
+proportional to $\rho\sigma_\varepsilon$; if $\rho=0$ then $\lambda$ drops out and OLS on the selected sample
+is fine. (SEs from step 2 must be corrected because $\hat\lambda$ is a <i>generated</i> regressor.)</p>`
           },
           {
             title: 'Stata commands (two dialects)',

@@ -215,17 +215,20 @@ Chance of a zero:  $P\{y_i=0\}=\Phi(-x_i'\beta/\sigma)=1-\Phi(x_i'\beta/\sigma)$
 behaves like a probit coefficient for the <i>participation</i> decision.</p>`
           },
           {
-            title: 'The two observed means (where the Mills ratio sneaks in)',
+            title: 'The inverse Mills ratio & the two observed means',
             html: String.raw`
-<p>Let $z=x'\beta/\sigma$ and define the <b>inverse Mills ratio</b> $\lambda(z)=\phi(z)/\Phi(z)$ — you'll
-meet it properly in Weeks 9–10.</p>
+<p>The key object is the <span class="key">inverse Mills ratio (IMR)</span>. Let $z=x'\beta/\sigma$:</p>
+<div class="formula">$$\boxed{\ \lambda(z)=\dfrac{\phi(z)}{\Phi(z)}\ }\qquad(\text{inverse Mills ratio})$$</div>
+<p>$\phi$ = the bell-curve height (pdf), $\Phi$ = the area under it (cdf). The same $\lambda$ runs the Tobit
+means below, the truncated mean (Week 9) and the Heckman correction (Week 10) — learn it here once.</p>
 <div class="formula">Among the doers:   $E[y\mid x,\,y>0]=x'\beta+\sigma\,\lambda(z)$
 Across everyone:    $E[y\mid x]=\Phi(z)\,x'\beta+\sigma\,\phi(z)$</div>
-<p>Differentiating gives the three marginal effects:</p>
+<p>Differentiating gives the <b>three marginal effects</b>:</p>
 <div class="formula">latent:         $\partial E[y^*]/\partial x_j=\beta_j$
-unconditional:  $\partial E[y\mid x]/\partial x_j=\beta_j\,\Phi(z)$   (McDonald–Moffitt)
-conditional:    $\partial E[y\mid x,y>0]/\partial x_j=\beta_j[1-z\lambda(z)-\lambda(z)^2]$</div>
-<p>Both observed effects are $\beta_j$ scaled by a number in $(0,1)$; with little censoring they ≈ $\beta_j$.</p>`
+unconditional ($E[y]$):  $\partial E[y\mid x]/\partial x_j=\beta_j\,\Phi(z)$   (McDonald–Moffitt)
+conditional ($E[y\mid y>0]$): $\partial E[y\mid x,y>0]/\partial x_j=\beta_j\big[1-z\,\lambda(z)-\lambda(z)^2\big]$</div>
+<p>Both observed effects are $\beta_j$ scaled by a number in $(0,1)$; with little censoring they ≈ $\beta_j$.
+($\sigma$ is identified because Tobit sees magnitudes — Probit normalises $\sigma=1$.)</p>`
           },
           {
             title: 'The log-likelihood',

@@ -109,7 +109,9 @@ fragile.</div>`
 <li><b>MLE</b> log-likelihood = density (positives, like OLS) + probit probability (zeros).</li>
 <li><b>Raw coef = effect on LATENT $y^*$</b>, NOT observed $y$. (The #1 trap.)</li>
 </ul>
-<div class="formula">3 marginal effects ($z=x'\beta/\sigma$, $\lambda=\phi/\Phi$):
+<div class="formula"><b>Inverse Mills ratio (IMR):</b> $\lambda(z)=\phi(z)/\Phi(z)$,  $z=x'\beta/\sigma$
+Conditional mean: $E[y\mid x,y>0]=x'\beta+\sigma\lambda(z)$;  $E[y\mid x]=\Phi(z)x'\beta+\sigma\phi(z)$
+3 marginal effects:
  latent: $\partial E[y^*]/\partial x_j=\beta_j$
  uncond (E[y], whole pop, POLICY): $\beta_j\,\Phi(z)$
  cond (E[y|y&gt;0], doers only): $\beta_j[1-z\lambda-\lambda^2]$</div>
@@ -143,8 +145,9 @@ misspecified ⇒ <b>Heckman</b> (Type-2) or <b>Cragg double-hurdle / two-part</b
           {
             title: 'Model, assumptions & vs Tobit',
             html: String.raw`
-<div class="formula">$y^*=x'\beta+\varepsilon$, observed only if $y^*>c$ (rest absent).
-Truncated mean: $E[y\mid y>c]=x'\beta+\sigma\dfrac{\phi(z)}{1-\Phi(z)}$  ($z=(c-x'\beta)/\sigma$)</div>
+<div class="formula">$y^*=x'\beta+\varepsilon$, observed only if $y^*>c$ (rest absent).  $\alpha=(c-x'\beta)/\sigma$
+truncation IMR $\lambda(\alpha)=\phi(\alpha)/(1-\Phi(\alpha))$
+Truncated mean: $E[y\mid y>c]=x'\beta+\sigma\,\lambda(\alpha)$;  ME $=\beta_j[1-\lambda(\lambda-\alpha)]=\beta_j(1-\delta)$, $0{<}\delta{<}1$</div>
 <p><b>Assumptions:</b> normality + homoskedasticity of $\varepsilon$, correct truncation point, linear latent
 (same as Tobit). Estimated by MLE (density rescaled by $\Phi$).</p>
 <table>
@@ -369,6 +372,7 @@ households each wave) — buys sample size.</li>
             title: 'Within · LSDV · (FD) and what they share',
             html: String.raw`
 <div class="formula">Within (demean): $(y_{it}-\bar y_i)=\beta_1(x_{it}-\bar x_i)+(u_{it}-\bar u_i)$
+Closed form: $\hat\beta_{FE}=\dfrac{\sum_i\sum_t \ddot x_{it}\ddot y_{it}}{\sum_i\sum_t \ddot x_{it}^2}$ ($\ddot x{=}x{-}\bar x$); df $=NT{-}N{-}k$
 LSDV: dummy intercept per unit (drop one — dummy trap)
 FD:   $\Delta y_{it}=\beta_1\Delta x_{it}+\Delta u_{it}$ (loses 1st period)</div>
 <ul>
@@ -530,7 +534,8 @@ absorb that correlation.</li>
 <tr><td><b>Modified Wald</b> (xttest3)</td><td>groupwise heterosk.</td><td>$\sigma_i^2=\sigma^2$ ∀$i$ / differ</td><td>cluster-robust SE</td></tr>
 <tr><td><b>Wooldridge</b> (xtserial)</td><td>serial correlation</td><td>no AR(1) / AR(1)</td><td>cluster-robust SE / FD</td></tr>
 </table>
-<div class="note"><b>Hausman detail:</b> stat $=(\hat\beta_{FE}-\hat\beta_{RE})'[\mathrm{Var}(\hat\beta_{FE})-\mathrm{Var}(\hat\beta_{RE})]^{-1}(\hat\beta_{FE}-\hat\beta_{RE})\sim\chi^2(k)$. $b$=FE (consistent under H₀ &amp; H₁); $B$=RE (efficient only under H₀). Fail to reject ⇒ RE ok OR low power.</div>`
+<div class="note"><b>Hausman stat:</b> $(\hat\beta_{FE}-\hat\beta_{RE})'[\mathrm{Var}(\hat\beta_{FE})-\mathrm{Var}(\hat\beta_{RE})]^{-1}(\hat\beta_{FE}-\hat\beta_{RE})\sim\chi^2(k)$. $b$=FE (consistent under H₀ &amp; H₁); $B$=RE (efficient only under H₀). Fail to reject ⇒ RE ok OR low power.
+<br><b>BP-LM stat:</b> $\dfrac{NT}{2(T-1)}\big[\frac{\sum_i(\sum_t \hat v_{it})^2}{\sum_i\sum_t \hat v_{it}^2}-1\big]^2\sim\chi^2(1)$.  <b>F all $u_i{=}0$:</b> $\frac{(R^2_{LSDV}-R^2_{pool})/(N-1)}{(1-R^2_{LSDV})/(NT-N-k)}\sim F_{N-1,\,NT-N-k}$.</div>`
           }
         ]
       },
