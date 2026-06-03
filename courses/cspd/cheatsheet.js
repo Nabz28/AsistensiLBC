@@ -86,6 +86,17 @@ restriction (all $\sim\chi^2$):</p>
 </table>`
           },
           {
+            title: '▸ How to decide: Tobit vs OLS (a diagnosis, not a p-test)',
+            html: String.raw`
+<p>There is <b>no p-value test</b> that picks Tobit — you decide by <b>looking at the data</b> (a histogram):</p>
+<table>
+<tr><td>units pile at a limit AND stay in the sample (capped)</td><td><b>Tobit</b> — OLS would be attenuated/biased</td></tr>
+<tr><td>out-of-range units are deleted (absent)</td><td>Truncated (next section)</td></tr>
+<tr><td>no pile-up; full range observed</td><td>plain OLS</td></tr>
+</table>
+<div class="note">Caveats: Tobit MLE needs <b>normal, homoskedastic</b> errors (else inconsistent). If participation &amp; amount are driven by <b>different</b> forces ⇒ use <b>Heckman</b> instead. (A residual normality/heteroskedasticity check supports the choice.)</div>`
+          },
+          {
             title: 'Model & types of limit',
             html: String.raw`
 <div class="formula">Latent:  $y_i^*=x_i'\beta+\varepsilon_i$,  observed $y_i=\max(0,y_i^*)$ (floor)
@@ -167,6 +178,16 @@ misspecified ⇒ <b>Heckman</b> (Type-2) or <b>Cragg double-hurdle / two-part</b
 </table>`
           },
           {
+            title: '▸ How to decide: Truncated vs Tobit vs OLS',
+            html: String.raw`
+<p>Again a <b>diagnosis</b>, not a hypothesis test — ask "do the boundary cases appear in my data?":</p>
+<table>
+<tr><td><b>No</b> — out-of-range units were never sampled</td><td><b>Truncated regression</b></td></tr>
+<tr><td><b>Yes, but capped</b> — they appear at the limit</td><td>Tobit</td></tr>
+<tr><td><b>Yes, full range</b></td><td>OLS</td></tr>
+</table>`
+          },
+          {
             title: 'Model, assumptions & vs Tobit',
             html: String.raw`
 <div class="formula">$y^*=x'\beta+\varepsilon$, observed only if $y^*>c$ (rest absent).  $\alpha=(c-x'\beta)/\sigma$
@@ -218,6 +239,18 @@ Outcome:  $y_i=\beta_0+\beta_1 x_i+\varepsilon_i$  (observed only if $s_i=1$)</d
 <tr><td>$\rho$</td><td>corr$(u_i,\varepsilon_i)$ — selection bias exists iff $\rho\ne 0$</td></tr>
 <tr><td>$\lambda=\phi/\Phi$</td><td>inverse Mills ratio — added to the outcome to remove the bias; its coef $=\rho\sigma_\varepsilon$</td></tr>
 </table>`
+          },
+          {
+            title: '▸ Which test? Is there selection bias? (Heckman vs OLS)',
+            html: String.raw`
+<p><b>LR test of independent equations</b> (MLE), or a $z$-test on the <b>/mills $\lambda$</b> coefficient (two-step):</p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$\rho=0$ — selection &amp; outcome errors independent ⇒ <b>OLS is consistent</b></td></tr>
+<tr><td><b>$H_1$</b></td><td>$\rho\ne 0$ — selection bias present</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ report Heckman</b></td></tr>
+<tr><td>Fail to reject</td><td>⇒ report OLS (more efficient; or low power)</td></tr>
+</table>
+<div class="note"><b>Meaning:</b> a significant $\lambda$/$\rho$ means the unobservables deciding "who is observed" also drive $y$ ⇒ OLS on the selected sample is biased.</div>`
           },
           {
             title: 'Classify the missingness FIRST',
@@ -308,6 +341,14 @@ $x$ links to selection.</li>
 </table>`
           },
           {
+            title: '▸ Which test? Time trend & structural break',
+            html: String.raw`
+<table>
+<tr><td><b>Is there a time trend?</b><br>F-test on the year dummies</td><td>$H_0$: all $\delta_t=0$ (no time effects). <b>Reject (p&lt;0.05) ⇒ keep the year dummies</b> — a real trend exists.</td></tr>
+<tr><td><b>Did the relationship change? (structural break)</b><br>Chow test</td><td>$H_0$: coefficients stable across periods. <b>Reject ⇒ a break ⇒ don't pool</b> with one set of coefficients (split the sample / interact with the period).</td></tr>
+</table>`
+          },
+          {
             title: 'What it is · time dummies · interactions',
             html: String.raw`
 <ul>
@@ -353,6 +394,14 @@ time-interactions $=0$.</li>
 <tr><td>$\beta_1$</td><td>fixed pre-existing treated-vs-control gap (NOT the treatment)</td></tr>
 <tr><td>$\delta_0$</td><td>common time shock (both groups)</td></tr>
 <tr><td>$\beta_0$</td><td>baseline = control group, before</td></tr>
+</table>`
+          },
+          {
+            title: '▸ Which test? Treatment effect & parallel trends',
+            html: String.raw`
+<table>
+<tr><td><b>Is there a treatment effect?</b><br>$t$/$z$-test on the interaction $\delta_1$</td><td>$H_0:\delta_1=0$ (no effect) vs $H_1:\delta_1\ne0$. <b>Reject (p&lt;0.05) ⇒ a significant causal effect.</b></td></tr>
+<tr><td><b>Is the design valid?</b><br>Parallel-trends check</td><td>Not a single p-value: check <b>pre-trends</b> (pre-period interactions ≈ 0) or run a <b>placebo</b> DiD on a fake earlier date — its interaction should be <b>insignificant</b>.</td></tr>
 </table>`
           },
           {
@@ -402,6 +451,18 @@ removes $a_i$; 2nd diff (across groups) removes the common shock. <b>DiD = FD ap
 <div class="note">All panel methods below differ only in how they treat $a_i$: POLS leaves it in the error; FE/FD remove it; RE assumes it's uncorrelated with $x$; CRE models it.</div>`
           },
           {
+            title: '▸ Which test? The panel decision chain (POLS → RE → FE → CRE)',
+            html: String.raw`
+<table>
+<tr><th>Test</th><th>$H_0$ → reject ⇒</th></tr>
+<tr><td><b>F test all $u_i=0$</b> (POLS vs FE)</td><td>no fixed effects → <b>FE</b></td></tr>
+<tr><td><b>Breusch–Pagan LM</b> / xttest0 (POLS vs RE)</td><td>$\sigma_a^2=0$ → <b>RE</b></td></tr>
+<tr><td><b>Hausman</b> (RE vs FE)</td><td>$\mathrm{Cov}(a_i,x)=0$ → <b>FE</b> (else RE)</td></tr>
+<tr><td><b>Mundlak/Wald</b> (RE vs CRE)</td><td>$\xi=0$ → <b>CRE/FE</b> (else RE)</td></tr>
+</table>
+<div class="tip">Each model's own section below repeats its specific test with full H₀/H₁. Usual verdict: <b>FE &gt; RE &gt; POLS</b>.</div>`
+          },
+          {
             title: 'Model, aᵢ, between vs within',
             html: String.raw`
 <div class="formula">$y_{it}=\beta_1 x_{it}+a_i+u_{it}$
@@ -433,6 +494,16 @@ by $a_i$). <b>FE</b> asks "when the SAME unit's $x$ changes, does $y$?" (<b>with
 <tr><td>$a_i$ inside $v$</td><td>causes bias if correlated with $x$, and serial correlation in $v$ (⇒ wrong SEs)</td></tr>
 <tr><td>$\beta_1$</td><td>the slope — consistent only if $\mathrm{Cov}(a_i,x)=0$</td></tr>
 </table>`
+          },
+          {
+            title: '▸ Which test? When is Pooled OLS enough?',
+            html: String.raw`
+<p>POLS is the baseline; two tests tell you to upgrade away from it:</p>
+<table>
+<tr><td><b>vs FE</b> — F test all $u_i=0$</td><td>$H_0$: no fixed effects. <b>Reject ⇒ use FE.</b></td></tr>
+<tr><td><b>vs RE</b> — Breusch–Pagan LM (xttest0)</td><td>$H_0:\sigma_a^2=0$. <b>Reject ⇒ use RE.</b></td></tr>
+</table>
+<div class="note">If <b>both</b> fail to reject ⇒ Pooled OLS is adequate (no panel effect to worry about). Even then, use cluster-robust SEs for serial correlation.</div>`
           },
           {
             title: 'Assumptions, problems, when to use',
@@ -467,6 +538,25 @@ households each wave) — buys sample size.</li>
 <tr><td>$\alpha_i$ (LSDV)</td><td>a separate <b>intercept (dummy) per unit</b> = the estimated fixed effect; gives the same $\hat\beta_1$ as within</td></tr>
 <tr><td>$\beta_1$</td><td>the <b>within-unit</b> effect of $x$ on $y$</td></tr>
 </table>`
+          },
+          {
+            title: '▸ Which test? FE vs Pooled OLS, and FE vs RE',
+            html: String.raw`
+<p><b>FE vs Pooled OLS — "F test that all $u_i=0$"</b> (printed at the bottom of the FE output):</p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$a_1=a_2=\dots=a_N$ — all unit effects equal ⇒ <b>no fixed effects ⇒ Pooled OLS is fine</b></td></tr>
+<tr><td><b>$H_1$</b></td><td>the $a_i$ differ across units</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ fixed effects are jointly significant ⇒ USE FE</b></td></tr>
+<tr><td>Fail to reject</td><td>⇒ Pooled OLS is adequate</td></tr>
+</table>
+<p><b>FE vs RE — Hausman test:</b></p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$\mathrm{Cov}(a_i,x)=0$ — RE is consistent &amp; efficient</td></tr>
+<tr><td><b>$H_1$</b></td><td>$\mathrm{Cov}(a_i,x)\ne 0$ — RE is biased</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ USE FE</b> (RE inconsistent)</td></tr>
+<tr><td>Fail to reject</td><td>⇒ RE is OK (more efficient)</td></tr>
+</table>
+<div class="note"><b>Meaning:</b> the F-test asks "do units really need their own intercepts?"; Hausman asks "is the unobserved effect correlated with $x$?" Reject either ⇒ lean to FE.</div>`
           },
           {
             title: 'Within · LSDV · (FD) and what they share',
@@ -535,6 +625,18 @@ time-invariant effects; doesn't fix time-varying OVB or simultaneity (need IV/Di
 </table>`
           },
           {
+            title: '▸ Which test? FE vs FD',
+            html: String.raw`
+<p>There is <b>no hypothesis test</b> for FE vs FD — decide by $T$ and serial correlation:</p>
+<table>
+<tr><td><b>$T=2$</b></td><td>FE = FD (algebraically identical) — it doesn't matter.</td></tr>
+<tr><td><b>$T\ge 3$</b> — use Wooldridge test (xtserial)</td><td>$H_0$: no AR(1) serial correlation.</td></tr>
+<tr><td>— fail to reject (no serial corr)</td><td>⇒ <b>FE is more efficient</b></td></tr>
+<tr><td>— reject (serial corr / random walk)</td><td>⇒ <b>FD is more efficient</b> (differencing removes it)</td></tr>
+</table>
+<div class="note">Both are unbiased &amp; consistent under strict exogeneity — the choice is purely about efficiency.</div>`
+          },
+          {
             title: 'FD assumptions (FD.1–FD.6)',
             html: String.raw`
 <div class="formula">$\Delta y_{it}=\beta_1\Delta x_{it}+\Delta u_{it}$ — OLS on changes; $a_i$ differenced out.</div>
@@ -580,6 +682,24 @@ Estimated by GLS (quasi-demeaning): $(y_{it}-\theta\bar y_i)=\dots$</div>
 <tr><td>$\theta$</td><td>the <b>quasi-demeaning weight</b> $\in[0,1]$: how much of the unit mean RE subtracts ($0$=POLS, $1$=FE)</td></tr>
 <tr><td>$\beta_1$</td><td>effect of $x$ — and RE can ALSO estimate <b>time-invariant</b> regressors (FE can't)</td></tr>
 </table>`
+          },
+          {
+            title: '▸ Which test? RE vs Pooled OLS, and RE vs FE',
+            html: String.raw`
+<p><b>RE vs Pooled OLS — Breusch–Pagan LM test (xttest0):</b></p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$\sigma_a^2=0$ — no panel-level variance ⇒ <b>Pooled OLS is fine</b></td></tr>
+<tr><td><b>$H_1$</b></td><td>$\sigma_a^2>0$ — there is a unit effect</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ USE RE over Pooled OLS</b></td></tr>
+</table>
+<p><b>RE vs FE — Hausman test:</b></p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$\mathrm{Cov}(a_i,x)=0$ — RE consistent &amp; efficient</td></tr>
+<tr><td><b>$H_1$</b></td><td>$\mathrm{Cov}(a_i,x)\ne 0$ — RE biased</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ USE FE</b></td></tr>
+<tr><td>Fail to reject</td><td><b>⇒ USE RE</b> (consistent &amp; efficient; or low power)</td></tr>
+</table>
+<div class="note"><b>Chain:</b> xttest0 rejects (RE&gt;POLS) → Hausman decides FE vs RE. If your key $x$ is time-invariant you must use RE regardless (FE can't estimate it).</div>`
           },
           {
             title: 'Model, θ, quasi-demeaning',
@@ -634,6 +754,18 @@ variation).</li>
 <tr><td>$z_i$</td><td>a <b>time-invariant</b> variable — CRE CAN estimate its effect $\gamma$ (FE cannot)</td></tr>
 <tr><td>$r_i$</td><td>the leftover unit effect, now uncorrelated with $x$ by construction</td></tr>
 </table>`
+          },
+          {
+            title: '▸ Which test? Is RE enough, or do you need CRE/FE?',
+            html: String.raw`
+<p><b>Mundlak / Wald test on the time-averages $\bar x_i$:</b></p>
+<table>
+<tr><td><b>$H_0$</b></td><td>$\xi=0$ — the time-means don't matter ⇒ <b>RE is sufficient</b> (= $\hat\beta_{RE}$)</td></tr>
+<tr><td><b>$H_1$</b></td><td>$\xi\ne 0$ — $a_i$ correlates with $x$</td></tr>
+<tr><td><b>Reject</b> (p&lt;0.05)</td><td><b>⇒ need CRE / FE</b> (= $\hat\beta_{FE}$)</td></tr>
+<tr><td>Fail to reject</td><td>⇒ RE is enough</td></tr>
+</table>
+<div class="note"><b>Meaning:</b> a heteroskedasticity-robust version of Hausman. Bonus over FE: CRE still estimates time-invariant variables.</div>`
           },
           {
             title: 'The synthesis of FE and RE',
