@@ -516,26 +516,83 @@ absorb that correlation.</li>
 
       /* =============================================== 12. TEST TABLE */
       {
-        heading: 'MASTER TEST TABLE — H₀, H₁, decision',
+        heading: 'Tests — grouped by the model they belong to',
         num: '12',
         cards: [
           {
-            title: 'Every test you must know',
+            title: 'A · Heckman / sample selection (Topic 2)',
             html: String.raw`
 <table>
-<tr><th>Test</th><th>Purpose</th><th>H₀ / H₁</th><th>Reject (small p) ⇒</th></tr>
-<tr><td><b>Breusch–Pagan LM</b> (xttest0)</td><td>POLS vs RE</td><td>$\sigma_a^2=0$ / $>0$</td><td>RE beats POLS</td></tr>
-<tr><td><b>Hausman</b></td><td>FE vs RE</td><td>$\mathrm{Cov}(a,x)=0$ (RE consistent) / $\ne 0$</td><td>use FE</td></tr>
-<tr><td><b>Mundlak / Wald</b> (CRE)</td><td>RE vs FE (robust)</td><td>$\xi=0$ (RE enough) / $\ne 0$</td><td>use CRE/FE</td></tr>
-<tr><td><b>F test all $u_i=0$</b></td><td>POLS vs FE</td><td>all $a_i$ equal / differ</td><td>FE beats POLS</td></tr>
-<tr><td><b>Chow</b></td><td>structural break</td><td>coefs stable / change</td><td>break (split model)</td></tr>
-<tr><td><b>LR indep. eqns</b> (Heckman)</td><td>selection bias</td><td>$\rho=0$ / $\ne 0$</td><td>report Heckman</td></tr>
-<tr><td><b>F on year dummies</b></td><td>time trend</td><td>all $\delta_t=0$ / some $\ne 0$</td><td>significant trend</td></tr>
-<tr><td><b>Modified Wald</b> (xttest3)</td><td>groupwise heterosk.</td><td>$\sigma_i^2=\sigma^2$ ∀$i$ / differ</td><td>cluster-robust SE</td></tr>
-<tr><td><b>Wooldridge</b> (xtserial)</td><td>serial correlation</td><td>no AR(1) / AR(1)</td><td>cluster-robust SE / FD</td></tr>
+<tr><th>Test (what you read)</th><th>H₀ (null) → H₁ (alt)</th><th>If you REJECT (p&lt;0.05)</th></tr>
+<tr><td><b>LR test of independent equations</b><br><span class="rd-hint">the line at the bottom of <b>heckman</b>; dist. $\chi^2(1)$</span></td>
+    <td><b>$\rho=0$</b> (no selection bias, OLS fine) → $\rho\ne 0$ (the two equations are linked)</td>
+    <td>selection bias is real ⇒ <b>report Heckman</b> (not OLS)</td></tr>
+<tr><td><b>Is /mills lambda significant?</b><br><span class="rd-hint">two-step Heckman; a $z$-test on the $\lambda$ coefficient</span></td>
+    <td><b>$\beta_\lambda=0$</b> (i.e. $\rho=0$) → $\ne 0$</td>
+    <td>same verdict ⇒ keep Heckman; if NOT significant ⇒ revert to OLS</td></tr>
 </table>
-<div class="note"><b>Hausman stat:</b> $(\hat\beta_{FE}-\hat\beta_{RE})'[\mathrm{Var}(\hat\beta_{FE})-\mathrm{Var}(\hat\beta_{RE})]^{-1}(\hat\beta_{FE}-\hat\beta_{RE})\sim\chi^2(k)$. $b$=FE (consistent under H₀ &amp; H₁); $B$=RE (efficient only under H₀). Fail to reject ⇒ RE ok OR low power.
-<br><b>BP-LM stat:</b> $\dfrac{NT}{2(T-1)}\big[\frac{\sum_i(\sum_t \hat v_{it})^2}{\sum_i\sum_t \hat v_{it}^2}-1\big]^2\sim\chi^2(1)$.  <b>F all $u_i{=}0$:</b> $\frac{(R^2_{LSDV}-R^2_{pool})/(N-1)}{(1-R^2_{LSDV})/(NT-N-k)}\sim F_{N-1,\,NT-N-k}$.</div>`
+<div class="tip">Fail to reject ⇒ no detectable selection ⇒ OLS (more efficient). "Fail to reject" ≠ "no
+selection" — could be low power.</div>`
+          },
+          {
+            title: 'B · Pooled cross-section & changes over time (Topic 3)',
+            html: String.raw`
+<table>
+<tr><th>Test (what you read)</th><th>H₀ (null) → H₁ (alt)</th><th>If you REJECT (p&lt;0.05)</th></tr>
+<tr><td><b>F-test on the year dummies</b><br><span class="rd-hint">jointly test all $\delta_t$; dist. $F$</span></td>
+    <td><b>all $\delta_t=0$</b> (no time trend) → some $\delta_t\ne 0$</td>
+    <td>a real <b>time trend</b> exists (even if single years look insignificant)</td></tr>
+<tr><td><b>Chow test</b><br><span class="rd-hint">= F-test that all time-interactions $=0$; dist. $F_{k,\,n-2k}$</span></td>
+    <td><b>coefficients stable</b> across periods → some change</td>
+    <td><b>structural break</b> ⇒ don't pool with one set of coefs (split / interact)</td></tr>
+</table>`
+          },
+          {
+            title: 'C · Panel — choose the estimator (the decision chain)',
+            html: String.raw`
+<table>
+<tr><th>Test (what you read)</th><th>H₀ (null) → H₁ (alt)</th><th>If you REJECT (p&lt;0.05)</th></tr>
+<tr><td><b>F test that all $u_i=0$</b><br><span class="rd-hint">bottom line of <b>xtreg, fe</b>; dist. $F_{N-1,\,NT-N-k}$</span></td>
+    <td><b>all $a_i$ equal</b> (no fixed effects, POLS ok) → they differ</td>
+    <td><b>FE beats Pooled OLS</b> (each unit needs its own intercept)</td></tr>
+<tr><td><b>Breusch–Pagan LM</b><br><span class="rd-hint">"xttest0"; dist. $\chi^2(1)$</span></td>
+    <td><b>$\sigma_a^2=0$</b> (no panel-level variance, POLS ok) → $\sigma_a^2>0$</td>
+    <td><b>RE beats Pooled OLS</b></td></tr>
+<tr><td><b>Hausman</b> ⭐ <i>the decisive one</i><br><span class="rd-hint">"hausman fe re"; dist. $\chi^2(k)$, $k$=# time-varying $x$</span></td>
+    <td><b>$\mathrm{Cov}(a_i,x)=0$</b> (RE consistent &amp; efficient) → $\ne 0$ (RE biased)</td>
+    <td><b>use Fixed Effects</b> (RE is inconsistent)</td></tr>
+<tr><td><b>Mundlak / Wald on the time-means</b><br><span class="rd-hint">CRE: test the $\bar x_i$ coefs; robust alt. to Hausman</span></td>
+    <td><b>$\xi=0$</b> (RE is enough) → $\xi\ne 0$</td>
+    <td><b>use CRE / FE</b> (and CRE keeps the time-invariant variables)</td></tr>
+</table>
+<div class="tip"><b>Run them in order:</b> F-test $u_i{=}0$ <i>or</i> BP-LM (effects exist?) → Hausman (FE or RE?)
+→ need a time-invariant $z$? use CRE. <b>Usual verdict: FE &gt; RE &gt; POLS.</b></div>`
+          },
+          {
+            title: 'D · Used across ALL panel models — diagnostics (fix the SEs)',
+            html: String.raw`
+<p>These don't pick a model — they apply to FE and RE alike and only affect <b>inference</b> (the
+coefficients are unchanged):</p>
+<table>
+<tr><th>Test (what you read)</th><th>H₀ (null) → H₁ (alt)</th><th>If you REJECT (p&lt;0.05)</th></tr>
+<tr><td><b>Modified Wald</b><br><span class="rd-hint">"xttest3"; groupwise heteroskedasticity; $\chi^2(N)$</span></td>
+    <td><b>$\sigma_i^2=\sigma^2$ for all $i$</b> (homoskedastic) → they differ</td>
+    <td>heteroskedasticity ⇒ use <b>cluster-robust SEs</b></td></tr>
+<tr><td><b>Wooldridge test</b><br><span class="rd-hint">"xtserial"; serial correlation in panels; $F$</span></td>
+    <td><b>no first-order autocorrelation</b> (no AR(1)) → AR(1) present</td>
+    <td>serial correlation ⇒ <b>cluster-robust SEs</b> (or FD if it's a random walk)</td></tr>
+</table>
+<div class="note">Golden rule: heteroskedasticity &amp; serial correlation break the <b>standard errors</b>, NOT
+the point estimates. The fix is the SEs (cluster-robust), never the coefficients.</div>`
+          },
+          {
+            title: 'The test statistics (formulas)',
+            html: String.raw`
+<div class="formula">Hausman: $(\hat\beta_{FE}-\hat\beta_{RE})'\big[\widehat{\mathrm{Var}}(\hat\beta_{FE})-\widehat{\mathrm{Var}}(\hat\beta_{RE})\big]^{-1}(\hat\beta_{FE}-\hat\beta_{RE})\sim\chi^2(k)$
+  $b{=}$FE (consistent under H₀ &amp; H₁); $B{=}$RE (efficient only under H₀).
+Breusch–Pagan LM: $\dfrac{NT}{2(T-1)}\Big[\dfrac{\sum_i(\sum_t \hat v_{it})^2}{\sum_i\sum_t \hat v_{it}^2}-1\Big]^2\sim\chi^2(1)$
+F (all $u_i{=}0$): $\dfrac{(R^2_{LSDV}-R^2_{pool})/(N-1)}{(1-R^2_{LSDV})/(NT-N-k)}\sim F_{N-1,\,NT-N-k}$
+Chow: $\dfrac{(SSR_{pool}-SSR_1-SSR_2)/k}{(SSR_1+SSR_2)/(n-2k)}\sim F_{k,\,n-2k}$</div>`
           }
         ]
       },
@@ -549,13 +606,13 @@ absorb that correlation.</li>
             title: 'Diagnose from the outcome & sample',
             html: String.raw`
 <table>
-<tr><th>Clue</th><th>Model</th></tr>
-<tr><td>$y$ continuous, piles at a limit, units <b>kept</b></td><td>Tobit</td></tr>
-<tr><td>out-of-range units <b>deleted</b></td><td>Truncated</td></tr>
-<tr><td>$y$ missing via a <b>separate selection</b> tied to unobservables</td><td>Heckman</td></tr>
-<tr><td>different units each round (independent samples over time)</td><td>Pooled CS / DiD</td></tr>
-<tr><td>same units over time; remove $a_i$</td><td>FE / FD</td></tr>
-<tr><td>same units; key $x$ time-invariant / want efficiency</td><td>RE / CRE</td></tr>
+<tr><th>Clue in the question</th><th>Model</th><th>Tell-tale on the output</th></tr>
+<tr><td>$y$ continuous, piles at a limit, units <b>kept</b></td><td><b>Tobit</b></td><td>a <code>/sigma</code> line + a censored-obs count</td></tr>
+<tr><td>out-of-range units <b>deleted</b> (never sampled)</td><td><b>Truncated</b></td><td><code>truncreg</code>; a lower/upper limit</td></tr>
+<tr><td>$y$ missing via a <b>separate selection</b> tied to unobservables</td><td><b>Heckman</b></td><td><code>/mills lambda</code>, <code>rho</code>, Selected/Nonselected</td></tr>
+<tr><td>different units each round (independent samples over time)</td><td><b>Pooled CS / DiD</b></td><td>year dummies; a $post\times treat$ interaction</td></tr>
+<tr><td>same units over time; remove $a_i$</td><td><b>FE / FD</b></td><td><code>corr(u_i,Xb)</code>; "F test all u_i=0"</td></tr>
+<tr><td>same units; key $x$ time-invariant / want efficiency</td><td><b>RE / CRE</b></td><td><code>theta</code>; time-invariant vars have coefs</td></tr>
 </table>
 <div class="formula">Panel chain:  F-test $u_i{=}0$ (or BP-LM) → effects exist
 → Hausman: reject ⇒ FE, else RE → need time-invariant $z$? ⇒ CRE
