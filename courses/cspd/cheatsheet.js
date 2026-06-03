@@ -646,24 +646,104 @@ selection / censoring fix the <b>estimates</b>.</div>`
 
       /* =============================================== 15. INTERPRET */
       {
-        heading: 'Interpretation templates',
+        heading: 'How to read it — the EXACT sentence per model',
         num: '15',
         cards: [
           {
-            title: 'Say the right sentence for the right model',
+            title: 'The 5 wording rules that win/lose marks',
             html: String.raw`
-<table>
-<tr><th>Model</th><th>Coef = effect on…</th><th>Template ("+1 $x$ ⇒")</th></tr>
-<tr><td>OLS / FE / FD / RE</td><td>observed $y$ (within-unit for FE/FD)</td><td>$\beta$ change in $y$, cp.</td></tr>
-<tr><td>Tobit (raw)</td><td><b>latent $y^*$</b></td><td>$\beta$ change in latent $y^*$, cp.</td></tr>
-<tr><td>Truncated</td><td>observed $y$ (survivors)</td><td>$\beta$ change in $y$ among observed, cp.</td></tr>
-<tr><td>Probit / selection eq.</td><td>a <b>probability</b></td><td>raises $P$(selected), cp.</td></tr>
-<tr><td>Year dummy</td><td>intercept shift</td><td>avg $y$ is $\delta$ higher/lower vs base year.</td></tr>
-<tr><td>$x\times$year</td><td><b>change</b> in slope</td><td>the effect of $x$ changed by $\delta$ vs base.</td></tr>
-<tr><td>DiD interaction</td><td>causal treatment effect</td><td>treatment caused $\delta$ change (parallel trends).</td></tr>
-</table>
-<div class="tip">Every interpretation: <b>number + units + ceteris paribus + significance</b>. Logs: coef ≈ %
-change (×100). Drop any piece ⇒ drop marks.</div>`
+<ol>
+<li><b>Always include 4 things:</b> the <b>number</b> + its <b>unit</b> + "<b>ceteris paribus</b>" (holding
+all else constant) + a <b>significance</b> statement. Miss one ⇒ lose marks.</li>
+<li><b>"associated with" vs "causes":</b> say "<b>is associated with</b>" / "predicts" for correlational
+models (OLS, RE, Pooled). Say "<b>causes</b> / the causal effect" ONLY with a clean design — <b>DiD, FE
+(within), IV</b>.</li>
+<li><b>Continuous vs dummy X:</b> continuous → "a <b>one-unit increase</b> in X…"; dummy → "<b>being</b>
+[group] <b>rather than</b> [the base group]…".</li>
+<li><b>Significance:</b> "<b>statistically significant at the 5% level</b> ($p<0.05$)" or "<b>not
+statistically significant</b> ($p=…$)". A CI that excludes 0 ⇒ significant.</li>
+<li><b>Match the outcome:</b> probability models say "<b>the probability</b> of…"; Tobit says
+"<b>latent</b> $y^*$"; FE says "<b>within a unit</b>". Wrong target = wrong answer.</li>
+</ol>`
+          },
+          {
+            title: 'OLS & functional form (logs, dummies, quadratics)',
+            html: String.raw`
+<ul>
+<li><b>Level–level</b> ($y$ on $x$): "A one-unit increase in $x$ is associated with a <b>$\beta$-unit</b>
+[increase/decrease] in $y$, ceteris paribus."</li>
+<li><b>Log–level</b> ($\ln y$ on $x$): "A one-unit increase in $x$ is associated with a <b>$(100\beta)\%$</b>
+change in $y$, cp." (dummy, exact: $100(e^{\beta}-1)\%$.)</li>
+<li><b>Level–log</b> ($y$ on $\ln x$): "A <b>1% increase</b> in $x$ is associated with a <b>$(\beta/100)$-unit</b>
+change in $y$, cp."</li>
+<li><b>Log–log</b> ($\ln y$ on $\ln x$): "A <b>1% increase</b> in $x$ is associated with a <b>$\beta\%$</b>
+change in $y$ — i.e. $\beta$ is the <b>elasticity</b>, cp."</li>
+<li><b>Dummy</b> ($y$ level): "$y$ is on average <b>$\beta$ units higher</b> for [group] <b>than the base
+group</b>, cp."</li>
+<li><b>Quadratic</b> ($x,x^2$): "the effect of $x$ is <b>$\beta_1+2\beta_2 x$</b> (it depends on $x$); turning
+point at <b>$x=-\beta_1/2\beta_2$</b>."</li>
+</ul>`
+          },
+          {
+            title: 'Tobit & Truncated — exact sentences',
+            html: String.raw`
+<ul>
+<li><b>Tobit (raw coefficient):</b> "A one-unit increase in $x$ is associated with a <b>$\beta$-unit increase
+in the <u>latent</u> variable $y^*$</b> (the desired/unconstrained outcome), cp — <b>not</b> the observed
+$y$." <span class="rd-hint"><b>Never</b> say "the observed $y$" for the raw Tobit coef.</span></li>
+<li><b>Tobit unconditional ME ($E[y]$):</b> "A one-unit increase in $x$ increases the <b>expected observed
+$y$ across all units</b> (including those at the limit) by <b>[ME]</b>, cp."</li>
+<li><b>Tobit conditional ME ($E[y\mid y>0]$):</b> "<b>Among uncensored units</b> ($y>0$), a one-unit increase
+in $x$ increases expected $y$ by <b>[ME]</b>, cp."</li>
+<li><b>Truncated:</b> "A one-unit increase in $x$ is associated with a $\beta$-unit increase in the
+<b>observed $y$, among the (above-threshold) units in the sample</b>, cp."</li>
+</ul>`
+          },
+          {
+            title: 'Probit & Heckman selection — exact sentences',
+            html: String.raw`
+<ul>
+<li><b>Probit / the selection equation (raw coef = sign only):</b> "A one-unit increase in $x$
+<b>increases the probability</b> that [$s=1$, e.g. the person works], cp." <span class="rd-hint">magnitude needs
+the marginal effect $\phi(\cdot)\beta$ — the raw coef gives only the sign.</span></li>
+<li><b>Heckman outcome (wage) equation:</b> "<b>Correcting for sample selection</b>, a one-unit increase in
+$x$ is associated with a $\beta$-unit increase in $y$, cp."</li>
+<li><b>$\lambda$ (/mills) significant:</b> "$\lambda$ is positive and significant ⇒ <b>sample selection bias
+is present</b>, so OLS on the selected sample would be biased."</li>
+<li><b>$\rho$:</b> "$\rho>0$ ⇒ the unobservables that raise the chance of selection <b>also raise $y$</b> ⇒
+selected units have higher unobserved $y$ (naive OLS overstates the mean)."</li>
+</ul>
+<div class="note">Trap: a coefficient in the <b>selection</b> block (e.g. children) moves a <b>probability of
+participating</b>, <u>never</u> the outcome $y$.</div>`
+          },
+          {
+            title: 'Pooled cross-section & DiD — exact sentences',
+            html: String.raw`
+<ul>
+<li><b>Year dummy $\delta_t$:</b> "Compared with the <b>base year</b>, the average $y$ in year $t$ is
+<b>$\delta$ units higher/lower</b>, cp (significance)."</li>
+<li><b>Interaction $x\times$year ($\delta$):</b> "The effect of $x$ on $y$ in year $t$ is <b>$\beta+\delta$</b>;
+the interaction coefficient $\delta$ is the <b>change in the effect of $x$ relative to the base year</b>" —
+<u>not</u> the effect itself.</li>
+<li><b>DiD (post$\times$treat, $\delta_1$):</b> "Assuming <b>parallel trends</b>, the treatment <b>caused</b> a
+<b>$\delta_1$-unit change</b> in $y$ for the treated group <b>relative to the control</b>."</li>
+</ul>`
+          },
+          {
+            title: 'Panel (FE / FD / RE / LSDV / CRE) — exact sentences',
+            html: String.raw`
+<ul>
+<li><b>Fixed Effects / First Diff:</b> "<b>Within a given unit, over time</b>, a one-unit increase in $x$ is
+associated with a $\beta$-unit change in $y$, <b>holding constant all time-invariant characteristics of the
+unit</b>, cp." <span class="rd-hint">FE supports a causal reading if strict exogeneity holds.</span></li>
+<li><b>Random Effects:</b> "A one-unit increase in $x$ is associated with a $\beta$-unit change in $y$, cp
+(individual effects treated as <b>random and uncorrelated with $x$</b>)." (RE can also interpret
+<b>time-invariant</b> regressors.)</li>
+<li><b>LSDV unit/region dummy:</b> "<b>[Region $r$]</b> has an average $y$ that is <b>$\beta$ units
+higher/lower than the base region</b>, holding the other regressors constant."</li>
+<li><b>CRE:</b> time-varying $x$ — read it <b>exactly like FE</b>; time-invariant $z$ — "a one-unit increase
+in $z$ is associated with a $\gamma$-unit change in $y$, cp."</li>
+</ul>`
           }
         ]
       },
