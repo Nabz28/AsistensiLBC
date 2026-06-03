@@ -158,9 +158,29 @@ dropout is tied to the <b>idiosyncratic</b> shock $u_{it}$.</div>`
           {
             title: 'RE quasi-demeaning & θ',
             html: String.raw`
-<div class="formula">$\theta=1-\sqrt{\dfrac{\sigma_u^2}{\sigma_u^2+T\sigma_a^2}}$
-$(y_{it}-\theta\bar y_i)=(1-\theta)\beta_0+\beta_1(x_{it}-\theta\bar x_i)+(v_{it}-\theta\bar v_i)$
-θ=0 -> POLS;  θ=1 -> FE;  0&lt;θ&lt;1 -> RE.   Intraclass corr = $\sigma_a^2/(\sigma_a^2+\sigma_u^2)$.</div>`
+<div class="formula">Composite error: $v_{it}=a_i+u_{it}$;  intraclass corr $\mathrm{Corr}(v_{it},v_{is})=\dfrac{\sigma_a^2}{\sigma_a^2+\sigma_u^2}$
+$\theta=1-\sqrt{\dfrac{\sigma_u^2}{\sigma_u^2+T\sigma_a^2}}\in[0,1]$
+GLS / quasi-demeaned: $(y_{it}-\theta\bar y_i)=(1-\theta)\beta_0+\beta_1(x_{it}-\theta\bar x_i)+(v_{it}-\theta\bar v_i)$</div>
+<p>θ=0 → POLS; θ=1 → FE; $0<\theta<1$ → RE (partial demeaning). FGLS plugs in $\hat\theta$ from POLS/FE
+residuals to estimate $\sigma_a^2,\sigma_u^2$.</p>`
+          },
+          {
+            title: 'Hausman, BP-LM & CRE — the test statistics',
+            html: String.raw`
+<div class="formula">Hausman (FE vs RE):  $H=(\hat\beta_{FE}-\hat\beta_{RE})'\big[\widehat{\mathrm{Var}}(\hat\beta_{FE})-\widehat{\mathrm{Var}}(\hat\beta_{RE})\big]^{-1}(\hat\beta_{FE}-\hat\beta_{RE})\ \sim\ \chi^2(k)$
+  $k=$ # time-varying regressors. $H_0:\mathrm{Cov}(a_i,x)=0$. Reject ⇒ FE.</div>
+<div class="formula">Breusch–Pagan LM (POLS vs RE), balanced panel:
+  $LM=\dfrac{NT}{2(T-1)}\!\left[\dfrac{\sum_i\big(\sum_t \hat v_{it}\big)^2}{\sum_i\sum_t \hat v_{it}^2}-1\right]^2\ \sim\ \chi^2(1)$
+  $H_0:\sigma_a^2=0$. Reject ⇒ RE beats POLS.</div>`
+          },
+          {
+            title: 'Correlated Random Effects (Mundlak) equations',
+            html: String.raw`
+<div class="formula">Model the correlation:  $a_i=\alpha+\xi\,\bar x_i+r_i$,  $\mathrm{Cov}(\bar x_i,r_i)=0$
+Substitute:  $y_{it}=\alpha+\beta\,x_{it}+\xi\,\bar x_i+\gamma\,z_i+(r_i+u_{it})$  — estimate by RE
+Result:  $\hat\beta_{CRE}=\hat\beta_{FE}$ (and you also recover $\gamma$ on time-invariant $z_i$).</div>
+<p><b>Mundlak test</b> $H_0:\xi=0$ (Wald, $\sim\chi^2(q)$, $q$ = # time-averages). Reject ⇒ $a_i$ correlates
+with $x$ ⇒ need CRE/FE. This is a heteroskedasticity-robust alternative to Hausman ($\xi=0\Rightarrow\hat\beta_{RE}$).</p>`
           },
           {
             title: 'Which model? The test map',

@@ -130,13 +130,18 @@ exam will check if you know which:</p>
       {
         cards: [
           {
-            title: 'Model and the truncated mean',
+            title: 'Model, the truncated mean & its marginal effect',
             html: String.raw`
 <div class="formula">Model:  $y^*=x'\beta+\varepsilon,\ \varepsilon\sim N(0,\sigma^2)$; observe only $y^*>c$.
-Truncated mean (lower cut at $c$, $z=(c-x'\beta)/\sigma$):
-  $E[y\mid x,\ y>c]=x'\beta+\sigma\,\dfrac{\phi(z)}{1-\Phi(z)}$</div>
-<p>The extra term is the upward pull from chopping the tail. OLS ignores it ⇒ the error correlates with
-$x$ ⇒ bias. <code>truncreg</code> puts it back.</p>`
+Let $\alpha=(c-x'\beta)/\sigma$ and the <b>(truncation) inverse Mills ratio</b>
+  $\lambda(\alpha)=\dfrac{\phi(\alpha)}{1-\Phi(\alpha)}$  (lower cut);  $\dfrac{-\phi(\alpha)}{\Phi(\alpha)}$ (upper cut)
+Truncated mean:  $E[y\mid x,\ y>c]=x'\beta+\sigma\,\lambda(\alpha)$</div>
+<p>The extra term $\sigma\lambda(\alpha)>0$ is the upward pull from chopping the tail. OLS ignores it ⇒ the
+error correlates with $x$ ⇒ bias. <code>truncreg</code> puts it back. The <b>marginal effect</b> on the
+observed (truncated) mean is a <b>shrunken</b> $\beta$:</p>
+<div class="formula">$\dfrac{\partial E[y\mid x,\,y>c]}{\partial x_j}=\beta_j\big[1-\lambda(\alpha)\,(\lambda(\alpha)-\alpha)\big]=\beta_j(1-\delta),\quad 0<\delta<1$</div>
+<p>So, like Tobit, the effect on what you observe is gentler than $\beta_j$. (Note: the variance also
+shrinks, $\mathrm{Var}(y\mid y>c)=\sigma^2(1-\delta)<\sigma^2$ — truncation compresses the spread.)</p>`
           },
           {
             title: 'Command map & how to read the coefficient',
