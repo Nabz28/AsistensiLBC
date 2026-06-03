@@ -367,6 +367,12 @@ details[open]>summary::before{transform:rotate(90deg)}
 #st-pop.above::after{top:auto;bottom:-14px;border-bottom-color:transparent;border-top-color:#0f1726}
 .rd-hint{font-size:12px;color:var(--ink-3);margin:6px 0 2px;font-style:italic}
 .rd-hint b{color:var(--accent);font-style:normal}
+/* the mathematical model shown above a Stata output table */
+.st-modelbox{margin:10px 0 6px;border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--accent-soft);padding:9px 13px}
+.st-modelcap{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.st-modeleq{font-size:13.5px;line-height:1.7;color:var(--ink);white-space:pre-wrap;overflow-x:auto}
 
 /* ---- Cheatsheet (dense, printable one-pager) ----------------------------- */
 .cheatsheet{column-gap:16px}

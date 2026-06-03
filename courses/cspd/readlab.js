@@ -37,6 +37,7 @@ the <b>Reading the tests</b> section. (Each week also has its own Read Data tab.
 <li><b>P&gt;|t|</b> — p-value; <b>p&lt;0.05 ⇒ significant.</b> (Stars: * 10%, ** 5%, *** 1%.)</li>
 <li><b>Header / footer</b> — N, F/Wald/LR, R², and the test lines (the model giveaway).</li>
 </ol>` + S({
+              model: String.raw`$income_i=\beta_0+\beta_1\,educ_i+\beta_2\,exper_i+u_i$`,
               cmd: 'reg income education experience',
               title: 'Linear regression (OLS)',
               info: [
@@ -70,6 +71,8 @@ the <b>Reading the tests</b> section. (Each week also has its own Read Data tab.
 <span class="rd-tag">tobit · UCLA apt · right-censored at 800</span>
 <p>200 students; <code>apt</code> capped at <b>800</b> (17 hit it). Every coef is an effect on the
 <b>latent</b> score, and watch the <code>/sigma</code> + censored count.</p>` + S({
+              model: String.raw`Latent: $apt_i^*=\beta_0+\beta_1\,read_i+\beta_2\,math_i+\varepsilon_i,\ \varepsilon\sim N(0,\sigma^2)$
+Observed: $apt_i=\min(apt_i^*,\ 800)$  (right-censored)`,
               cmd: 'tobit apt read math, ul(800)',
               title: 'Tobit regression',
               info: [
@@ -101,6 +104,8 @@ the <b>Reading the tests</b> section. (Each week also has its own Read Data tab.
 <span class="rd-tag">tobit · donations · left-censored at 0 · teaching figures</span>
 <p>600 households; many donate <b>0</b> (corner solution). We need the <b>three marginal effects</b> to talk
 about observed donations, because the raw coef is only the latent effect. (Illustrative figures.)</p>` + S({
+              model: String.raw`Latent: $don_i^*=\beta_0+\beta_1\,income_i+\beta_2\,age_i+\varepsilon_i$
+Observed: $don_i=\max(0,\ don_i^*)$  (left-censored at 0)`,
               title: 'Tobit + marginal effects of income on donations',
               dep: 'donation',
               cols: ['effect', 'income coef', 'read as'],
@@ -135,6 +140,7 @@ about observed donations, because the raw coef is only the latent effect. (Illus
 <span class="rd-tag">truncreg · achiv ≥ 40 only · teaching figures</span>
 <p>Only students scoring <b>≥ 40</b> were ever recorded (lower truncation). OLS lost the bottom tail ⇒ its
 slopes are <b>too flat</b>; <code>truncreg</code> rebuilds the tail and recovers the steeper truth.</p>` + S({
+              model: String.raw`$achiv_i=\beta_0+\beta_1\,math_i+\beta_2\,lang_i+\varepsilon_i$,  observed ONLY if $achiv_i>40$`,
               title: 'Coefficients: OLS vs truncreg (achiv on math, language)',
               dep: 'achiv',
               cols: ['OLS (biased)', 'truncreg, ll(40)'],
@@ -156,6 +162,7 @@ slopes are <b>too flat</b>; <code>truncreg</code> rebuilds the tail and recovers
 <span class="rd-tag">truncreg · wages, only earners &gt; Rp5m surveyed · teaching figures</span>
 <p>A wage survey only interviewed workers earning <b>above Rp5m</b> (lower truncation). Read it like an OLS
 table, but the coef is the effect on <b>observed</b> log-wage among the surveyed, and note <code>/sigma</code>.</p>` + S({
+              model: String.raw`$lwage_i=\beta_0+\beta_1\,educ_i+\beta_2\,exper_i+\varepsilon_i$,  observed ONLY if $wage_i>\text{Rp5m}$`,
               cmd: 'truncreg lwage educ exper, ll(1.609)',
               title: 'Truncated regression  (lower limit, log scale)',
               info: [
@@ -195,6 +202,8 @@ table, but the coef is the effect on <b>observed</b> log-wage among the surveyed
 <span class="rd-tag">heckman · womenwk · exam Table 1.2</span>
 <p>Wage seen for only the 1,343 working women. Two blocks (<b>wage</b>, <b>select</b>) + <b>lambda/rho</b>.
 The four exam numbers are highlighted.</p>` + S({
+              model: String.raw`Selection: $work_i^*=\gamma_0+\gamma_1 married_i+\gamma_2 children_i+\gamma_3 educ_i+\gamma_4 age_i+u_i$
+Outcome:  $wage_i=\beta_0+\beta_1 educ_i+\beta_2 age_i+\varepsilon_i$  (seen only if $work_i{=}1$)`,
               cmd: 'heckman wage education age, select(work = married children education age)',
               title: 'Heckman selection model — two-step',
               info: [
@@ -235,6 +244,8 @@ The four exam numbers are highlighted.</p>` + S({
 <span class="rd-tag">heckman · returns to training · teaching figures</span>
 <p>Same machinery, opposite verdict. Here the correction term is <b>insignificant</b>, so there's no
 detectable selection bias — you'd report the simpler OLS. This is the decision the exam loves.</p>` + S({
+              model: String.raw`Selection: $insample_i^*=\gamma_0+\gamma_1 training_i+\gamma_2 educ_i+\gamma_3 distance_i+u_i$
+Outcome:  $lwage_i=\beta_0+\beta_1 training_i+\beta_2 educ_i+\varepsilon_i$  (seen only if selected)`,
               cmd: 'heckman lwage training educ, select(insample = training educ distance)',
               title: 'Heckman selection model',
               info: [
@@ -275,6 +286,7 @@ detectable selection bias — you'd report the simpler OLS. This is the decision
 <span class="rd-tag">reg · fertility on year dummies · exam Table 2a</span>
 <p>Each year dummy compares that year to the <b>base year 1972</b>. The single years drift negative; the
 joint <b>F-test</b> confirms a real downward trend.</p>` + S({
+              model: String.raw`$kids_i=\beta_0+\delta_{74}\,y74_i+\delta_{76}\,y76_i+\dots+\delta_{84}\,y84_i+u_i$  (base year = 1972)`,
               cmd: 'reg kids y74 y76 y78 y80 y82 y84, robust',
               title: 'Linear regression',
               info: [
@@ -302,6 +314,7 @@ joint <b>F-test</b> confirms a real downward trend.</p>` + S({
 <span class="rd-tag">reg · educ × year · exam Table 2b</span>
 <p>Interacting education with year lets the <b>slope</b> change. <code>educ</code> alone is the 1972 effect;
 each interaction is how that effect <b>changed</b>. Combine them for a specific year.</p>` + S({
+              model: String.raw`$kids_i=\beta_0+\sum_t\delta_t\,year_{t}+\beta_1\,educ_i+\sum_t\gamma_t\,(year_{t}\!\cdot\!educ_i)+u_i$`,
               cmd: 'reg kids y74 ... y84 educ y74educ ... y84educ, robust',
               title: 'Linear regression (interaction model)',
               info: [['Number of obs', '1,129'], ['Prob > F', '0.0000'], ['R-squared', '0.0854']],
@@ -334,6 +347,7 @@ each interaction is how that effect <b>changed</b>. Combine them for a specific 
 <p>The model is
 $\;price=\beta_0+\delta_0\,y81+\beta_1\,nearinc+\delta_1\,(y81{\cdot}nearinc)+u$. Read <b>only the
 interaction</b> as the incinerator's effect. Hover every coefficient to see its role.</p>` + S({
+              model: String.raw`$price=\beta_0+\delta_0\,y81+\beta_1\,nearinc+\boxed{\delta_1}\,(y81\!\cdot\!nearinc)+u$  ($\delta_1$ = the DiD)`,
               cmd: 'reg rprice y81 nearinc y81_nearinc',
               title: 'Difference-in-Differences (North Andover)',
               info: [['Number of obs', '321'], ['Prob > F', '0.0000']],
@@ -361,6 +375,7 @@ interaction</b> as the incinerator's effect. Hover every coefficient to see its 
 <span class="rd-tag">reg · PKH cash transfer on school enrollment · teaching figures</span>
 <p>Districts that received a cash-transfer program (<b>treat</b>) vs those that didn't, <b>before/after</b>.
 Same DiD skeleton; the interaction is the policy's causal effect on enrollment (pp). Hover each term.</p>` + S({
+              model: String.raw`$enroll=\beta_0+\delta_0\,post+\beta_1\,treat+\boxed{\delta_1}\,(post\!\cdot\!treat)+u$  ($\delta_1$ = the DiD)`,
               cmd: 'reg enroll post treat post_treat',
               title: 'Difference-in-Differences (cash transfer)',
               info: [['Number of obs', '480'], ['Prob > F', '0.0000']],
@@ -396,6 +411,7 @@ Same DiD skeleton; the interaction is the policy's causal effect on enrollment (
 <span class="rd-tag">xtreg · cross-country growth</span>
 <p>Run Pooled OLS (ignores country differences) and FE (controls them). The coefficient <b>changes</b> once
 $a_i$ is removed — proof heterogeneity mattered.</p>` + S({
+              model: String.raw`$gdp\_growth_{it}=\beta_1\,remit_{it}+\beta_2\,unemp_{it}+a_i+u_{it}$  ($a_i$ = country fixed effect)`,
               title: 'GDP growth on remittances &amp; unemployment',
               dep: 'gdp_growth',
               cols: ['Pooled OLS', 'Fixed Effects'],
@@ -417,6 +433,7 @@ $a_i$ is removed — proof heterogeneity mattered.</p>` + S({
 <span class="rd-tag">xtreg, fe · exam Table 3.1 · i=7, t=10</span>
 <p>The real exam panel table. Beyond the slope, three numbers matter: <code>corr(u_i,Xb)</code> (FE vs RE
 hint), the <b>F test all u_i=0</b> (FE vs POLS), and <code>rho</code> (variance share from the effects).</p>` + S({
+              model: String.raw`$y_{it}=\beta_1\,x1_{it}+a_i+u_{it}$   (within: subtract each unit's mean ⇒ $a_i$ cancels)`,
               cmd: 'xtreg y x1, fe',
               title: 'Fixed-effects (within) regression · Group: country',
               info: [
@@ -446,6 +463,7 @@ hint), the <b>F test all u_i=0</b> (FE vs POLS), and <code>rho</code> (variance 
             html: String.raw`
 <span class="rd-tag">rent · 2-period panel</span>
 <p>Same panel three ways — identical slopes (all kill $a_i$), but FD loses the first period.</p>` + S({
+              model: String.raw`$lrent_{it}=\beta_1\,lavginc_{it}+\dots+a_i+u_{it}$  — solved 3 ways (within / LSDV / FD)`,
               title: 'Coefficient on lavginc: three estimators',
               dep: 'lrent',
               cols: ['Within (fe)', 'LSDV (i.city)', 'First Diff'],
@@ -471,6 +489,7 @@ hint), the <b>F test all u_i=0</b> (FE vs POLS), and <code>rho</code> (variance 
             html: String.raw`
 <span class="rd-tag">airfare · RE vs FE, then Hausman</span>
 <p>Both say higher concentration ⇒ higher fares, but they disagree on size. Hausman judges the gap.</p>` + S({
+              model: String.raw`$lfare_{it}=\beta_1\,concen_{it}+\dots+a_i+u_{it}$   (RE assumes $\mathrm{Cov}(a_i,x)=0$; FE doesn't)`,
               title: 'concentration on log fare: RE vs FE (+ Hausman)',
               dep: 'lfare',
               cols: ['Random Effects', 'Fixed Effects'],
@@ -490,6 +509,7 @@ hint), the <b>F test all u_i=0</b> (FE vs POLS), and <code>rho</code> (variance 
 <span class="rd-tag">firm panel · Hausman p&gt;0.05 · teaching figures</span>
 <p>The opposite verdict. RE and FE are close, Hausman can't reject, and you also need a <b>time-invariant</b>
 variable (sector) — so RE wins (more efficient, and it can estimate the constant variable).</p>` + S({
+              model: String.raw`$lprod_{it}=\beta_1\,rnd_{it}+\beta_2\,sector_i+a_i+u_{it}$  ($sector_i$ time-invariant ⇒ needs RE)`,
               title: 'RE vs FE (+ Hausman + BP-LM)',
               dep: 'lprod',
               cols: ['Random Effects', 'Fixed Effects'],
@@ -519,6 +539,7 @@ variable (sector) — so RE wins (more efficient, and it can estimate the consta
 <span class="rd-tag">district math pass-rate · exam Table 4.1/4.2</span>
 <p>CRE = RE + the time-average <code>lenrolbar</code>. The time-varying slopes match FE; the time-average's
 coefficient is the Mundlak test.</p>` + S({
+              model: String.raw`CRE: $math_{it}=\beta\,x_{it}+\xi\,\bar x_i+a_i+u_{it}$  (RE + the time-average $\bar x_i$)`,
               title: 'math4 pass rate: RE vs FE vs CRE',
               dep: '',
               cols: ['RE', 'FE', 'CRE'],
@@ -544,6 +565,7 @@ coefficient is the Mundlak test.</p>` + S({
 <p>FE can't estimate <b>female</b> (time-invariant). CRE (RE + the time-averages $\bar x_i$) gives
 FE-consistent slopes on the time-varying vars <b>and</b> recovers the female coefficient. The joint test on
 the time-means is the Mundlak/Hausman.</p>` + S({
+              model: String.raw`$lwage_{it}=\beta\,exper_{it}+\delta\,female_i+\xi\,\overline{exper}_i+r_i+u_{it}$  ($\overline{exper}_i$ = Mundlak term)`,
               cmd: 'xtreg lwage exper female mean_exper, re   (+ test mean_exper)',
               title: 'Correlated Random Effects (wage)',
               dep: 'lwage',
@@ -575,6 +597,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             html: String.raw`
 <span class="rd-tag">hausman fe re · exam Table 3.2</span>
 <p>(b) is FE, (B) is RE; a big gap ⇒ RE biased ⇒ FE. Read the chi² and p at the bottom.</p>` + S({
+              modelLabel: 'Hypothesis',
+              model: String.raw`$H_0:\ \mathrm{Cov}(a_i,x)=0$ (RE consistent) vs $H_1:\ \ne 0$ (use FE).  Reject ⇒ FE.`,
               cmd: 'hausman fixed random',
               title: 'H0: difference in coefficients not systematic',
               dep: '',
@@ -593,6 +617,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             title: 'Breusch–Pagan LM (xttest0) — POLS vs RE',
             html: String.raw`
 <span class="rd-tag">xttest0 · is there any panel effect?</span>` + S({
+              modelLabel: 'Hypothesis',
+              model: String.raw`$H_0:\ \sigma_a^2=0$ (no panel effect, POLS ok) vs $H_1:\ \sigma_a^2>0$ (RE).  Reject ⇒ RE.`,
               cmd: 'xttest0',
               title: 'Breusch and Pagan LM test for random effects',
               dep: '',
@@ -612,6 +638,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             title: 'F test that all uᵢ = 0 — POLS vs FE',
             html: String.raw`
 <span class="rd-tag">bottom line of xtreg, fe</span>` + S({
+              modelLabel: 'Hypothesis',
+              model: String.raw`$H_0:\ a_1=a_2=\dots=a_N$ (no fixed effects, POLS ok) vs $H_1:$ they differ.  Reject ⇒ FE.`,
               cmd: '(reported automatically after xtreg, fe)',
               title: 'F test that all u_i = 0',
               dep: '',
@@ -632,6 +660,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             title: 'LR test of independent equations — Heckman selection',
             html: String.raw`
 <span class="rd-tag">bottom of heckman (MLE)</span>` + S({
+              modelLabel: 'Hypothesis',
+              model: String.raw`$H_0:\ \rho=0$ (no selection bias, OLS ok) vs $H_1:\ \rho\ne 0$.  Reject ⇒ Heckman.`,
               cmd: '(reported after heckman)',
               title: 'LR test of indep. eqns (rho = 0)',
               dep: '',
@@ -652,6 +682,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             title: 'Chow test — structural break across periods',
             html: String.raw`
 <span class="rd-tag">F-test that all coefficients are stable</span>` + S({
+              modelLabel: 'Hypothesis',
+              model: String.raw`$H_0:$ coefficients stable across periods vs $H_1:$ a structural break.  Reject ⇒ don't pool.`,
               cmd: '(F-test all time-interactions = 0)',
               title: 'Chow test for a structural break',
               dep: '',
@@ -673,6 +705,8 @@ the time-means is the Mundlak/Hausman.</p>` + S({
             html: String.raw`
 <span class="rd-tag">xttest3 + xtserial · exam Q3(f)</span>
 <p>The exam pair. These change the <b>standard errors</b>, not the coefficients.</p>` + S({
+              modelLabel: 'Hypotheses',
+              model: String.raw`xttest3 — $H_0:\ \sigma_i^2=\sigma^2\ \forall i$ (homoskedastic).   xtserial — $H_0:$ no AR(1).`,
               title: 'Two diagnostic tests on the FE model',
               dep: '',
               cols: ['test', 'H0', 'statistic', 'p-value', 'conclusion'],

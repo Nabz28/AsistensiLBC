@@ -46,7 +46,13 @@
     spec = spec || {};
     var cols = spec.cols || [];
     var colTips = spec.colTips || {};
-    var h = '<div class="stata2-wrap"><div class="stata2">';
+    var h = '';
+    // optional mathematical model shown ABOVE the output table
+    if (spec.model) {
+      h += '<div class="st-modelbox"><span class="st-modelcap">' +
+        (spec.modelLabel || 'Model') + '</span><div class="st-modeleq">' + spec.model + '</div></div>';
+    }
+    h += '<div class="stata2-wrap"><div class="stata2">';
 
     // command echo (Stata prints the command you ran at the top)
     if (spec.cmd) h += '<div class="st-cmd">' + esc(spec.cmd) + '</div>';
