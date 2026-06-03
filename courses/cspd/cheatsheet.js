@@ -73,6 +73,19 @@ restriction (all $\sim\chi^2$):</p>
         num: '1',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_i^*=\beta_0+\beta_1 x_i+\varepsilon_i,\quad \varepsilon_i\sim N(0,\sigma^2)$;  observed $y_i=\max(0,\,y_i^*)$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$y_i^*$</td><td><b>latent</b> outcome — the desired / unconstrained value, <b>unobserved</b></td></tr>
+<tr><td>$y_i$</td><td>the <b>observed</b> outcome — censored (capped) at the limit</td></tr>
+<tr><td>$\beta_1$</td><td>effect of $x$ on the <b>latent</b> $y^*$ (NOT on observed $y$)</td></tr>
+<tr><td>limit $0$</td><td>the censoring point (a ceiling $UL$ behaves the same way)</td></tr>
+<tr><td>$\sigma$</td><td>SD of the error — Tobit <b>estimates</b> it (Probit can't)</td></tr>
+</table>`
+          },
+          {
             title: 'Model & types of limit',
             html: String.raw`
 <div class="formula">Latent:  $y_i^*=x_i'\beta+\varepsilon_i$,  observed $y_i=\max(0,y_i^*)$ (floor)
@@ -143,6 +156,17 @@ misspecified ⇒ <b>Heckman</b> (Type-2) or <b>Cragg double-hurdle / two-part</b
         num: '2',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_i=\beta_0+\beta_1 x_i+\varepsilon_i$,  observed <b>ONLY if</b> $y_i>c$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$c$</td><td>the <b>truncation threshold</b></td></tr>
+<tr><td>units with $y\le c$</td><td><b>absent</b> from the data — never sampled (unlike Tobit, which keeps them)</td></tr>
+<tr><td>$\beta_1$</td><td>effect on the <b>observed</b> $y$, among the survivors (the above-$c$ subpopulation)</td></tr>
+</table>`
+          },
+          {
             title: 'Model, assumptions & vs Tobit',
             html: String.raw`
 <div class="formula">$y^*=x'\beta+\varepsilon$, observed only if $y^*>c$ (rest absent).  $\alpha=(c-x'\beta)/\sigma$
@@ -181,6 +205,20 @@ units aren't in the population). Report the coefficient / $E[y\mid$ trunc$]$.</l
         heading: 'Heckman / sample selection (Tobit II)',
         num: '3',
         cards: [
+          {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">Selection (probit): $s_i^*=\gamma_0+\gamma_1 w_i+u_i$,  $s_i=\mathbf 1[s_i^*>0]$
+Outcome:  $y_i=\beta_0+\beta_1 x_i+\varepsilon_i$  (observed only if $s_i=1$)</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$s_i$</td><td>=1 if <b>selected</b> (e.g. the person works), else 0</td></tr>
+<tr><td>$w_i$</td><td>selection regressors — must include the <b>exclusion restriction</b> $z$ (in selection, NOT in the outcome)</td></tr>
+<tr><td>$y_i$</td><td>the outcome (e.g. wage) — seen only for the selected</td></tr>
+<tr><td>$\rho$</td><td>corr$(u_i,\varepsilon_i)$ — selection bias exists iff $\rho\ne 0$</td></tr>
+<tr><td>$\lambda=\phi/\Phi$</td><td>inverse Mills ratio — added to the outcome to remove the bias; its coef $=\rho\sigma_\varepsilon$</td></tr>
+</table>`
+          },
           {
             title: 'Classify the missingness FIRST',
             html: String.raw`
@@ -258,6 +296,18 @@ $x$ links to selection.</li>
         num: '4',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_{it}=\beta_0+\delta_2 d2_t+\dots+\delta_T dT_t+\beta_1 x_{it}+u_{it}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$i,\ t$</td><td>$i$ = unit (a <b>different</b> set each round), $t$ = year</td></tr>
+<tr><td>$d2_t,\dots$</td><td><b>year dummies</b> (=1 in that year, 0 otherwise); base year omitted</td></tr>
+<tr><td>$\delta$</td><td>shift in the <b>average level</b> vs the base year</td></tr>
+<tr><td>$\beta_1$</td><td>effect of $x$ (common across years unless you add an $x\times$year interaction)</td></tr>
+</table>`
+          },
+          {
             title: 'What it is · time dummies · interactions',
             html: String.raw`
 <ul>
@@ -292,6 +342,20 @@ time-interactions $=0$.</li>
         num: '5',
         cards: [
           {
+            title: '◆ The model at a glance — which term is the DiD',
+            html: String.raw`
+<div class="formula">$y_{it}=\beta_0+\delta_0\,post_t+\beta_1\,treat_i+\boxed{\ \delta_1\ }\,(post_t\!\cdot\!treat_i)+u_{it}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$post_t$</td><td>=1 <b>after</b> the policy/event, 0 before</td></tr>
+<tr><td>$treat_i$</td><td>=1 if in the <b>treated</b> group, 0 if control</td></tr>
+<tr><td>$\boxed{\delta_1}$ (interaction)</td><td><b>THE DiD estimator = the causal treatment effect</b> ⭐</td></tr>
+<tr><td>$\beta_1$</td><td>fixed pre-existing treated-vs-control gap (NOT the treatment)</td></tr>
+<tr><td>$\delta_0$</td><td>common time shock (both groups)</td></tr>
+<tr><td>$\beta_0$</td><td>baseline = control group, before</td></tr>
+</table>`
+          },
+          {
             title: 'Setup, formula, coefficients',
             html: String.raw`
 <div class="formula">$y=\beta_0+\delta_0\,post+\beta_1\,treat+\delta_1(post\!\cdot\!treat)+u$
@@ -325,6 +389,19 @@ removes $a_i$; 2nd diff (across groups) removes the common shock. <b>DiD = FD ap
         num: '6',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_{it}=\beta_1 x_{it}+\boxed{\,a_i\,}+u_{it}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$i,\ t$</td><td>$i$ = the <b>unit</b> (person / firm / country), $t$ = the time period</td></tr>
+<tr><td>$x_{it}$</td><td>the regressor (varies over unit and time); $\beta_1$ = its effect</td></tr>
+<tr><td>$\boxed{a_i}$</td><td>the <b>unobserved effect / fixed effect</b> — everything <b>permanent</b> about unit $i$ (ability, culture, geography). No $t$ subscript ⇒ time-invariant.</td></tr>
+<tr><td>$u_{it}$</td><td>the <b>idiosyncratic</b> error — the shock that varies each period</td></tr>
+</table>
+<div class="note">All panel methods below differ only in how they treat $a_i$: POLS leaves it in the error; FE/FD remove it; RE assumes it's uncorrelated with $x$; CRE models it.</div>`
+          },
+          {
             title: 'Model, aᵢ, between vs within',
             html: String.raw`
 <div class="formula">$y_{it}=\beta_1 x_{it}+a_i+u_{it}$
@@ -347,6 +424,17 @@ by $a_i$). <b>FE</b> asks "when the SAME unit's $x$ changes, does $y$?" (<b>with
         num: '7',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_{it}=\beta_0+\beta_1 x_{it}+v_{it}$,  with composite error $v_{it}=a_i+u_{it}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$v_{it}$</td><td>the <b>composite error</b> — Pooled OLS lumps $a_i$ INTO the error (ignores the panel)</td></tr>
+<tr><td>$a_i$ inside $v$</td><td>causes bias if correlated with $x$, and serial correlation in $v$ (⇒ wrong SEs)</td></tr>
+<tr><td>$\beta_1$</td><td>the slope — consistent only if $\mathrm{Cov}(a_i,x)=0$</td></tr>
+</table>`
+          },
+          {
             title: 'Assumptions, problems, when to use',
             html: String.raw`
 <p>Stacks all $NT$ rows, ignores panel structure.</p>
@@ -368,6 +456,18 @@ households each wave) — buys sample size.</li>
         heading: 'Fixed Effects — three estimators, one slope',
         num: '8',
         cards: [
+          {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">Within (demeaned): $\ddot y_{it}=\beta_1\ddot x_{it}+\ddot u_{it}$;  LSDV: $y_{it}=\alpha_i+\beta_1 x_{it}+u_{it}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$\ddot y_{it}=y_{it}-\bar y_i$</td><td><b>demeaned</b> $y$ — deviation from that unit's own time-average $\bar y_i$</td></tr>
+<tr><td>$\ddot x_{it}=x_{it}-\bar x_i$</td><td>demeaned $x$; subtracting the mean <b>cancels $a_i$</b> (and any time-invariant variable)</td></tr>
+<tr><td>$\alpha_i$ (LSDV)</td><td>a separate <b>intercept (dummy) per unit</b> = the estimated fixed effect; gives the same $\hat\beta_1$ as within</td></tr>
+<tr><td>$\beta_1$</td><td>the <b>within-unit</b> effect of $x$ on $y$</td></tr>
+</table>`
+          },
           {
             title: 'Within · LSDV · (FD) and what they share',
             html: String.raw`
@@ -423,6 +523,18 @@ time-invariant effects; doesn't fix time-varying OVB or simultaneity (need IV/Di
         num: '9',
         cards: [
           {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$\Delta y_{it}=\beta_1\,\Delta x_{it}+\Delta u_{it}$,  where $\Delta z_{it}=z_{it}-z_{i,t-1}$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$\Delta$</td><td>the <b>first difference</b>: this period minus the previous period</td></tr>
+<tr><td>$\Delta y,\ \Delta x$</td><td>the <b>changes</b>; OLS is run on these changes</td></tr>
+<tr><td>(no $a_i$)</td><td>$a_i$ is constant ⇒ $\Delta a_i=0$ ⇒ it <b>cancels</b>. The intercept also drops (add time dummies)</td></tr>
+<tr><td>1st period</td><td><b>lost</b> (no "previous" to subtract) ⇒ $N(T-1)$ rows</td></tr>
+</table>`
+          },
+          {
             title: 'FD assumptions (FD.1–FD.6)',
             html: String.raw`
 <div class="formula">$\Delta y_{it}=\beta_1\Delta x_{it}+\Delta u_{it}$ — OLS on changes; $a_i$ differenced out.</div>
@@ -457,6 +569,18 @@ exogeneity.</li>
         heading: 'Random Effects (GLS)',
         num: '10',
         cards: [
+          {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_{it}=\beta_0+\beta_1 x_{it}+a_i+u_{it}$,  ASSUMING $\mathrm{Cov}(a_i,x_{it})=0$
+Estimated by GLS (quasi-demeaning): $(y_{it}-\theta\bar y_i)=\dots$</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$a_i$</td><td>now treated as a <b>random</b> draw, <b>uncorrelated with $x$</b> (the key RE assumption)</td></tr>
+<tr><td>$\theta$</td><td>the <b>quasi-demeaning weight</b> $\in[0,1]$: how much of the unit mean RE subtracts ($0$=POLS, $1$=FE)</td></tr>
+<tr><td>$\beta_1$</td><td>effect of $x$ — and RE can ALSO estimate <b>time-invariant</b> regressors (FE can't)</td></tr>
+</table>`
+          },
           {
             title: 'Model, θ, quasi-demeaning',
             html: String.raw`
@@ -498,6 +622,19 @@ variation).</li>
         heading: 'Correlated Random Effects (Mundlak)',
         num: '11',
         cards: [
+          {
+            title: '◆ The model at a glance — what each term means',
+            html: String.raw`
+<div class="formula">$y_{it}=\alpha+\beta x_{it}+\boxed{\xi\,\bar x_i}+\gamma z_i+r_i+u_{it}$  (estimate by RE)</div>
+<table>
+<tr><th>Term</th><th>What it is</th></tr>
+<tr><td>$\boxed{\bar x_i}$</td><td>the <b>time-average</b> of $x$ for unit $i$ — the <b>Mundlak term</b> added to plain RE</td></tr>
+<tr><td>$\xi$</td><td>coef on $\bar x_i$ — absorbs the $a_i$–$x$ correlation; <b>test $\xi=0$</b> = robust Hausman</td></tr>
+<tr><td>$\beta$</td><td>the slope on $x_{it}$ — comes out <b>equal to FE</b> (consistent)</td></tr>
+<tr><td>$z_i$</td><td>a <b>time-invariant</b> variable — CRE CAN estimate its effect $\gamma$ (FE cannot)</td></tr>
+<tr><td>$r_i$</td><td>the leftover unit effect, now uncorrelated with $x$ by construction</td></tr>
+</table>`
+          },
           {
             title: 'The synthesis of FE and RE',
             html: String.raw`
