@@ -10,13 +10,13 @@
   function rp(v, d) { var k = Math.pow(10, d || 2); return Math.round(v * k) / k; }
 
   /* ---- FIG 7: Social Security benefit formula (PIA), piecewise-linear ------
-     Bend points b1=711, b2=4288. PIA = .90·min(AIME,b1) + .32·(mid) + .15·(top).
+     Bend points b1=767, b2=4624 (Rosen & Gayer, 2012). PIA = .90·min(AIME,b1) + .32·(mid) + .15·(top).
      The kinks are EXACT; replacement rate falls as AIME rises (progressive). */
   F.register({
     id: 'ss-pia',
     title: { en: 'Social Security benefit (PIA): a progressive kinked formula', id: 'Manfaat pensiun (PIA): rumus berkelok progresif' },
-    note: { en: 'Marginal replacement falls at each bend point (90% → 32% → 15%), so low earners get a <i>higher share</i> of their earnings back. The line is exactly kinked at $711 and $4 288.',
-            id: 'Penggantian marginal turun di tiap titik kelok (90% → 32% → 15%), sehingga pekerja berpendapatan rendah menerima <i>porsi lebih besar</i>. Kelok tepat di $711 dan $4.288.' },
+    note: { en: 'Marginal replacement falls at each bend point (90% → 32% → 15%), so low earners get a <i>higher share</i> of their earnings back. The line is exactly kinked at the 2012 bend points $767 and $4 624.',
+            id: 'Penggantian marginal turun di tiap titik kelok (90% → 32% → 15%), sehingga pekerja berpendapatan rendah menerima <i>porsi lebih besar</i>. Kelok tepat di titik kelok 2012, $767 dan $4.624.' },
     params: [
       { key: 'aime', label: { en: 'AIME (avg monthly earnings)', id: 'AIME (rerata bulanan)' }, min: 0, max: 6000, step: 50, value: 2500, fmt: function (v) { return '$' + v; } }
     ],
@@ -32,7 +32,7 @@
                id: 'Di atas kelok kedua hanya 15¢ tiap dolar tambahan yang diganti, jadi pekerja berpendapatan tinggi menerima kembali PORSI kecil dari penghasilannya. Rumus ini sengaja meredistribusi ke bawah.' } }
     ],
     compute: function (p) {
-      var b1 = 711, b2 = 4288, r1 = 0.90, r2 = 0.32, r3 = 0.15;
+      var b1 = 767, b2 = 4624, r1 = 0.90, r2 = 0.32, r3 = 0.15;
       function PIA(a) {
         var x = 0;
         x += r1 * Math.min(a, b1);
@@ -45,7 +45,7 @@
       var rr = a > 0 ? pia / a : r1;
       return {
         axes: {
-          x: { min: 0, max: 6000, label: 'AIME ($/mo)', ticks: [{ v: 711, label: '711' }, { v: 4288, label: '4288' }] },
+          x: { min: 0, max: 6000, label: 'AIME ($/mo)', ticks: [{ v: 767, label: '767' }, { v: 4624, label: '4624' }] },
           y: { min: 0, max: piaMax * 1.1, label: 'PIA ($/mo)' }
         },
         items: [
