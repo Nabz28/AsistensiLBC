@@ -5,7 +5,7 @@
     id: 'u5',
     label: { en: 'Unit 5', id: 'Unit 5' },
     title: { en: 'Social Security & Public Pensions', id: 'Jaminan Sosial & Pensiun Publik' },
-    subtitle: { en: 'Annuities & consumption smoothing · PAYG vs funded · the PIA formula · crowding out · reform', id: 'Anuitas & pemulusan konsumsi · PAYG vs funded · rumus PIA · crowding out · reformasi' },
+    subtitle: { en: 'Annuities & consumption smoothing · PAYG vs funded · benefits, FICA & the trust fund · distribution · crowding out · retirement · reform', id: 'Anuitas & pemulusan konsumsi · PAYG vs funded · manfaat, FICA & dana perwalian · distribusi · crowding out · pensiun · reformasi' },
 
     notes: [
       {
@@ -40,14 +40,50 @@
         ]
       },
       {
-        heading: { en: 'Saving, retirement & reform', id: 'Tabungan, pensiun & reformasi' }, num: '3',
+        heading: { en: 'Structure of Social Security', id: 'Struktur jaminan sosial' }, num: '3',
+        cards: [
+          { title: { en: 'Basic components: benefits, transfers & adjustments', id: 'Komponen dasar: manfaat, transfer & penyesuaian' },
+            html: '<p>The core benefit is the <span class="key">PIA</span> built from <span class="key">AIME</span> (above). On top of it:</p>' +
+              '<ul><li><b>Explicit transfers</b> — dependents’ and survivors’ benefits (since 1939); <b>Supplemental Security Income (SSI)</b> for the very poor.</li>' +
+              '<li><b>Family-status adjustment</b> — +50% for a spouse or dependent child; a surviving spouse gets 100% of the worker’s benefit or their own (whichever is higher); a divorced spouse married ≥10 years qualifies.</li>' +
+              '<li><b>Earnings test</b> — benefits reduced <b>$1 for every $2</b> earned above a threshold (≈$14,160), acting as an <i>implicit tax on working</i> in retirement.</li>' +
+              '<li><b>Taxing benefits</b> — up to <b>85%</b> of benefits are taxable for recipients with income above a base ($25,000 single / $32,000 married).</li></ul>' },
+          { title: { en: 'Financing: FICA', id: 'Pendanaan: FICA' },
+            html: '<p>Funded by the <span class="key">FICA</span> payroll tax (Federal Insurance Contribution Act), <b>not</b> general revenue — earmarking signals it is an <i>earned</i> benefit, not welfare.</p>' +
+              '<table><thead><tr><th>Tax</th><th>Rate (2008)</th><th>Base</th></tr></thead><tbody>' +
+              '<tr><td>Social Security (OASDI)</td><td><b>6.2%</b> each on employer & employee (OASI 5.6% + DI 0.6%)</td><td>up to a ceiling ($102k)</td></tr>' +
+              '<tr><td>Self-employed</td><td><b>12.4%</b> (both halves)</td><td>up to ceiling</td></tr>' +
+              '<tr><td>Medicare</td><td><b>1.45%</b> each</td><td><b>no</b> earnings ceiling</td></tr>' +
+              '</tbody></table>' +
+              '<div class="tip">📝 Why not fund it from general revenue? Earmarked contributions make the benefit feel earned, build political durability, and tie benefits to a contribution record.</div>' },
+          { title: { en: 'Distributional issues', id: 'Isu distribusi' },
+            html: '<p><b>Intergenerational</b>: early cohorts got far more than they paid. <span class="key">Ida Mae Fuller</span>, the first recipient, paid ~$25 in taxes and collected ~$22,900 over her life — early PAYG generations win, because they receive without having contributed for a full career.</p>' +
+              '<p><b>Intragenerational (within a generation)</b> redistribution runs along several margins:</p>' +
+              '<ul><li><b>By earnings</b> — the progressive PIA favours low earners.</li>' +
+              '<li><b>By lifespan</b> — longer-lived people (e.g. women) collect more; the annuity is worth more to them.</li>' +
+              '<li><b>By living arrangements & number of earners</b> — a one-earner couple gains from the +50% spousal benefit that a two-earner couple paying the same tax does not.</li></ul>' +
+              '<p>Whether each transfer is "fair" is a <b>normative</b> question — the model only quantifies who gains and loses.</p>' },
+          { title: { en: 'The Trust Fund & national saving', id: 'Dana Perwalian & tabungan nasional' },
+            html: '<p>Contributions in excess of current benefits accumulate in the <span class="key">Social Security Trust Fund</span>. Two debates:</p>' +
+              '<ul><li><b>Budget treatment</b> — counted <span class="key">off-budget</span> (on its own) or in the <span class="key">unified budget</span> (lumped with the rest)? The unified figure can mask the rest of the deficit when the fund runs a surplus.</li>' +
+              '<li><b>National saving</b> — does the trust fund actually add to national saving, or does the government simply spend the surplus and leave IOUs? This is the heart of whether Social Security raises the capital stock.</li></ul>' +
+              '<div class="note">💡 Indonesia parallel: the civil-service pension is PAYG with a ~Rp 3,200 T unfunded liability — there is no real funded trust to lean on, which is exactly why reform is on the table.</div>' }
+        ]
+      },
+      {
+        heading: { en: 'Effects on behaviour & reform', id: 'Efek pada perilaku & reformasi' }, num: '4',
         cards: [
           { title: { en: 'Does social security crowd out private saving?', id: 'Apakah jaminan sosial menggusur tabungan swasta?' },
             html: '<p>Life-cycle theory: people save while working to fund retirement. Social security adds three effects:</p>' +
               '<ul><li><b>Wealth-substitution effect</b>: social-security wealth substitutes for private saving → saving falls.</li>' +
               '<li><b>Retirement effect</b>: it encourages earlier retirement → need to save <i>more</i> → offsets.</li>' +
               '<li><b>Bequest effect</b>: people save to offset the burden on their children → offsets.</li></ul>' +
-              '<p>An <b>actuarially fair</b> forced contribution moves the endowment <i>along</i> the same budget line, so optimal consumption is unchanged and <b>private saving falls one-for-one</b> — total saving is unchanged. Feldstein (1974) vs Leimer–Lesnoy (1982) debate the empirical size. See the Graphs tab.</p>' },
+              '<p>An <b>actuarially fair</b> forced contribution moves the endowment <i>along</i> the same budget line, so optimal consumption is unchanged and <b>private saving falls one-for-one</b> — total saving is unchanged. Feldstein (1974) vs Leimer–Lesnoy (1982) debate the empirical size. See the Graphs tab.</p>' +
+              '<div class="tip">📝 Two more channels: the <b>wealth of distribution</b> shifts from <i>bequeathable</i> wealth (you could leave it) toward <i>annuitized</i> wealth (dies with you) — so Social Security can reduce inherited wealth and affect wealth mobility.</div>' },
+          { title: { en: 'Retirement decisions', id: 'Keputusan pensiun' },
+            html: '<p>Social Security changes <i>when</i> people retire, not just how much they save. <span class="key">Social-security wealth</span> and the <b>earnings test</b> create an <span class="key">implicit tax on continued work</span>: keep working and you lose benefits (and may gain little extra), so many retire as soon as benefits are available.</p>' +
+              '<p>Evidence: <b>Diamond & Gruber (1999)</b> and <b>Gruber & Wise (2004)</b> show that the way benefit rules are structured strongly predicts the spike in retirement at the eligibility age across countries — badly designed rules push people out of the workforce early.</p>' +
+              '<div class="note">💡 Indonesia link (Unit 3): a universal pension floor (Program A) can act as an implicit tax on working past 65 if benefits are clawed back against labour income — a real allocative-efficiency cost.</div>' },
           { title: { en: 'Reform options & the policy frame', id: 'Opsi reformasi & kerangka kebijakan' },
             html: '<p><b>Maintain the system</b>: raise the payroll tax, raise the taxable-earnings ceiling, raise the retirement age, reduce the COLA, change the benefit formula. <b>Privatize</b>: personal accounts (carve-out or add-on) — trade solvency & ownership against market risk and admin cost.</p>' +
               '<div class="note">💡 Endterm policy frame — <b>Program A</b> (universal non-contributory floor) vs <b>Program B</b> (matching grant on private savings). Evaluate on: <b>allocative efficiency</b> (income vs substitution effects on labour/saving), <b>target efficiency</b> (A = no under-coverage but high leakage to the rich; B = low leakage but high under-coverage of the poorest who cannot save), and <b>deadweight loss / fiscal cost</b>. Add real-world frictions: formal-labour disincentives, informal-sector compliance gaps, and long-run solvency under aging.</div>' }

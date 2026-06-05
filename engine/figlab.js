@@ -244,6 +244,7 @@
           syncSliders(); draw();
           chips.querySelectorAll('.fl-chip').forEach(function (x) { x.classList.remove('on'); });
           b.classList.add('on');
+          setScenarioExpl(sc);
         };
         chips.appendChild(b);
       });
@@ -263,6 +264,7 @@
       inp.oninput = function () {
         state[q.key] = parseFloat(inp.value); show(); draw();
         if (chips) chips.querySelectorAll('.fl-chip').forEach(function (x) { x.classList.remove('on'); });
+        resetExpl();
       };
       sliders[q.key] = { inp: inp, show: show };
       row.appendChild(lab); row.appendChild(inp); side.appendChild(row);
@@ -271,10 +273,28 @@
 
     var readoutEl = document.createElement('div'); readoutEl.className = 'fl-readout';
     side.appendChild(readoutEl);
-    if (spec.note) {
-      var noteEl = document.createElement('div'); noteEl.className = 'fl-note';
-      noteEl.innerHTML = txt(spec.note); side.appendChild(noteEl);
+
+    // Explanation box: shows the figure's default note, OR the active scenario's
+    // "why" when a scenario chip is selected (reverts when a slider is moved).
+    var explEl = null;
+    if (spec.note || (spec.scenarios && spec.scenarios.some(function (s) { return s.why; }))) {
+      explEl = document.createElement('div'); explEl.className = 'fl-note';
+      side.appendChild(explEl);
     }
+    function resetExpl() {
+      if (!explEl) return;
+      explEl.classList.remove('fl-why');
+      explEl.innerHTML = spec.note ? txt(spec.note) : '';
+    }
+    function setScenarioExpl(sc) {
+      if (!explEl) return;
+      var w = sc.why ? txt(sc.why) : (sc.desc ? txt(sc.desc) : '');
+      explEl.classList.add('fl-why');
+      explEl.innerHTML = w
+        ? '<b class="fl-why-h">' + esc(txt(sc.label)) + '</b>' + w
+        : (spec.note ? txt(spec.note) : '');
+    }
+    resetExpl();
 
     function syncSliders() {
       (spec.params || []).forEach(function (q) {

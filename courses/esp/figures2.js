@@ -20,6 +20,17 @@
     params: [
       { key: 'aime', label: { en: 'AIME (avg monthly earnings)', id: 'AIME (rerata bulanan)' }, min: 0, max: 6000, step: 50, value: 2500, fmt: function (v) { return '$' + v; } }
     ],
+    scenarios: [
+      { label: { en: 'Low earner', id: 'Pendapatan rendah' }, set: { aime: 400 },
+        why: { en: 'Below the first bend point, every dollar of AIME is replaced at 90% — a low earner gets back almost all of their pre-retirement earnings. This is the heart of Social Security’s progressivity.',
+               id: 'Di bawah kelok pertama, tiap dolar AIME diganti 90% — pekerja berpendapatan rendah menerima kembali hampir seluruh penghasilannya. Inilah inti progresivitas jaminan sosial.' } },
+      { label: { en: 'Middle earner', id: 'Pendapatan menengah' }, set: { aime: 2500 },
+        why: { en: 'Between the two bend points only 32¢ of each extra AIME dollar is replaced, so the replacement RATE has already fallen well below 90% — the benefit rises more slowly than earnings.',
+               id: 'Di antara dua kelok, hanya 32¢ tiap dolar tambahan AIME yang diganti, jadi TINGKAT penggantian sudah jatuh jauh di bawah 90%.' } },
+      { label: { en: 'High earner', id: 'Pendapatan tinggi' }, set: { aime: 5500 },
+        why: { en: 'Above the second bend point only 15¢ of each extra dollar is replaced, so a high earner gets back a small SHARE of their earnings (even though the dollar benefit is the largest). The formula deliberately redistributes toward the bottom.',
+               id: 'Di atas kelok kedua hanya 15¢ tiap dolar tambahan yang diganti, jadi pekerja berpendapatan tinggi menerima kembali PORSI kecil dari penghasilannya. Rumus ini sengaja meredistribusi ke bawah.' } }
+    ],
     compute: function (p) {
       var b1 = 711, b2 = 4288, r1 = 0.90, r2 = 0.32, r3 = 0.15;
       function PIA(a) {
@@ -72,8 +83,15 @@
       { key: 'I1', label: { en: 'Income later I₁', id: 'Pendapatan nanti I₁' }, min: 1, max: 8, step: 0.5, value: 3, fmt: function (v) { return v.toFixed(1); } }
     ],
     scenarios: [
-      { label: { en: 'A saver', id: 'Penabung' }, set: { I0: 7, I1: 2, beta: 0.45, r: 0.25 } },
-      { label: { en: 'A borrower', id: 'Peminjam' }, set: { I0: 2.5, I1: 7, beta: 0.6, r: 0.25 } }
+      { label: { en: 'A saver', id: 'Penabung' }, set: { I0: 7, I1: 2, beta: 0.45, r: 0.25 },
+        why: { en: 'High income now plus patience (low taste for the present) puts the optimum LEFT of the endowment A: the person consumes less than I₀ today and lends the rest, earning (1+r). Saving = I₀ − c₀* > 0.',
+               id: 'Pendapatan kini tinggi + sabar menempatkan optimum di KIRI endowment A: konsumsi kini < I₀ dan sisanya dipinjamkan, memperoleh (1+r). Tabungan > 0.' } },
+      { label: { en: 'A borrower', id: 'Peminjam' }, set: { I0: 2.5, I1: 7, beta: 0.6, r: 0.25 },
+        why: { en: 'Low income now but high future income (or impatience) puts the optimum RIGHT of A: the person consumes more than I₀ today by borrowing against future income, repaying (1+r) later. Saving < 0.',
+               id: 'Pendapatan kini rendah tetapi nanti tinggi (atau tidak sabar) menempatkan optimum di KANAN A: konsumsi kini > I₀ dengan meminjam dari pendapatan masa depan. Tabungan < 0.' } },
+      { label: { en: 'Interest rate rises', id: 'Suku bunga naik' }, set: { I0: 6, I1: 3, beta: 0.5, r: 0.8 },
+        why: { en: 'A higher r steepens the budget line (slope −(1+r)) and pivots it through the unchanged endowment A. Saving now earns more — the substitution effect rewards saving today, raising future consumption (the income effect can partly offset for a saver).',
+               id: 'r lebih tinggi membuat garis anggaran lebih curam (−(1+r)) dan berputar lewat endowment A yang tetap. Menabung kini lebih menguntungkan — efek substitusi mendorong menabung.' } }
     ],
     compute: function (p) {
       var r = p.r, b = p.beta, I0 = p.I0, I1 = p.I1;
@@ -116,6 +134,20 @@
     params: [
       { key: 'r', label: { en: 'Interest rate r', id: 'Suku bunga r' }, min: 0.05, max: 0.8, step: 0.05, value: 0.25, fmt: function (v) { return (v * 100).toFixed(0) + '%'; } },
       { key: 'T', label: { en: 'Forced contribution T', id: 'Iuran wajib T' }, min: 0, max: 4, step: 0.25, value: 2, fmt: function (v) { return v.toFixed(2); } }
+    ],
+    scenarios: [
+      { label: { en: 'No pension', id: 'Tanpa pensiun' }, set: { r: 0.25, T: 0 },
+        why: { en: 'Baseline: the household saves S = I₀ − c₀* on its own to fund retirement.',
+               id: 'Dasar: rumah tangga menabung sendiri S = I₀ − c₀* untuk pensiun.' } },
+      { label: { en: 'Small pension', id: 'Pensiun kecil' }, set: { r: 0.25, T: 1 },
+        why: { en: 'A small actuarially-fair contribution slides the endowment a little along the SAME budget line, so the optimum doesn’t move. Private saving falls by exactly the contribution — total saving (private + state) is unchanged.',
+               id: 'Iuran adil kecil menggeser endowment sedikit di garis anggaran yang SAMA, jadi optimum tak bergerak. Tabungan swasta turun tepat sebesar iuran — total tetap.' } },
+      { label: { en: 'Large pension', id: 'Pensiun besar' }, set: { r: 0.25, T: 2.5 },
+        why: { en: 'A larger contribution crowds out almost ALL private saving — the household barely saves on its own because the state already saves on its behalf. Total saving (private + state) is still unchanged; push T higher and the household would even have to borrow privately.',
+               id: 'Iuran lebih besar menggusur hampir SELURUH tabungan swasta — rumah tangga nyaris tak menabung sendiri karena negara sudah menabung untuknya. Total tabungan tetap.' } },
+      { label: { en: 'Higher return', id: 'Imbal hasil lebih tinggi' }, set: { r: 0.6, T: 2 },
+        why: { en: 'Even at a higher interest rate, because the pension is actuarially fair (pay T now, get (1+r)T later) the endowment still moves ALONG the same budget line. The one-for-one crowding-out result does not depend on r.',
+               id: 'Bahkan pada bunga lebih tinggi, karena pensiun adil-aktuaria, endowment tetap bergerak DI garis anggaran yang sama. Hasil crowd-out satu-lawan-satu tak bergantung pada r.' } }
     ],
     compute: function (p) {
       var r = p.r, b = 0.5, I0 = 7, I1 = 2, T = p.T;
@@ -175,6 +207,20 @@
       { key: 'alpha', label: { en: 'Taste for G (α)', id: 'Selera G (α)' }, min: 0.2, max: 0.7, step: 0.05, value: 0.4, fmt: function (v) { return v.toFixed(2); } },
       { key: 'match', label: { en: 'Match rate', id: 'Rasio padanan' }, min: 0, max: 2, step: 0.25, value: 1, fmt: function (v) { return v.toFixed(2) + ':1'; } }
     ],
+    scenarios: [
+      { label: { en: '1-for-1 match', id: 'Padanan 1:1' }, set: { alpha: 0.4, match: 1 },
+        why: { en: 'For every $1 the region spends on G the donor adds $1, halving the price of G. The budget pivots out from the same private-good intercept; G jumps a lot, but c also rises — part of the grant becomes tax relief.',
+               id: 'Tiap $1 yang dibelanjakan daerah untuk G, donor menambah $1, memangkas harga G separuh. G melonjak, tetapi c juga naik — sebagian hibah menjadi keringanan pajak.' } },
+      { label: { en: 'Strong taste for G', id: 'Selera G kuat' }, set: { alpha: 0.6, match: 1 },
+        why: { en: 'A community that values G highly spends most of the price cut on G, so the public-good stimulus is large and little leaks to private consumption.',
+               id: 'Komunitas yang sangat menghargai G membelanjakan sebagian besar potongan harga untuk G, jadi stimulus besar dan sedikit bocor ke konsumsi privat.' } },
+      { label: { en: 'Weak taste for G', id: 'Selera G lemah' }, set: { alpha: 0.25, match: 1 },
+        why: { en: 'A community that cares little for G turns much of the price cut into private tax relief — G rises less and more leaks to c. Same grant, very different result depending on local preferences.',
+               id: 'Komunitas yang kurang peduli G mengubah sebagian besar potongan harga menjadi keringanan pajak — G naik lebih sedikit. Hibah sama, hasil sangat berbeda tergantung preferensi.' } },
+      { label: { en: 'Generous match (2:1)', id: 'Padanan murah hati' }, set: { alpha: 0.4, match: 2 },
+        why: { en: 'A higher match rate cuts the price of G further, pivoting the budget out more and stimulating G strongly — but the donor’s UNCAPPED cost balloons, which is the central weakness of open-ended matching.',
+               id: 'Rasio padanan lebih tinggi memangkas harga G lebih jauh, menstimulasi G kuat — tetapi biaya donor TANPA BATAS membengkak, kelemahan utama padanan terbuka.' } }
+    ],
     compute: function (p) {
       var a = p.alpha, mr = p.match, pG = 1 / (1 + mr);
       var b = gridBase(a);
@@ -211,6 +257,17 @@
     params: [
       { key: 'alpha', label: { en: 'Taste for G (α)', id: 'Selera G (α)' }, min: 0.2, max: 0.7, step: 0.05, value: 0.45, fmt: function (v) { return v.toFixed(2); } },
       { key: 'cap', label: { en: 'Donor cap (K)', id: 'Plafon donor (K)' }, min: 1, max: 7, step: 0.5, value: 5, fmt: function (v) { return v.toFixed(1); } }
+    ],
+    scenarios: [
+      { label: { en: 'Generous cap', id: 'Plafon longgar' }, set: { alpha: 0.45, cap: 5 },
+        why: { en: 'With a high cap the optimum stays on the subsidised segment AD (matched price), so G rises almost as much as the open-ended case — the cap doesn’t bind. The donor pays up to the cap.',
+               id: 'Dengan plafon tinggi, optimum tetap di segmen bersubsidi AD, jadi G naik hampir sebesar kasus tak terbatas — plafon tak mengikat.' } },
+      { label: { en: 'Cap binds (corner at D)', id: 'Plafon mengikat' }, set: { alpha: 0.45, cap: 3 },
+        why: { en: 'When the desired G would exceed the cap, the region ends up exactly at the kink D: it uses all the matched money, then stops because beyond the cap G is full price. The donor’s cost is exactly the cap — control achieved, stimulus reduced.',
+               id: 'Bila G yang diinginkan melebihi plafon, daerah berhenti tepat di kelok D: memakai seluruh dana padanan lalu berhenti karena di atas plafon G berharga penuh. Biaya donor = plafon.' } },
+      { label: { en: 'Tight cap', id: 'Plafon ketat' }, set: { alpha: 0.45, cap: 1.5 },
+        why: { en: 'A very tight cap is reached almost immediately; most of the budget line is at full price, so the closed-ended grant barely out-stimulates a plain lump-sum transfer.',
+               id: 'Plafon sangat ketat tercapai segera; sebagian besar garis anggaran berharga penuh, jadi hibah ini nyaris tak lebih menstimulasi daripada transfer lump-sum biasa.' } }
     ],
     compute: function (p) {
       var a = p.alpha, K = p.cap, pG = 0.5; // 1:1 match → price 0.5 up to cap
@@ -260,6 +317,17 @@
       { key: 'alpha', label: { en: 'Taste for G (α)', id: 'Selera G (α)' }, min: 0.2, max: 0.7, step: 0.05, value: 0.4, fmt: function (v) { return v.toFixed(2); } },
       { key: 'H', label: { en: 'Grant size (H)', id: 'Besar hibah (H)' }, min: 1, max: 8, step: 0.5, value: 4, fmt: function (v) { return v.toFixed(1); } }
     ],
+    scenarios: [
+      { label: { en: 'Normal crowd-out', id: 'Crowd-out normal' }, set: { alpha: 0.4, H: 4 },
+        why: { en: 'The region takes the earmarked grant but then cuts its OWN G spending and shifts the freed money to private c. G rises by only α·H — the rest (1−α)·H is crowd-out. Donors who expect $1 of grant to add $1 of G are disappointed (Payne 2009).',
+               id: 'Daerah menerima hibah ikat lalu memangkas belanja G SENDIRI dan mengalihkan dana bebas ke c. G hanya naik α·H — sisanya (1−α)·H crowd-out.' } },
+      { label: { en: 'Big grant', id: 'Hibah besar' }, set: { alpha: 0.4, H: 8 },
+        why: { en: 'A larger earmarked grant raises G more in absolute terms, but the SHARE that crowds out, (1−α), is unchanged — most of the extra still leaks to private consumption.',
+               id: 'Hibah lebih besar menaikkan G lebih banyak secara absolut, tetapi PORSI crowd-out (1−α) tetap — sebagian besar tetap bocor ke konsumsi privat.' } },
+      { label: { en: 'Earmark binds (corner)', id: 'Ikatan mengikat' }, set: { alpha: 0.2, H: 8 },
+        why: { en: 'If the grant H exceeds what the community would freely choose for G, the earmark BINDS: it’s stuck at the corner G=H, spending exactly the grant on G and nothing of its own. No crowd-out here, because it couldn’t reach this much G alone.',
+               id: 'Jika hibah H melebihi G yang akan dipilih bebas, ikatan MENGIKAT: daerah berhenti di sudut G=H, membelanjakan persis hibah untuk G. Tanpa crowd-out di sini.' } }
+    ],
     compute: function (p) {
       var a = p.alpha, H = p.H;
       var b = gridBase(a);
@@ -299,6 +367,17 @@
       { key: 'alpha', label: { en: 'Taste for G (α)', id: 'Selera G (α)' }, min: 0.2, max: 0.7, step: 0.05, value: 0.4, fmt: function (v) { return v.toFixed(2); } },
       { key: 'H', label: { en: 'Grant size (H)', id: 'Besar hibah (H)' }, min: 1, max: 8, step: 0.5, value: 4, fmt: function (v) { return v.toFixed(1); } }
     ],
+    scenarios: [
+      { label: { en: 'Equals an income rise', id: 'Setara kenaikan pendapatan' }, set: { alpha: 0.4, H: 4 },
+        why: { en: 'No strings → the budget shifts out in parallel, exactly like giving residents H of extra income. The optimum is the interior tangency, with ΔG = α·H — the SAME prediction as the conditional grant. Theoretically, conditional and unconditional are identical.',
+               id: 'Tanpa syarat → anggaran bergeser sejajar, persis seperti menambah pendapatan H. ΔG = α·H — prediksi SAMA dengan hibah bersyarat. Secara teori keduanya identik.' } },
+      { label: { en: 'Strong taste for G', id: 'Selera G kuat' }, set: { alpha: 0.6, H: 4 },
+        why: { en: 'A region that values G highly spends a large share of the extra income on G (ΔG = α·H is bigger). Even so, in the model it would spend the same whether the grant is labelled or not.',
+               id: 'Daerah yang menghargai G tinggi membelanjakan porsi besar tambahan untuk G (ΔG = α·H lebih besar). Tetap saja, dalam model, sama saja diberi label atau tidak.' } },
+      { label: { en: 'The flypaper puzzle', id: 'Teka-teki flypaper' }, set: { alpha: 0.25, H: 4 },
+        why: { en: 'The model says a grant and equal income give the same ΔG. But empirically a $1 grant raises public spending ~40¢ while $1 of income raises it only ~10¢ — "money sticks where it lands". The flypaper effect is a real-world departure the median-voter model can’t explain.',
+               id: 'Model bilang hibah dan pendapatan setara memberi ΔG sama. Tetapi empiris, $1 hibah menaikkan belanja publik ~40¢ sedangkan $1 pendapatan hanya ~10¢ — "uang menempel di tempat jatuhnya".' } }
+    ],
     compute: function (p) {
       var a = p.alpha, H = p.H;
       var b = gridBase(a);
@@ -337,6 +416,20 @@
       { key: 'g', label: { en: 'Real growth g', id: 'Pertumbuhan riil g' }, min: 0, max: 0.1, step: 0.005, value: 0.04, fmt: function (v) { return (v * 100).toFixed(1) + '%'; } },
       { key: 'pb', label: { en: 'Primary balance (% GDP)', id: 'Keseimbangan primer' }, min: -0.03, max: 0.03, step: 0.005, value: 0, fmt: function (v) { return (v * 100).toFixed(1) + '%'; } },
       { key: 'd0', label: { en: 'Starting debt/GDP', id: 'Utang awal/PDB' }, min: 0.2, max: 0.9, step: 0.05, value: 0.4, fmt: function (v) { return (v * 100).toFixed(0) + '%'; } }
+    ],
+    scenarios: [
+      { label: { en: 'Sustainable (g > r)', id: 'Lestari (g > r)' }, set: { r: 0.04, g: 0.06, pb: 0, d0: 0.4 },
+        why: { en: 'When growth beats the interest rate (g > r), the factor (1+r)/(1+g) < 1 pulls the debt ratio DOWN toward a stable level — sustainable even with a balanced primary budget. The economy "grows out of" its debt.',
+               id: 'Saat pertumbuhan > bunga (g > r), faktor (1+r)/(1+g) < 1 menarik rasio utang TURUN ke tingkat stabil — lestari bahkan dengan keseimbangan primer nol. Ekonomi "tumbuh keluar" dari utang.' } },
+      { label: { en: 'Snowball (r > g)', id: 'Bola salju (r > g)' }, set: { r: 0.07, g: 0.03, pb: 0, d0: 0.4 },
+        why: { en: 'When r > g the ratio rises every year — the "snowball": interest compounds faster than the economy grows, so debt drifts up through the 60% rule even with no new primary deficit. A primary surplus is needed to stop it.',
+               id: 'Saat r > g rasio naik tiap tahun — "bola salju": bunga berbunga lebih cepat dari pertumbuhan, jadi utang menembus aturan 60% walau tanpa defisit primer baru. Perlu surplus primer.' } },
+      { label: { en: 'Surplus rescue', id: 'Penyelamatan surplus' }, set: { r: 0.07, g: 0.03, pb: 0.03, d0: 0.6 },
+        why: { en: 'Even with r > g, running a primary SURPLUS offsets the snowball: each year’s surplus pays down enough debt to bend the path back down. This is the textbook consolidation Indonesia did after 2020–21.',
+               id: 'Bahkan dengan r > g, menjalankan SURPLUS primer mengimbangi bola salju: surplus tiap tahun melunasi cukup utang untuk membelokkan lintasan turun. Inilah konsolidasi pasca 2020–21.' } },
+      { label: { en: 'Deficit + r > g', id: 'Defisit + r > g' }, set: { r: 0.06, g: 0.04, pb: -0.02, d0: 0.5 },
+        why: { en: 'A primary DEFICIT on top of r > g is the worst case: the snowball and new borrowing reinforce each other, so debt climbs fastest. This is the danger zone fiscal rules are designed to prevent.',
+               id: 'DEFISIT primer di atas r > g adalah kasus terburuk: bola salju dan utang baru saling memperkuat, jadi utang naik tercepat. Inilah zona bahaya yang dicegah aturan fiskal.' } }
     ],
     compute: function (p) {
       var r = p.r, g = p.g, pb = p.pb, d = p.d0, N = 30;

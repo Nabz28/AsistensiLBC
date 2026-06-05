@@ -68,8 +68,18 @@
 .fl-note{
   font:400 11px/1.5 var(--sans,Inter,system-ui);color:var(--ink-3,#7c8aa0);
   background:var(--accent-soft,#e9f6f1);border-radius:9px;padding:8px 10px;margin-top:2px;
+  transition:background .15s ease;
 }
 .fl-note b{color:var(--ink-2,#41506a);font-weight:600}
+/* active-scenario explanation: a distinct "why this happens" callout */
+.fl-note.fl-why{
+  background:#fff7ed;color:var(--ink-2,#41506a);
+  border-left:3px solid var(--fl-accent,#b3541e);
+}
+.fl-note.fl-why .fl-why-h{
+  display:block;color:var(--fl-accent,#b3541e);font-weight:700;margin-bottom:3px;
+  font-size:10.5px;letter-spacing:.01em;
+}
 .fl-missing{font:500 12px var(--sans,Inter);color:#b4232a;padding:12px}
 
 @media(max-width:720px){

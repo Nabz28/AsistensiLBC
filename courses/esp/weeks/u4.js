@@ -45,6 +45,12 @@
               '<li><b>Asymmetric information / supplier-induced demand</b>: doctors are both advisor and seller; patients cannot judge necessity → over-treatment.</li>' +
               '<li><b>Merit good & equity</b>: health is something people <i>ought</i> to access regardless of ability to pay (commodity egalitarianism, paternalism).</li></ul>' +
               '<p>Cost inflation drivers (Gruber): aging population, income growth, quality improvements, commodity egalitarianism. The US spent ~17.9% of GDP on health (2010).</p>' },
+          { title: { en: 'Do we want “efficient” provision? The catches', id: 'Apakah kita mau penyediaan “efisien”?' },
+            html: '<p>Even setting market failures aside, three points complicate the "just be efficient" answer:</p>' +
+              '<ul><li><b>Flat-of-the-curve medicine</b>: at high spending levels the marginal health benefit of extra care is near <b>zero</b> — exactly the region full insurance pushes patients into (the moral-hazard triangle in the Graphs tab).</li>' +
+              '<li><b>Elasticity of demand for care</b>: the SIZE of moral hazard depends on how price-sensitive demand is — large for discretionary care, small for emergencies. This is why cost-sharing is targeted at elastic services.</li>' +
+              '<li><b>The uninsured & paternalism</b>: who are the uninsured, and does insurance actually improve health? If health decisions are too complex for individuals (paternalism), efficient private provision may still be the wrong social goal.</li></ul>' +
+              '<div class="tip">📝 <b>Risk pooling</b>: with a small pool, one big claim swamps premiums; with a large pool the <span class="key">law of large numbers</span> makes average cost predictable, so premiums fall — a core reason for broad, even universal, coverage.</div>' },
           { title: { en: 'Three intervention models', id: 'Tiga model intervensi' },
             html: '<table><thead><tr><th>Model</th><th>Mechanism</th><th>Example</th></tr></thead><tbody>' +
               '<tr><td><b>Beveridge</b> (direct provision)</td><td>State owns hospitals, employs staff, funds from progressive tax; free at point of service.</td><td>UK (NHS), Cuba</td></tr>' +
