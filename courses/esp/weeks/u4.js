@@ -12,52 +12,82 @@
         heading: { en: 'Why we buy insurance', id: 'Mengapa kita beli asuransi' }, num: '1',
         cards: [
           { title: { en: 'Expected value vs risk smoothing', id: 'Nilai harapan vs pemulusan risiko' },
-            html: '<p>An insurance premium buys compensation if a bad event happens. People buy insurance for two reasons:</p>' +
+            html: { en: '<p>An insurance premium buys compensation if a bad event happens. People buy insurance for two reasons:</p>' +
               '<ol><li><b>Expected value</b> of the payout: $EV = \\sum_i p_i \\times \\text{payout}_i$.</li>' +
               '<li><b>Risk smoothing</b>: paying money to <b>guarantee</b> a certain level of consumption if the adverse event occurs.</li></ol>' +
-              '<p>Two options with the <i>same</i> expected income are not equally good: a risk-averse person prefers the <b>certain</b> one. That preference is driven by <span class="key">diminishing marginal utility</span> of income — utility is concave.</p>' },
+              '<p>Two options with the <i>same</i> expected income are not equally good: a risk-averse person prefers the <b>certain</b> one. That preference is driven by <span class="key">diminishing marginal utility</span> of income — utility is concave.</p>',
+              id: '<p>Premi asuransi membeli kompensasi jika peristiwa buruk terjadi. Orang membeli asuransi karena dua alasan:</p>' +
+              '<ol><li><b>Nilai harapan</b> dari pembayaran: $EV = \\sum_i p_i \\times \\text{payout}_i$.</li>' +
+              '<li><b>Pemulusan risiko</b>: membayar uang untuk <b>menjamin</b> tingkat konsumsi tertentu jika peristiwa merugikan terjadi.</li></ol>' +
+              '<p>Dua opsi dengan pendapatan harapan yang <i>sama</i> tidak sama baiknya: orang yang risk-averse memilih yang <b>pasti</b>. Preferensi itu didorong oleh <span class="key">utilitas marginal yang menurun</span> dari pendapatan — utilitas bersifat cekung.</p>' } },
           { title: { en: 'Actuarially fair premium, risk aversion & loading', id: 'Premi adil-aktuaria, risk aversion & loading' },
-            html: '<ul><li><span class="key">Actuarially fair</span> premium = expected payout.</li>' +
+            html: { en: '<ul><li><span class="key">Actuarially fair</span> premium = expected payout.</li>' +
               '<li><span class="key">Risk aversion</span>: willingness to pay <i>more</i> than fair — a <span class="key">risk premium</span> — to guarantee compensation.</li>' +
               '<li><span class="key">Loading fee</span> = premium charged − actuarially fair premium (ratio ≈ 1.20 for private insurers).</li></ul>' +
               '<p><span class="key">Risk pooling</span>: pooling many independent risks lowers variance (law of large numbers), so premiums fall in a large population.</p>' +
-              '<div class="tip">📝 Because utility is concave, $U(E[W]) > E[U(W)]$ — the certainty equivalent is below expected income, and the gap is what a person will pay to insure. See the Graphs tab.</div>' }
+              '<div class="tip">📝 Because utility is concave, $U(E[W]) > E[U(W)]$ — the certainty equivalent is below expected income, and the gap is what a person will pay to insure. See the Graphs tab.</div>',
+              id: '<ul><li>Premi <span class="key">adil-aktuaria</span> = pembayaran yang diharapkan.</li>' +
+              '<li><span class="key">Risk aversion</span>: kesediaan membayar <i>lebih</i> dari yang adil — sebuah <span class="key">premi risiko</span> — untuk menjamin kompensasi.</li>' +
+              '<li><span class="key">Biaya loading</span> = premi yang dikenakan − premi adil-aktuaria (rasio ≈ 1,20 untuk asuransi swasta).</li></ul>' +
+              '<p><span class="key">Risk pooling</span>: menggabungkan banyak risiko independen menurunkan varians (hukum bilangan besar), sehingga premi turun pada populasi besar.</p>' +
+              '<div class="tip">📝 Karena utilitas cekung, $U(E[W]) > E[U(W)]$ — ekuivalen kepastian berada di bawah pendapatan harapan, dan selisihnya adalah yang akan dibayar seseorang untuk berasuransi. Lihat tab Grafik.</div>' } }
         ]
       },
       {
         heading: { en: 'Why the health market fails', id: 'Mengapa pasar kesehatan gagal' }, num: '2',
         cards: [
           { title: { en: 'Adverse selection & the death spiral', id: 'Adverse selection & death spiral' },
-            html: '<p><span class="key">Asymmetric information</span>: the individual knows her own risk, the insurer does not. Charging everyone the same premium attracts the <b>high-risk</b> and repels the <b>low-risk</b> → <span class="key">adverse selection</span>.</p>' +
+            html: { en: '<p><span class="key">Asymmetric information</span>: the individual knows her own risk, the insurer does not. Charging everyone the same premium attracts the <b>high-risk</b> and repels the <b>low-risk</b> → <span class="key">adverse selection</span>.</p>' +
               '<p>The <b>death spiral</b>: high-risk pool → premiums rise → healthier people drop out → pool gets sicker → premiums rise again → market thins or collapses. (Same logic kills the private annuity market — Unit 5.)</p>' +
-              '<div class="note">💡 Counterforce: if risk-averse people are also healthier, <b>advantageous selection</b> can partly offset adverse selection. Insurers also use <b>experience rating</b> (price by risk) vs <b>community rating</b> (one price) — an equity/efficiency trade-off.</div>' },
+              '<div class="note">💡 Counterforce: if risk-averse people are also healthier, <b>advantageous selection</b> can partly offset adverse selection. Insurers also use <b>experience rating</b> (price by risk) vs <b>community rating</b> (one price) — an equity/efficiency trade-off.</div>',
+              id: '<p><span class="key">Informasi asimetris</span>: individu mengetahui risikonya sendiri, perusahaan asuransi tidak. Mengenakan premi yang sama kepada semua orang menarik yang <b>berisiko tinggi</b> dan menolak yang <b>berisiko rendah</b> → <span class="key">adverse selection</span>.</p>' +
+              '<p><b>Death spiral</b>: pool berisiko tinggi → premi naik → orang yang lebih sehat keluar → pool makin sakit → premi naik lagi → pasar menipis atau kolaps. (Logika yang sama mematikan pasar anuitas swasta — Unit 5.)</p>' +
+              '<div class="note">💡 Gaya penyeimbang: jika orang yang risk-averse juga lebih sehat, <b>advantageous selection</b> dapat sebagian mengimbangi adverse selection. Asuransi juga memakai <b>experience rating</b> (harga menurut risiko) vs <b>community rating</b> (satu harga) — sebuah trade-off ekuitas/efisiensi.</div>' } },
           { title: { en: 'Moral hazard', id: 'Moral hazard' },
-            html: '<p><span class="key">Moral hazard</span>: once insured, the out-of-pocket price of care drops toward zero, so people consume <b>more</b> care (and take less care of their health). Every third-party payment system creates it.</p>' +
+            html: { en: '<p><span class="key">Moral hazard</span>: once insured, the out-of-pocket price of care drops toward zero, so people consume <b>more</b> care (and take less care of their health). Every third-party payment system creates it.</p>' +
               '<p>Tools to curb it: <span class="key">deductible</span> (pay first $X yourself), <span class="key">co-payment</span> (fixed fee per service), <span class="key">co-insurance</span> (pay a % of the cost).</p>' +
-              '<div class="tip">📝 The extra care induced by low prices is worth <i>less</i> than its cost — that triangle is the deadweight loss of insurance. See the Graphs tab.</div>' }
+              '<div class="tip">📝 The extra care induced by low prices is worth <i>less</i> than its cost — that triangle is the deadweight loss of insurance. See the Graphs tab.</div>',
+              id: '<p><span class="key">Moral hazard</span>: setelah berasuransi, harga layanan yang ditanggung sendiri turun mendekati nol, sehingga orang mengonsumsi layanan <b>lebih banyak</b> (dan kurang menjaga kesehatannya). Setiap sistem pembayaran pihak ketiga menciptakannya.</p>' +
+              '<p>Alat untuk menekannya: <span class="key">deductible</span> (bayar $X pertama sendiri), <span class="key">co-payment</span> (biaya tetap per layanan), <span class="key">co-insurance</span> (bayar % dari biaya).</p>' +
+              '<div class="tip">📝 Layanan ekstra yang dipicu harga rendah bernilai <i>kurang</i> dari biayanya — segitiga itu adalah deadweight loss asuransi. Lihat tab Grafik.</div>' } }
         ]
       },
       {
         heading: { en: 'Other failures & the case for intervention', id: 'Kegagalan lain & alasan intervensi' }, num: '3',
         cards: [
           { title: { en: 'Externalities, information, merit good', id: 'Eksternalitas, informasi, merit good' },
-            html: '<ul><li><b>Externalities</b>: vaccination & treating infectious disease protect others (positive) → private market under-provides prevention; untreated illness drains productivity (negative).</li>' +
+            html: { en: '<ul><li><b>Externalities</b>: vaccination & treating infectious disease protect others (positive) → private market under-provides prevention; untreated illness drains productivity (negative).</li>' +
               '<li><b>Asymmetric information / supplier-induced demand</b>: doctors are both advisor and seller; patients cannot judge necessity → over-treatment.</li>' +
               '<li><b>Merit good & equity</b>: health is something people <i>ought</i> to access regardless of ability to pay (commodity egalitarianism, paternalism).</li></ul>' +
-              '<p>Cost inflation drivers (Gruber): aging population, income growth, quality improvements, commodity egalitarianism. The US spent ~17.9% of GDP on health (2010).</p>' },
+              '<p>Cost inflation drivers (Gruber): aging population, income growth, quality improvements, commodity egalitarianism. The US spent ~17.9% of GDP on health (2010).</p>',
+              id: '<ul><li><b>Eksternalitas</b>: vaksinasi & pengobatan penyakit menular melindungi orang lain (positif) → pasar swasta kurang menyediakan pencegahan; penyakit yang tak diobati menggerus produktivitas (negatif).</li>' +
+              '<li><b>Informasi asimetris / supplier-induced demand</b>: dokter sekaligus penasihat dan penjual; pasien tak bisa menilai kebutuhan → pengobatan berlebihan.</li>' +
+              '<li><b>Merit good & ekuitas</b>: kesehatan adalah sesuatu yang <i>seharusnya</i> diakses orang tanpa memandang kemampuan membayar (commodity egalitarianism, paternalisme).</li></ul>' +
+              '<p>Pendorong inflasi biaya (Gruber): populasi menua, pertumbuhan pendapatan, peningkatan kualitas, commodity egalitarianism. AS membelanjakan ~17.9% PDB untuk kesehatan (2010).</p>' } },
           { title: { en: 'Do we want “efficient” provision? The catches', id: 'Apakah kita mau penyediaan “efisien”?' },
-            html: '<p>Even setting market failures aside, three points complicate the "just be efficient" answer:</p>' +
+            html: { en: '<p>Even setting market failures aside, three points complicate the "just be efficient" answer:</p>' +
               '<ul><li><b>Flat-of-the-curve medicine</b>: at high spending levels the marginal health benefit of extra care is near <b>zero</b> — exactly the region full insurance pushes patients into (the moral-hazard triangle in the Graphs tab).</li>' +
               '<li><b>Elasticity of demand for care</b>: the SIZE of moral hazard depends on how price-sensitive demand is — large for discretionary care, small for emergencies. This is why cost-sharing is targeted at elastic services.</li>' +
               '<li><b>The uninsured & paternalism</b>: who are the uninsured, and does insurance actually improve health? If health decisions are too complex for individuals (paternalism), efficient private provision may still be the wrong social goal.</li></ul>' +
-              '<div class="tip">📝 <b>Risk pooling</b>: with a small pool, one big claim swamps premiums; with a large pool the <span class="key">law of large numbers</span> makes average cost predictable, so premiums fall — a core reason for broad, even universal, coverage.</div>' },
+              '<div class="tip">📝 <b>Risk pooling</b>: with a small pool, one big claim swamps premiums; with a large pool the <span class="key">law of large numbers</span> makes average cost predictable, so premiums fall — a core reason for broad, even universal, coverage.</div>',
+              id: '<p>Bahkan dengan mengesampingkan kegagalan pasar, tiga poin mempersulit jawaban "cukup jadi efisien":</p>' +
+              '<ul><li><b>Flat-of-the-curve medicine</b>: pada tingkat belanja tinggi, manfaat kesehatan marginal dari layanan ekstra mendekati <b>nol</b> — persis wilayah yang didorong oleh asuransi penuh kepada pasien (segitiga moral hazard di tab Grafik).</li>' +
+              '<li><b>Elastisitas permintaan layanan</b>: BESARNYA moral hazard bergantung pada seberapa sensitif permintaan terhadap harga — besar untuk layanan diskresioner, kecil untuk keadaan darurat. Inilah mengapa cost-sharing diarahkan ke layanan yang elastis.</li>' +
+              '<li><b>Yang tak berasuransi & paternalisme</b>: siapa yang tak berasuransi, dan apakah asuransi benar-benar meningkatkan kesehatan? Jika keputusan kesehatan terlalu rumit bagi individu (paternalisme), penyediaan swasta yang efisien pun masih bisa menjadi tujuan sosial yang salah.</li></ul>' +
+              '<div class="tip">📝 <b>Risk pooling</b>: dengan pool kecil, satu klaim besar menenggelamkan premi; dengan pool besar, <span class="key">hukum bilangan besar</span> membuat biaya rata-rata dapat diprediksi, sehingga premi turun — alasan inti untuk cakupan yang luas, bahkan universal.</div>' } },
           { title: { en: 'Three intervention models', id: 'Tiga model intervensi' },
-            html: '<table><thead><tr><th>Model</th><th>Mechanism</th><th>Example</th></tr></thead><tbody>' +
+            html: { en: '<table><thead><tr><th>Model</th><th>Mechanism</th><th>Example</th></tr></thead><tbody>' +
               '<tr><td><b>Beveridge</b> (direct provision)</td><td>State owns hospitals, employs staff, funds from progressive tax; free at point of service.</td><td>UK (NHS), Cuba</td></tr>' +
               '<tr><td><b>Bismarck</b> (social insurance)</td><td>Mandatory payroll-deducted social-insurance funds, jointly managed; state subsidises those who can’t pay.</td><td>Germany, <b>Indonesia (BPJS/JKN)</b></td></tr>' +
               '<tr><td><b>Regulated private + subsidies</b></td><td>Private insurers/providers, heavy regulation + targeted public programs.</td><td>US (Medicare/Medicaid)</td></tr>' +
               '</tbody></table>' +
-              '<div class="note">💡 Demand-side tool: <b>Conditional Cash Transfers (CCTs)</b> — cash to poor households conditional on school attendance and clinic visits — fight current poverty <i>and</i> break its intergenerational transmission by forcing human-capital investment.</div>' }
+              '<div class="note">💡 Demand-side tool: <b>Conditional Cash Transfers (CCTs)</b> — cash to poor households conditional on school attendance and clinic visits — fight current poverty <i>and</i> break its intergenerational transmission by forcing human-capital investment.</div>',
+              id: '<table><thead><tr><th>Model</th><th>Mekanisme</th><th>Contoh</th></tr></thead><tbody>' +
+              '<tr><td><b>Beveridge</b> (penyediaan langsung)</td><td>Negara memiliki rumah sakit, mempekerjakan staf, dibiayai dari pajak progresif; gratis di titik layanan.</td><td>UK (NHS), Kuba</td></tr>' +
+              '<tr><td><b>Bismarck</b> (asuransi sosial)</td><td>Dana asuransi sosial wajib yang dipotong dari gaji, dikelola bersama; negara mensubsidi yang tak mampu membayar.</td><td>Jerman, <b>Indonesia (BPJS/JKN)</b></td></tr>' +
+              '<tr><td><b>Swasta teregulasi + subsidi</b></td><td>Asuransi/penyedia swasta, regulasi ketat + program publik tertarget.</td><td>US (Medicare/Medicaid)</td></tr>' +
+              '</tbody></table>' +
+              '<div class="note">💡 Alat sisi permintaan: <b>Conditional Cash Transfers (CCT)</b> — uang tunai untuk rumah tangga miskin dengan syarat kehadiran sekolah dan kunjungan klinik — melawan kemiskinan saat ini <i>dan</i> memutus transmisi antargenerasinya dengan memaksa investasi modal manusia.</div>' } }
         ]
       }
     ],
@@ -65,25 +95,33 @@
     formulas: [
       { cards: [
         { title: { en: 'Expected value of a gamble', id: 'Nilai harapan' },
-          html: '<div class="formula">$$ EV = \\sum_i p_i \\cdot \\text{payout}_i $$</div><p>e.g. $\\tfrac14(\\$12)+\\tfrac34(-\\$4)=\\$0$.</p>' },
+          html: { en: '<div class="formula">$$ EV = \\sum_i p_i \\cdot \\text{payout}_i $$</div><p>e.g. $\\tfrac14(\\$12)+\\tfrac34(-\\$4)=\\$0$.</p>',
+            id: '<div class="formula">$$ EV = \\sum_i p_i \\cdot \\text{payout}_i $$</div><p>mis. $\\tfrac14(\\$12)+\\tfrac34(-\\$4)=\\$0$.</p>' } },
         { title: { en: 'Risk premium & certainty equivalent', id: 'Premi risiko & ekuivalen kepastian' },
-          html: '<div class="formula">$$ E[U] = (1-p)\\,U(W_h) + p\\,U(W_s), \\qquad U(CE) = E[U] $$</div>' +
-            '<div class="formula">$$ \\text{Risk premium} = E[W] - CE > 0 \\ \\text{(concave } U) $$</div>' },
+          html: { en: '<div class="formula">$$ E[U] = (1-p)\\,U(W_h) + p\\,U(W_s), \\qquad U(CE) = E[U] $$</div>' +
+            '<div class="formula">$$ \\text{Risk premium} = E[W] - CE > 0 \\ \\text{(concave } U) $$</div>',
+            id: '<div class="formula">$$ E[U] = (1-p)\\,U(W_h) + p\\,U(W_s), \\qquad U(CE) = E[U] $$</div>' +
+            '<div class="formula">$$ \\text{Risk premium} = E[W] - CE > 0 \\ \\text{(concave } U) $$</div>' } },
         { title: { en: 'Actuarially fair premium & loading', id: 'Premi adil & loading' },
-          html: '<div class="formula">$$ \\text{Fair premium} = \\text{expected payout}, \\qquad \\text{Loading} = \\text{premium} - \\text{fair premium} $$</div>' },
+          html: { en: '<div class="formula">$$ \\text{Fair premium} = \\text{expected payout}, \\qquad \\text{Loading} = \\text{premium} - \\text{fair premium} $$</div>',
+            id: '<div class="formula">$$ \\text{Fair premium} = \\text{expected payout}, \\qquad \\text{Loading} = \\text{premium} - \\text{fair premium} $$</div>' } },
         { title: { en: 'Deadweight loss of insurance', id: 'DWL asuransi' },
-          html: '<div class="formula">$$ DWL = \\tfrac12\\,(P_0 - c\\,P_0)\\,(M_1 - M_0) $$</div>' +
-            '<p>$c$ = coinsurance (patient’s price share). Lower $c$ → bigger over-consumption $M_1-M_0$ → bigger DWL.</p>' }
+          html: { en: '<div class="formula">$$ DWL = \\tfrac12\\,(P_0 - c\\,P_0)\\,(M_1 - M_0) $$</div>' +
+            '<p>$c$ = coinsurance (patient’s price share). Lower $c$ → bigger over-consumption $M_1-M_0$ → bigger DWL.</p>',
+            id: '<div class="formula">$$ DWL = \\tfrac12\\,(P_0 - c\\,P_0)\\,(M_1 - M_0) $$</div>' +
+            '<p>$c$ = koasuransi (bagian harga yang ditanggung pasien). $c$ lebih rendah → over-consumption $M_1-M_0$ lebih besar → DWL lebih besar.</p>' } }
       ] }
     ],
 
     graphs: [
       { cards: [
         { title: { en: 'Why buy insurance: concave utility', id: 'Mengapa beli asuransi: utilitas cekung' },
-          html: '<p>Drag the curvature (risk aversion) and the loss. Because utility is concave, the expected utility of the gamble (on the chord) sits below the utility of the same income for certain — the gap between expected income and the certainty equivalent is the <b>risk premium</b> a person will pay to insure.</p>',
+          html: { en: '<p>Drag the curvature (risk aversion) and the loss. Because utility is concave, the expected utility of the gamble (on the chord) sits below the utility of the same income for certain — the gap between expected income and the certainty equivalent is the <b>risk premium</b> a person will pay to insure.</p>',
+            id: '<p>Geser kelengkungan (risk aversion) dan kerugiannya. Karena utilitas cekung, utilitas harapan dari judi (pada tali busur) berada di bawah utilitas dari pendapatan yang sama secara pasti — selisih antara pendapatan harapan dan ekuivalen kepastian adalah <b>premi risiko</b> yang akan dibayar seseorang untuk berasuransi.</p>' },
           chartId: 'risk-utility' },
         { title: { en: 'Moral hazard & the deadweight loss', id: 'Moral hazard & DWL' },
-          html: '<p>Insurance drops the price the patient faces from P₀ to c·P₀, so quantity jumps from M₀ to M₁. The units between M₀ and M₁ are valued (on the demand curve) at less than their P₀ cost — the shaded triangle is the deadweight loss. Set coinsurance to 100% (no insurance) and it vanishes; to 0% (full cover) and it is largest.</p>',
+          html: { en: '<p>Insurance drops the price the patient faces from P₀ to c·P₀, so quantity jumps from M₀ to M₁. The units between M₀ and M₁ are valued (on the demand curve) at less than their P₀ cost — the shaded triangle is the deadweight loss. Set coinsurance to 100% (no insurance) and it vanishes; to 0% (full cover) and it is largest.</p>',
+            id: '<p>Asuransi menurunkan harga yang dihadapi pasien dari P₀ ke c·P₀, sehingga kuantitas melonjak dari M₀ ke M₁. Unit antara M₀ dan M₁ dinilai (pada kurva permintaan) lebih rendah daripada biaya P₀-nya — segitiga yang diarsir adalah deadweight loss. Setel koasuransi ke 100% (tanpa asuransi) dan ia lenyap; ke 0% (tanggungan penuh) dan ia terbesar.</p>' },
           chartId: 'moral-hazard' }
       ] }
     ],
