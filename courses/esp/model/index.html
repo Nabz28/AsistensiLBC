@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ESP — Interactive Graph Lab</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#b3541e;--accent-soft:#fbeee4;
+    --ink:#16202e;--ink-2:#41506a;--ink-3:#7c8aa0;--line:#e7e8e3;--line-2:#d8dad3;
+    --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono',Consolas,ui-monospace,monospace;--paper-2:#faf8f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--paper-2);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:30px 22px 80px}
+  .hero{margin:6px 0 26px}
+  .eyebrow{font:700 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  h1{font:800 30px/1.1 var(--sans);letter-spacing:-.02em;margin-bottom:10px}
+  .sub{font:400 15px/1.6 var(--sans);color:var(--ink-2);max-width:62ch}
+  .langtog{display:inline-flex;gap:2px;margin-top:16px;border:1px solid var(--line-2);border-radius:999px;padding:3px;background:#fff}
+  .langbtn{font:600 11px/1 var(--sans);padding:6px 13px;border-radius:999px;border:0;background:transparent;color:var(--ink-3);cursor:pointer}
+  .langbtn.active{background:var(--accent);color:#fff}
+  .grp{margin-top:34px}
+  .grp-h{font:700 12px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+    border-bottom:1px solid var(--line);padding-bottom:9px;margin-bottom:16px}
+  .fig{margin-bottom:24px}
+  .fig-cap{font:500 12.5px/1.5 var(--sans);color:var(--ink-2);margin:8px 2px 0}
+  .fig-cap b{color:var(--ink);font-weight:700}
+  .toc{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+  .toc a{font:600 11.5px/1 var(--sans);text-decoration:none;color:var(--ink-2);background:#fff;
+    border:1px solid var(--line-2);border-radius:999px;padding:7px 12px;transition:all .14s}
+  .toc a:hover{border-color:var(--accent);color:var(--accent)}
+  body.embed .hero .eyebrow,body.embed .hero h1,body.embed .toc{display:none}
+  body.embed .wrap{padding-top:18px}
+  .foot{margin-top:48px;font:400 12px/1.6 var(--sans);color:var(--ink-3);border-top:1px solid var(--line);padding-top:16px}
+</style>
+<link rel="stylesheet" href="../../../engine/figlab.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">ESP · Public Sector Economics</div>
+    <h1 data-i18n="title">Interactive Graph Lab</h1>
+    <p class="sub" data-i18n="sub">Every diagram is computed from its equations — drag a slider and the equilibrium, tangency or kink moves to the exact solved point. Use the scenario chips to jump between cases.</p>
+    <div class="langtog"><button class="langbtn active" data-lang="en">EN</button><button class="langbtn" data-lang="id">ID</button></div>
+    <div class="toc" id="toc"></div>
+  </div>
+  <div id="figs"></div>
+  <div class="foot" data-i18n="foot">LBC Learning · ESP. Diagrams rendered by FigLab — correct by construction, verified by a numeric geometry test.</div>
+</div>
+
+<script src="../../../engine/figlab.js"></script>
+<script src="../figures.js"></script>
+<script src="../figures2.js"></script>
+<script>
+(function(){
+  'use strict';
+  var I18N={
+    en:{title:'Interactive Graph Lab',sub:'Every diagram is computed from its equations — drag a slider and the equilibrium, tangency or kink moves to the exact solved point. Use the scenario chips to jump between cases.',foot:'LBC Learning · ESP. Diagrams rendered by FigLab — correct by construction, verified by a numeric geometry test.'},
+    id:{title:'Lab Grafik Interaktif',sub:'Setiap diagram dihitung dari persamaannya — geser slider dan keseimbangan, singgung, atau kelok berpindah ke titik solusi yang tepat. Gunakan chip skenario untuk berpindah kasus.',foot:'LBC Learning · ESP. Diagram dirender oleh FigLab — benar secara konstruksi, diverifikasi uji geometri numerik.'}
+  };
+  var GROUPS=[
+    {h:{en:'Taxation & revenue',id:'Perpajakan & penerimaan'},figs:['tax-dwl','laffer']},
+    {h:{en:'Property tax incidence',id:'Insidensi pajak properti'},figs:['ptax-land','ptax-struct']},
+    {h:{en:'Health insurance',id:'Asuransi kesehatan'},figs:['moral-hazard','risk-utility']},
+    {h:{en:'Social security & saving',id:'Jaminan sosial & tabungan'},figs:['ss-pia','intertemporal','ss-crowdout']},
+    {h:{en:'Intergovernmental grants',id:'Hibah antarpemerintah'},figs:['grant-open','grant-closed','grant-cond','grant-uncond']},
+    {h:{en:'Fiscal sustainability',id:'Keberlanjutan fiskal'},figs:['debt-dynamics']}
+  ];
+  var params=new URLSearchParams(location.search);
+  if(params.get('embed')==='1')document.body.classList.add('embed');
+
+  function curLang(){try{var s=localStorage.getItem('lbc-lang');if(s==='en'||s==='id')return s;}catch(e){}return 'en';}
+  function txt(v){if(v&&typeof v==='object'){var l=curLang();return v[l]!=null?v[l]:v.en;}return v;}
+
+  function build(){
+    document.documentElement.lang=curLang();
+    var dict=I18N[curLang()]||I18N.en;
+    document.querySelectorAll('[data-i18n]').forEach(function(n){n.textContent=dict[n.getAttribute('data-i18n')];});
+    document.querySelectorAll('.langbtn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-lang')===curLang());});
+    var toc=document.getElementById('toc');toc.innerHTML='';
+    var host=document.getElementById('figs');host.innerHTML='';
+    GROUPS.forEach(function(g,gi){
+      var a=document.createElement('a');a.href='#g'+gi;a.textContent=txt(g.h);toc.appendChild(a);
+      var sec=document.createElement('div');sec.className='grp';sec.id='g'+gi;
+      sec.innerHTML='<div class="grp-h">'+txt(g.h)+'</div>';
+      g.figs.forEach(function(fid){
+        var spec=window.FigLab._reg[fid];if(!spec)return;
+        var fig=document.createElement('div');fig.className='fig';
+        var mountEl=document.createElement('div');
+        fig.appendChild(mountEl);
+        if(spec.note){var cap=document.createElement('div');cap.className='fig-cap';cap.innerHTML=txt(spec.note);fig.appendChild(cap);}
+        sec.appendChild(fig);
+        window.FigLab.mount(mountEl,fid,{});
+      });
+      host.appendChild(sec);
+    });
+  }
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.onclick=function(){try{localStorage.setItem('lbc-lang',b.getAttribute('data-lang'));}catch(e){}build();};
+  });
+  build();
+})();
+</script>
+</body>
+</html>

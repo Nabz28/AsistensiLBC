@@ -1,0 +1,78 @@
+/* ============================================================================
+   FigLab widget styles — interactive, math-exact diagrams (engine/figlab.js)
+   Scoped to .figlab so it can be loaded alongside study.css without collisions.
+   ============================================================================ */
+.figlab{
+  --fl-accent:var(--accent,#0e7c66);
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(190px,1fr);
+  gap:16px;align-items:start;
+  border:1px solid var(--line,#e7e8e3);
+  border-radius:14px;background:#fff;
+  padding:14px 16px;margin:6px 0 2px;
+  box-shadow:0 1px 3px rgba(16,32,46,.05),0 10px 26px rgba(16,32,46,.045);
+}
+.fl-stage{min-width:0}
+.fl-title{
+  font:600 12.5px/1.35 var(--sans,Inter,system-ui);
+  color:var(--ink,#16202e);margin:0 0 6px;letter-spacing:.01em;
+}
+.fl-stage svg{display:block}
+
+.fl-side{display:flex;flex-direction:column;gap:10px;padding-top:2px}
+
+.fl-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2px}
+.fl-chip{
+  font:600 11px/1 var(--sans,Inter,system-ui);
+  padding:6px 10px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line-2,#d8dad3);background:#fafaf8;color:var(--ink-2,#41506a);
+  transition:all .14s ease;
+}
+.fl-chip:hover{border-color:var(--fl-accent);color:var(--fl-accent)}
+.fl-chip.on{background:var(--fl-accent);border-color:var(--fl-accent);color:#fff}
+
+.fl-slider{display:flex;flex-direction:column;gap:3px}
+.fl-slider label{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font:500 11px/1.3 var(--sans,Inter,system-ui);color:var(--ink-2,#41506a);
+}
+.fl-slider label .fl-val{
+  font:600 11.5px/1 var(--mono,'JetBrains Mono',monospace);
+  color:var(--fl-accent);white-space:nowrap;
+}
+.fl-slider input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+  background:linear-gradient(90deg,var(--fl-accent) 0%,#e3e6e2 0%);
+  background:#e3e6e2;outline:none;cursor:pointer;
+}
+.fl-slider input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;
+  background:#fff;border:2px solid var(--fl-accent);cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+}
+.fl-slider input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;background:#fff;border:2px solid var(--fl-accent);
+  cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18);
+}
+
+.fl-readout{
+  display:flex;flex-direction:column;gap:0;margin-top:4px;
+  border-top:1px solid var(--line,#e7e8e3);padding-top:8px;
+}
+.fl-ro{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:3px 0;font:500 11px/1.35 var(--sans,Inter,system-ui);color:var(--ink-3,#7c8aa0);
+}
+.fl-ro b{font:600 12px/1 var(--mono,'JetBrains Mono',monospace);color:var(--ink,#16202e)}
+
+.fl-note{
+  font:400 11px/1.5 var(--sans,Inter,system-ui);color:var(--ink-3,#7c8aa0);
+  background:var(--accent-soft,#e9f6f1);border-radius:9px;padding:8px 10px;margin-top:2px;
+}
+.fl-note b{color:var(--ink-2,#41506a);font-weight:600}
+.fl-missing{font:500 12px var(--sans,Inter);color:#b4232a;padding:12px}
+
+@media(max-width:720px){
+  .figlab{grid-template-columns:1fr}
+  .fl-side{order:2}
+}
