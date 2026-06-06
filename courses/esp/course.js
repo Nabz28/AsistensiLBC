@@ -28,7 +28,8 @@
   // .chart-wrap; we replace that wrapper with the live widget (no engine change).
   var FIG_IDS = ['tax-dwl', 'laffer', 'ptax-land', 'ptax-struct', 'moral-hazard',
     'risk-utility', 'ss-pia', 'intertemporal', 'ss-crowdout', 'grant-open',
-    'grant-closed', 'grant-cond', 'grant-uncond', 'debt-dynamics'];
+    'grant-closed', 'grant-cond', 'grant-uncond', 'debt-dynamics',
+    'welfare-bc', 'inkind-cash'];
   var charts = {};
   FIG_IDS.forEach(function (id) {
     charts[id] = function (canvas) {
@@ -74,6 +75,11 @@
     },
 
     units: order.map(function (k) { return W[k]; }).filter(Boolean),
+
+    exams: (function () {
+      var E = window.ESP_EXAMS || {};
+      return ['2024', '2023'].map(function (y) { return E[y]; }).filter(Boolean);
+    })(),
 
     glossary: (window.ESP_GLOSSARY || []),
 

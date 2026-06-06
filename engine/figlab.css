@@ -86,3 +86,10 @@
   .figlab{grid-template-columns:1fr}
   .fl-side{order:2}
 }
+
+/* static, math-exact diagram embedded inside a worked Past-Exam answer */
+.exam-fig{
+  margin:10px 0;padding:10px;border:1px solid var(--line,#e7e8e3);border-radius:10px;
+  background:#fff;max-width:430px;
+}
+.exam-fig svg{display:block}
