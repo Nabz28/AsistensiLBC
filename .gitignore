@@ -29,3 +29,8 @@ desktop.ini
 /ESDMK/
 /Indonesian Economics/
 /Makro/
+/ESP/
+/CSPD/
+
+# Local scratch (figure-render harness, extracted source text) — never ship.
+_scratch/

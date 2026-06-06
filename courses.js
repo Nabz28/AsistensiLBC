@@ -71,5 +71,18 @@ window.LBC_COURSES = [
       { label: 'Weeks', value: '7' },
       { label: 'Focus', value: 'UAS' }
     ]
+  },
+  {
+    slug: 'esp',
+    code: 'ESP',
+    title: 'Ekonomi Sektor Publik',
+    subtitle: 'APBN & fiscal policy · taxation (PPh/PPN/cukai) · state expenditure · health insurance · social security · fiscal decentralization',
+    faculty: 'UI · FEB',
+    status: 'ready',
+    accent: '#b3541e',
+    meta: [
+      { label: 'Units', value: '6' },
+      { label: 'Focus', value: 'UAS' }
+    ]
   }
 ];
